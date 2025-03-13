@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Создать заявку</title>
+  <link rel="stylesheet" type="text/css" href="add_user.css">
+</head>
+<body>
+  
+  <div class="form-wrap">
+    <div class="profile"><img src="anonim2.png" width="220" height="200">
+      <h1>Регистрация нового пользователя</h1>
+    </div>
+    <form method="post" action="form.php">
+      <div>
+        <label for="name">Имя</label>
+        <input type="text" name="name" required>
+      </div>
+      <div>
+        <label for="name">Фамилия</label>
+        <input type="text" name="lastname" required>
+      </div>
+      <div>
+        <label for="name">Отчество</label>
+        <input type="text" name="surname" required>
+      </div>
+      <div class="radio">
+        <span>Пол</span>
+        <label>
+          <input type="radio" name="sex" value="мужской">мужской
+          <div class="radio-control male"></div>
+        </label>
+        <label>
+          <input type="radio" name="sex" value="женский">женский
+          <div class="radio-control female"></div>
+        </label>
+      </div>
+      <div>
+        <label for="email">E-mail</label>
+        <input type="email" name="email" required>
+      </div>
+      <div>
+        <label for="country">Гражданство</label>
+        <select name="country">
+          <option>Выбери гражданство</option>
+          <option value="Россия">Россия</option> 
+          <option value="Украина">Казахстан</option> 
+          <option value="Беларусь">Беларусь</option> 
+        </select> 
+        <div class="select-arrow"></div> 
+      </div> 
+      <button type="submit">Отправить</button> 
+    </form> 
+  </div>
+</body>
+</html>
