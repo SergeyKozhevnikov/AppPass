@@ -11,7 +11,7 @@
         <div id="user-tools">
             <h3>
                 Беликов А.В.
-                <a href="#">  Профиль</a>
+                <button onclick="btnProfile('1')">Профиль</div>
             </h3>
         </div>
     </header>
@@ -54,9 +54,9 @@
                         <td>паспорт 6304 ...</td>
                         <td>согласование</td>
                         <td>
-                            <a href="#" title="Узнать статус">
-                                <img src="./html/icon-view.svg">
-                            </a>
+                            <button onclick="btnStatus('3')">
+                                <img src="./html/icon-view.svg" title="Узнать статус">
+                            </button>                        
                         </td>
                     </tr>
                     <tr>
@@ -68,14 +68,14 @@
                         <td>паспорт 6305 225001</td>
                         <td>черновик</td>
                         <td>
-                            <a href="#" title="Узнать статус">
-                                <img src="./html/icon-change.svg">
-                            </a>
+                            <button onclick="btnChange('3')">
+                                <img src="./html/icon-change.svg" title="Узнать статус">
+                            </button>
                         </td>
                         <td>
-                            <a href="#" title="Узнать статус">
-                                <img src="./html/icon-delete.svg">
-                            </a>
+                            <button onclick="btnDelete('3')">
+                                <img src="./html/icon-delete.svg" title="Узнать статус">
+                            </button>
                         </td>
                     </tr>
                 </tbody>
@@ -83,5 +83,19 @@
             </table>
         </div>
     </main>
+    <script>
+        function btnProfile(user) {
+            alert(`Профиль пользователя с id = ${user}`)
+        }
+        function btnStatus(passnumber) {
+            alert(`Статус заявки номер = ${passnumber}`)
+        }
+        function btnChange(passnumber) {
+            alert(`Изменить заяку номер ${passnumber}`)
+        }
+        function btnDelete(passnumber) {
+            alert(`Удалить заяку номер = ${passnumber}`)
+        }
+    </script>
 </body>
 </html>

@@ -31,10 +31,10 @@ Profile.hasOne(User, {foreignKey: "profileid"})
 
 const Pass = sequelize.define("passes", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    date: {type: DataTypes.DATE},
+    date: {type: DataTypes.DATEONLY},
     name: {type: DataTypes.STRING(50)},
     docum: {type: DataTypes.STRING(64)},
-    birthday: {type: DataTypes.DATE},
+    birthday: {type: DataTypes.DATEONLY},
     status: {type: DataTypes.STRING(20)},
     car_num: {type: DataTypes.STRING(10)},
     car_model: {type: DataTypes.STRING(20)},
