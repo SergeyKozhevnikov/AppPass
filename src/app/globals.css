@@ -1,6 +1,5 @@
 /* normalize.css + шрифты + tailwind */
-@import url(./vendor/normalize.css);
-@import url(./vendor/fonts/fonts.css);
+@import url(../vendor/fonts/fonts.css);
 @import "tailwindcss";
 
 :root {
