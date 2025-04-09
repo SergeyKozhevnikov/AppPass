@@ -1,6 +1,6 @@
 /* шрифты + tailwind */
-@import url(../vendor/fonts/fonts.css);
-@import "tailwindcss";
+@import url(/public/assets/fonts/fonts.css);
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;

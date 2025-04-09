@@ -1,9 +1,9 @@
-import GuestPassForm from '@/app/user/guest-pass/page';
+// Главная страница - MainPage (Андрей Б)
 
 export default function Home() {
   return (
     <div className="">
-      <GuestPassForm/>
+      <main className="">Главная страница</main>
     </div>
   );
 }
