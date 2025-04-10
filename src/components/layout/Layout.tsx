@@ -10,7 +10,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <Header />
       <div className="layout__wrapper flex flex-1 min-h-screen h-full">
         {showSidebar && <Sidebar />}
-        <main className="layout__main flex-1 min-h-screen h-full">{children}</main>
+        <main style={{ borderColor: "#007EC0" }} className="px-5 py-5 layout__main flex-1 min-h-screen h-full border border-2 m-0.5 rounded">{children}</main>
       </div>
     </div>
   );
