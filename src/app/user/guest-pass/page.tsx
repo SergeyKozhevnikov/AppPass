@@ -237,7 +237,7 @@ export default function GuestPassForm() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid container direction="column" spacing={3}>
                   {/* Блок с фото профиля */}
-                  <Grid item direction="column" size={12} alignSelf="center">
+                    <Grid item xs={12} container direction="column" alignItems="center">
                     <Box sx={{ width: 200, height: 200, bgcolor: '#3b82f6', alignItems: "center"}}>
                       <PersonIcon sx={{ width: 80, height: 80, color: 'white'}} />
                     </Box>
