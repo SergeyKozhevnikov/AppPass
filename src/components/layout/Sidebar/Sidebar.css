@@ -1,6 +1,8 @@
-/* Просто для наглядности */
-.sidebar {
-  width: 180px;
-  height: calc(100vh - 80px);
-  border: 2px solid blue;
+li {
+    list-style-type: none!important;
+}
+
+li a {
+    color: #000;
+    font-size: 16px;
 }
