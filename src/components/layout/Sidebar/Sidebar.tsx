@@ -21,6 +21,9 @@ export function Sidebar() {
         <li>
           <Link className="flex items-center mb-5" href="" title="Мои заявки"><Image className="mr-1" src="/assets/images/first-level-settings.svg" alt="item" width={40} height={40} />Настройки</Link>
         </li>
+        <li>
+          <Link className="flex items-center mb-5" href="/about" title="О программе"><Image className="mr-1" src="/assets/images/about.svg" alt="item" width={40} height={40} />О программе</Link>
+        </li>
       </nav>
     </aside>
   );
