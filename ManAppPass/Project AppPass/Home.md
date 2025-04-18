@@ -25,8 +25,6 @@ https://disk.yandex.ru/i/qknMz13d8sD4PA
 7.Страница "О программе" и "Связь с тех поддержкой"        
 8.Страница для печати согласованной заявки на пропуск.
 
-**Команда**
-
 **Ресурсы** 
 Github - https://github.com/SergeyKozhevnikov/AppPass
 ЁЖКА - https://bun.rt.ru/project/PROPUSKONL/board
@@ -61,6 +59,7 @@ https://marketplace.visualstudio.com/items?itemName=PulkitGangwar.nextjs-snippet
 Базы данных проекта будем хранить в **СУБД PostgreSQL** — это мощная объектно-реляционная система управления базами данных с открытым исходным кодом.
 https://www.postgresql.org/download/
 
+**Проект**
 Для создания проекта мы будем использовать create-react-app - это официально поддерживаемый способ создания одностраничных приложений React без предварительной настройки. 
 Для использования необходимо иметь установленный node.js, компоненты и плагины:
 Node.js — скачать и установить (https://nodejs.org/en/download)
@@ -68,5 +67,9 @@ NestJS - а progressive Node.js frame https://nestjs.com/
 MUI X - плагин (https://mui.com/x/whats-new/)
 Tailwind CSS - плагин (https://tailwindcss.ru/docs/editor-setup/)
 
-
-
+**Инструкции** 
+Obsidian - бесплатное и гибкое приложение для заметок и ваших идей.
+https://obsidian.md/
+### Инструкции
+[[Запуск проекта]]
+[[Начало работы в GIT]]
