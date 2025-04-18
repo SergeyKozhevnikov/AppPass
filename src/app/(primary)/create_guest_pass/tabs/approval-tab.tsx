@@ -8,7 +8,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
   IconButton,
   Paper,
   Table,
@@ -19,11 +18,14 @@ import {
   TableRow,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   KeyboardArrowUp as ArrowUpIcon,
   KeyboardArrowDown as ArrowDownIcon,
   Delete as DeleteIcon,
+  Add as AddIcon,
 } from '@mui/icons-material';
 
 // Интерфейс для согласующего
@@ -42,6 +44,10 @@ export interface ApprovalTabProps {
 export default function ApprovalTab({ approvers, setApprovers }: ApprovalTabProps) {
   // Состояние для модального окна
   const [open, setOpen] = useState(false);
+
+  // Получаем тему и проверяем, является ли устройство мобильным
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Состояние для нового согласующего
   const [newApprover, setNewApprover] = useState({ name: '', position: 'Сотрудник' });
@@ -94,14 +100,22 @@ export default function ApprovalTab({ approvers, setApprovers }: ApprovalTabProp
         Очередь согласования
       </Typography>
       {/* Заголовок секции и кнопка добавления */}
-      <Grid container size={12} spacing={2} sx={{ mb: 3 }}>
-        <Grid size={9} />
-        <Grid size={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
-            Добавить согласующего
-          </Button>
-        </Grid>
-      </Grid>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexDirection: { xs: 'column', sm: 'row' },
+          mb: 3,
+          gap: 2,
+        }}
+      >
+        <Box /> {/* Пустой элемент для выравнивания */}
+        <Button variant="contained" color="primary" onClick={() => setOpen(true)}
+                startIcon={isMobile ? <AddIcon /> : null}
+                sx={{ alignSelf: { xs: 'stretch', sm: 'flex-end' }, whiteSpace: 'nowrap', px: { xs: 2, sm: 3 } }}>Добавить
+          согласующего</Button>
+      </Box>
 
       {/* Проверяем, пуст ли список согласующих */}
       {approvers.length === 0 ? (
@@ -122,38 +136,104 @@ export default function ApprovalTab({ approvers, setApprovers }: ApprovalTabProp
           </Typography>
         </Box>
       ) : (
-        <TableContainer component={Paper} sx={{ mb: 4, borderRadius: 1 }}>
-          <Table>
+        <TableContainer
+          component={Paper}
+          sx={{
+            mb: 4,
+            borderRadius: 1,
+            width: '100%',
+          }}
+        >
+          <Table size={isMobile ? 'small' : 'medium'}>
             <TableHead sx={{ bgcolor: '#f5f5f5' }}>
               <TableRow>
-                <TableCell sx={{ width: '10%', fontWeight: 'bold', color: '#757575' }}>№</TableCell>
-                <TableCell sx={{ width: '45%', fontWeight: 'bold', color: '#757575' }}>ФИО</TableCell>
-                <TableCell sx={{ width: '30%', fontWeight: 'bold', color: '#757575' }}>ДОЛЖНОСТЬ</TableCell>
-                <TableCell sx={{ width: '15%', fontWeight: 'bold', color: '#757575' }}>ДЕЙСТВИЯ</TableCell>
+                <TableCell
+                  sx={{
+                    width: isMobile ? '10%' : '10%',
+                    fontWeight: 'bold',
+                    color: '#757575',
+                    padding: isMobile ? 1 : 2,
+                  }}
+                >
+                  №
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: isMobile ? '40%' : '45%',
+                    fontWeight: 'bold',
+                    color: '#757575',
+                    padding: isMobile ? 1 : 2,
+                  }}
+                >
+                  ФИО
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: isMobile ? '25%' : '30%',
+                    fontWeight: 'bold',
+                    color: '#757575',
+                    padding: isMobile ? 1 : 2,
+                  }}
+                >
+                  ДОЛЖНОСТЬ
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: isMobile ? '25%' : '15%',
+                    fontWeight: 'bold',
+                    color: '#757575',
+                    padding: isMobile ? 1 : 2,
+                  }}
+                >
+                  ДЕЙСТВИЯ
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {approvers.map((approver, index) => (
                 <TableRow key={approver.id}>
-                  <TableCell sx={{ borderBottom: index === approvers.length - 1 ? 0 : undefined }}>
+                  <TableCell
+                    sx={{
+                      borderBottom: index === approvers.length - 1 ? 0 : undefined,
+                      padding: isMobile ? 1 : 2,
+                    }}
+                  >
                     {index + 1}
                   </TableCell>
-                  <TableCell sx={{ borderBottom: index === approvers.length - 1 ? 0 : undefined }}>
+                  <TableCell
+                    sx={{
+                      borderBottom: index === approvers.length - 1 ? 0 : undefined,
+                      wordBreak: 'break-word',
+                      padding: isMobile ? 1 : 2,
+                    }}
+                  >
                     {approver.name}
                   </TableCell>
-                  <TableCell sx={{ borderBottom: index === approvers.length - 1 ? 0 : undefined }}>
+                  <TableCell
+                    sx={{
+                      borderBottom: index === approvers.length - 1 ? 0 : undefined,
+                      wordBreak: 'break-word',
+                      padding: isMobile ? 1 : 2,
+                    }}
+                  >
                     {approver.position}
                   </TableCell>
-                  <TableCell sx={{ borderBottom: index === approvers.length - 1 ? 0 : undefined }}>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                  <TableCell
+                    sx={{
+                      borderBottom: index === approvers.length - 1 ? 0 : undefined,
+                      padding: isMobile ? 1 : 2,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', gap: isMobile ? 0 : 1 }}>
                       {/* Кнопка перемещения вверх */}
                       <IconButton
                         size="small"
                         onClick={() => handleMoveUp(index)}
                         disabled={index === 0}
                         color="default"
+                        sx={{ padding: isMobile ? 0.5 : 1 }}
                       >
-                        <ArrowUpIcon fontSize="small" />
+                        <ArrowUpIcon fontSize={isMobile ? 'small' : 'medium'} />
                       </IconButton>
                       {/* Кнопка перемещения вниз */}
                       <IconButton
@@ -161,12 +241,18 @@ export default function ApprovalTab({ approvers, setApprovers }: ApprovalTabProp
                         onClick={() => handleMoveDown(index)}
                         disabled={index === approvers.length - 1}
                         color="default"
+                        sx={{ padding: isMobile ? 0.5 : 1 }}
                       >
-                        <ArrowDownIcon fontSize="small" />
+                        <ArrowDownIcon fontSize={isMobile ? 'small' : 'medium'} />
                       </IconButton>
                       {/* Кнопка удаления */}
-                      <IconButton size="small" onClick={() => handleDeleteApprover(approver.id)} color="error">
-                        <DeleteIcon fontSize="small" />
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteApprover(approver.id)}
+                        color="error"
+                        sx={{ padding: isMobile ? 0.5 : 1 }}
+                      >
+                        <DeleteIcon fontSize={isMobile ? 'small' : 'medium'} />
                       </IconButton>
                     </Box>
                   </TableCell>
@@ -178,7 +264,7 @@ export default function ApprovalTab({ approvers, setApprovers }: ApprovalTabProp
       )}
 
       {/* Модальное окно для добавления согласующего */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>Добавить согласующего</DialogTitle>
         <DialogContent>
           <TextField

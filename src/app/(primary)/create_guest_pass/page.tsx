@@ -44,10 +44,12 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { CalendarIcon } from '@mui/x-date-pickers';
+import { LoadingButton } from '@mui/lab';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 // Импорт компонентов табов и интерфейса согласующих для валидации
 import ApprovalTab from './tabs/approval-tab';
-import { Approver } from './tabs/approval-tab';
+import type { Approver } from './tabs/approval-tab';
 import HistoryTab from './tabs/history-tab';
 
 // Создание кастомной темы MUI
@@ -215,6 +217,11 @@ export default function GuestPassForm() {
     severity: 'error',
   });
 
+  // Состояние для хранения фотографии профиля
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  // Состояние для отслеживания загрузки фотографии
+  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
+
   // Обработчик изменения таба
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => setTabValue(newValue);
 
@@ -254,6 +261,26 @@ export default function GuestPassForm() {
 
   // Расчет разницы в днях между начальной и конечной датой
   const daysDifference = startDate && endDate ? differenceInDays(endDate, startDate) + 1 : 0;
+
+  // Обработчик загрузки фотографии
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setIsPhotoLoading(true);
+
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        // Имитация задержки загрузки для демонстрации LoadingButton
+        setTimeout(() => {
+          setProfilePhoto(reader.result as string);
+          setIsPhotoLoading(false);
+        }, 1000);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Обработчик отправки формы
   const onSubmit = handleSubmit((data) => {
@@ -309,7 +336,7 @@ export default function GuestPassForm() {
       setAlert({
         open: true,
         message: `Пожалуйста, заполните корректно следующие поля: ${missingFields}`,
-        severity: "error",
+        severity: 'error',
       });
 
       // Переключаемся на вкладку с основной информацией
@@ -343,9 +370,7 @@ export default function GuestPassForm() {
                 <Tab
                   label={
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <Typography variant="body1" fontWeight={500}>
-                        Основное
-                      </Typography>
+                      <Typography variant="body1" fontWeight={500}>Основное</Typography>
                     </Box>
                   }
                 />
@@ -353,9 +378,7 @@ export default function GuestPassForm() {
                 <Tab
                   label={
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <Typography variant="body1" fontWeight={500}>
-                        Согласование
-                      </Typography>
+                      <Typography variant="body1" fontWeight={500}>Согласование</Typography>
                     </Box>
                   }
                 />
@@ -363,9 +386,7 @@ export default function GuestPassForm() {
                 <Tab
                   label={
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <Typography variant="body1" fontWeight={500}>
-                        История
-                      </Typography>
+                      <Typography variant="body1" fontWeight={500}>История</Typography>
                     </Box>
                   }
                 />
@@ -379,24 +400,71 @@ export default function GuestPassForm() {
               </Typography>
 
               <form>
-                <Grid container spacing={2}>
+                <Grid container spacing={{ xs: 2, sm: 2 }}>
                   {/* Блок с фото профиля */}
-                  <Grid container size={4} justifyContent="center" alignItems="center">
+                  <Grid container size={{ xs: 12, sm: 4 }} justifyContent="center" alignItems="center">
                     <Box
                       sx={{
-                        width: 200,
-                        height: 200,
+                        width: 250,
+                        height: 250,
                         bgcolor: 'primary.main',
                         display: 'flex',
+                        flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        borderRadius: 2,
+                        ...(profilePhoto && {
+                          backgroundImage: `url(${profilePhoto})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                        }),
                       }}
                     >
-                      <PersonIcon sx={{ width: 80, height: 80, color: 'white' }} />
+                      {!profilePhoto && <PersonIcon sx={{ width: 80, height: 80, color: 'white', mb: 2 }} />}
+
+                      <input
+                        accept="image/*"
+                        type="file"
+                        id="upload-photo"
+                        style={{ display: 'none' }}
+                        onChange={handlePhotoUpload}
+                      />
+
+                      <label
+                        htmlFor="upload-photo"
+                        style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          width: '100%',
+                        }}
+                      >
+                        <LoadingButton
+                          loading={isPhotoLoading}
+                          loadingPosition="start"
+                          startIcon={<CloudUploadIcon />}
+                          variant="contained"
+                          component="span"
+                          fullWidth
+                          sx={{
+                            borderRadius: profilePhoto ? '0' : '0 0 8px 8px',
+                            height: '48px',
+                            bgcolor: profilePhoto ? 'rgba(0, 0, 0, 0.6)' : 'white',
+                            color: profilePhoto ? 'white' : 'primary.main',
+                            '&:hover': {
+                              bgcolor: profilePhoto ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                            },
+                          }}
+                        >
+                          {profilePhoto ? 'Изменить фото' : 'Добавить фото'}
+                        </LoadingButton>
+                      </label>
                     </Box>
                   </Grid>
                   {/* Левая колонка полей */}
-                  <Grid size={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     {/* Поле ФИО */}
                     <Controller
                       name="fullName"
@@ -474,7 +542,7 @@ export default function GuestPassForm() {
                     />
                   </Grid>
                   {/* Правая колонка полей */}
-                  <Grid size={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     {/* Поле даты рождения */}
                     <Controller
                       name="birthDate"
@@ -673,7 +741,8 @@ export default function GuestPassForm() {
         </MainContainer>
 
         {/* Уведомление об успешности отправки формы */}
-        <Snackbar open={alert.open} autoHideDuration={6000} onClose={handleCloseAlert} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <Snackbar open={alert.open} autoHideDuration={6000} onClose={handleCloseAlert}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
           <Alert onClose={handleCloseAlert} severity={alert.severity} sx={{ width: '100%' }}>
             {alert.message}
           </Alert>
