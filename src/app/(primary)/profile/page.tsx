@@ -2,8 +2,8 @@
 'use client';
 
 import Field from '@/components/Field';
+import { PROFILE_FIELDS } from '@/lib/constants';
 import { scrollbarStyles } from '@/styles/shared-styles';
-import { PROFILE_FIELDS } from '@/interfaces/user.interface';
 import {
   Box,
   Typography,

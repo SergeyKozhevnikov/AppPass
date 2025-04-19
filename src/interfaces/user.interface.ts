@@ -24,19 +24,3 @@ export interface IUser extends IUserProfile {
   id: number;
   role: 'user' | 'admin';
 }
-
-// Константа для отображаемых названий полей профиля
-export const PROFILE_FIELDS = {
-  tabNum: 'Табельный номер',
-  surname: 'Фамилия',
-  name: 'Имя',
-  patronymic: 'Отчество',
-  pos: 'Должность',
-  department: 'Подразделение',
-  login: 'Логин',
-  email: 'Почта',
-  password: 'Пароль',
-  phoneNum: 'Телефон',
-} as const;
-
-export type TProfileFieldName = keyof typeof PROFILE_FIELDS; // тип значений PROFILE_FIELDS

@@ -1,6 +1,6 @@
 // Шаблон поля
+import { PROFILE_FIELDS } from '@/lib/constants';
 import { Grid, TextField, Typography } from '@mui/material';
-import { PROFILE_FIELDS } from '@/interfaces/user.interface';
 
 // объединенный тип из значений объекта + интерфейс для пропсов
 type ProfileFieldValue = (typeof PROFILE_FIELDS)[keyof typeof PROFILE_FIELDS];
