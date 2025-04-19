@@ -46,7 +46,7 @@ export default function Profile() {
     >
       <Box display={'flex'} sx={{ mb: 3 }}>
         <Avatar
-          src={user.avatar}
+          src={'...'}
           sx={{ height: '55px', width: '55px', mr: 2 }}
         ></Avatar>
         <Box>
