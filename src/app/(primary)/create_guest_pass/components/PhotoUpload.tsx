@@ -11,18 +11,46 @@ import ClearIcon from '@mui/icons-material/Clear';
 interface PhotoUploadProps {
   profilePhoto: string | null
   onProfilePhotoChangeAction: React.Dispatch<React.SetStateAction<string | null>>
+  onError: (message: string, severity: "error" | "warning" | "info" | "success") => void
 }
 
-export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction }: PhotoUploadProps) {
+export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction , onError}: PhotoUploadProps) {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Обработчик загрузки фотографии
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+    // Максимальный размер файла в байтах (2MB)
+    const MAX_FILE_SIZE = 2 * 1024 * 1024
+    // Допустимые типы файлов
+    const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/jpg"]
+
     if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0]
+
+      // Проверка размера файла
+      if (file.size > MAX_FILE_SIZE) {
+        onError("Размер файла превышает 2MB. Пожалуйста, выберите файл меньшего размера.", "error")
+        // Сбрасываем значение input file
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ""
+        }
+        return
+      }
+
+      // Проверка типа файла
+      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+        onError("Недопустимый формат файла. Пожалуйста, выберите изображение в формате JPEG или PNG.", "error")
+        // Сбрасываем значение input file
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ""
+        }
+        return
+      }
+
       setIsPhotoLoading(true)
 
-      const file = event.target.files[0]
       const reader = new FileReader()
 
       reader.onloadend = () => {
@@ -30,10 +58,11 @@ export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction }
         setTimeout(() => {
           onProfilePhotoChangeAction(reader.result as string)
           setIsPhotoLoading(false)
+          onError("Фотография успешно загружена", "success")
         }, 1000)
       }
 
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(file) // Читаем файл как Base64
     }
   }
 
@@ -44,6 +73,7 @@ export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction }
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
+    onError("Фотография удалена", "info")
   }
 
   return (
@@ -102,7 +132,7 @@ export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction }
       {/* Input для загрузки файла */}
       <input
         ref={fileInputRef}
-        accept="image/*"
+        accept="image/jpeg,image/png,image/jpg"
         type="file"
         id="upload-photo"
         style={{ display: "none" }}

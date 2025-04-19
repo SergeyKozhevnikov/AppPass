@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, type SyntheticEvent } from 'react';
-import { differenceInDays } from 'date-fns';
-import { ru } from 'date-fns/locale';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useEffect, type SyntheticEvent } from "react"
+import { differenceInDays } from "date-fns"
+import { ru } from "date-fns/locale"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Box,
   Card,
@@ -24,31 +24,36 @@ import {
   Snackbar,
   Alert,
   IconButton,
-} from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import PersonIcon from '@mui/icons-material/Person';
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
-import BusinessIcon from '@mui/icons-material/Business';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import ClearIcon from '@mui/icons-material/Clear';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-import { CalendarIcon } from '@mui/x-date-pickers';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button as MuiButton,
+} from "@mui/material"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import PersonIcon from "@mui/icons-material/Person"
+import PhoneIcon from "@mui/icons-material/Phone"
+import EmailIcon from "@mui/icons-material/Email"
+import BusinessIcon from "@mui/icons-material/Business"
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
+import ClearIcon from "@mui/icons-material/Clear"
+import "@fontsource/roboto/300.css"
+import "@fontsource/roboto/400.css"
+import "@fontsource/roboto/500.css"
+import "@fontsource/roboto/700.css"
+import { CalendarIcon } from "@mui/x-date-pickers"
 
 // Импорт компонентов, типов и утилит
-import { theme } from './styles/theme';
-import { formSchema, defaultFormValues, fieldNames } from './utils/helpers';
-import { MainContainer } from './components/MainContainer';
-import TabPanel from './components/TabPanel';
-import PhotoUpload from './components/PhotoUpload';
-import ApprovalTab from './tabs/approval-tab';
-import HistoryTab from './tabs/history-tab';
-import type { Approver, AlertState } from './types';
+import { theme } from "./styles/theme"
+import { formSchema, defaultFormValues, fieldNames } from "./utils/helpers"
+import { MainContainer } from "./components/MainContainer"
+import TabPanel from "./components/TabPanel"
+import PhotoUpload from "./components/PhotoUpload"
+import ApprovalTab from "./tabs/approval-tab"
+import HistoryTab from "./tabs/history-tab"
+import type { Approver, AlertState, HistoryOperation } from "./types"
 
 // Основной компонент формы
 export default function GuestPassForm() {
@@ -65,6 +70,13 @@ export default function GuestPassForm() {
     severity: 'error',
   });
 
+  // Состояние для истории операций
+  const [operations, setOperations] = useState<HistoryOperation[]>([])
+
+  // Состояние для отображения JSON данных
+  const [jsonDialogOpen, setJsonDialogOpen] = useState(false)
+  const [jsonData, setJsonData] = useState("")
+
   // Состояние для хранения фотографии профиля
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
@@ -77,6 +89,7 @@ export default function GuestPassForm() {
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(formSchema),
@@ -97,37 +110,87 @@ export default function GuestPassForm() {
   // Расчет разницы в днях между начальной и конечной датой
   const daysDifference = startDate && endDate ? differenceInDays(endDate, startDate) + 1 : 0;
 
-  // Обработчик отправки формы
-  const onSubmit = handleSubmit((data) => {
-    // Проверяем наличие согласующих
-    if (approvers.length === 0) {
-      setAlert({
-        open: true,
-        message: 'Необходимо добавить хотя бы одного согласующего!',
-        severity: 'error',
-      });
-      // Переключаемся на вкладку согласования
-      setTabValue(1);
-      return;
-    }
-
-    // Если все проверки пройдены, отправляем форму
-    console.log('Данные формы:', data);
-    console.log('Согласующие:', approvers);
+  // Функция для отображения уведомлений
+  const showAlert = (message: string, severity: "error" | "warning" | "info" | "success") => {
     setAlert({
       open: true,
-      message: 'Форма успешно отправлена!',
-      severity: 'success',
-    });
-  });
+      message,
+      severity,
+    })
+  }
+
+  // Функция для создания JSON данных
+  const createJsonData = () => {
+    const formData = getValues()
+
+    // Создаем объект с данными формы
+    const jsonObject = {
+      photo: profilePhoto || null,
+      fullName: formData.fullName,
+      phone: formData.phone,
+      organization: formData.organization,
+      email: formData.email,
+      birthDate: formData.birthDate instanceof Date ? formData.birthDate.toISOString().split("T")[0] : null,
+      hasCar: formData.hasCar,
+      justification: formData.justification,
+      startDate: formData.startDate instanceof Date ? formData.startDate.toISOString().split("T")[0] : null,
+      endDate: formData.endDate instanceof Date ? formData.endDate.toISOString().split("T")[0] : null,
+      approvers: approvers,
+    }
+
+    return JSON.stringify(jsonObject, null, 2)
+  }
+
+  // Обработчик отправки формы
+  const onSubmit = handleSubmit(() => {
+    // Проверяем наличие согласующих
+    if (approvers.length === 0) {
+      showAlert("Необходимо добавить хотя бы одного согласующего!", "error")
+      // Переключаемся на вкладку согласования
+      setTabValue(1)
+      return
+    }
+
+    // Создаем JSON данные
+    const jsonData = createJsonData()
+    setJsonData(jsonData)
+    setJsonDialogOpen(true)
+
+    // Добавляем запись в историю
+    const newOperation: HistoryOperation = {
+      date: new Date().toLocaleString("ru"),
+      action: "Отправка заявки",
+      user: "Тестов Тест Тестович",
+    }
+    setOperations([newOperation, ...operations])
+  })
+
+  // Обработчик сохранения формы
+  const onSave = () => {
+    // Добавляем запись в историю
+    const newOperation: HistoryOperation = {
+      date: new Date().toLocaleString("ru"),
+      action: "Создан шаблон заявки",
+      user: "Тестов Тест Тестович",
+    }
+    setOperations([newOperation, ...operations])
+
+    // Показываем уведомление
+    showAlert("Шаблон заявки успешно сохранен!", "success")
+  }
 
   // Обработчик закрытия уведомления
   const handleCloseAlert = () => {
-    setAlert({ ...alert, open: false });
-  };
+    setAlert({ ...alert, open: false })
+  }
+
+  // Обработчик закрытия диалога с JSON
+  const handleCloseJsonDialog = () => {
+    setJsonDialogOpen(false)
+  }
 
   // Функция для проверки валидности формы и наличия согласующих
-  const validateAndSubmit = () => {
+  const validateAndSubmit = async () => {
     // Проверяем наличие ошибок в форме
     const errorFields = Object.keys(errors);
 
@@ -146,8 +209,17 @@ export default function GuestPassForm() {
       return;
     }
 
-    // Если форма валидна, запускаем onSubmit
-    onSubmit();
+    // Если форма валидна, запускаем onSubmit с обработкой промиса
+    try {
+      await onSubmit();
+    } catch (error) {
+      console.error('Ошибка при отправке формы:', error);
+      setAlert({
+        open: true,
+        message: 'Произошла ошибка при отправке формы',
+        severity: 'error',
+      });
+    }
   };
 
   return (
@@ -202,12 +274,12 @@ export default function GuestPassForm() {
             </Box>
 
             {/* Содержимое таба "Основная информация" */}
-            <TabPanel value={tabValue} index={0} onSubmit={validateAndSubmit}>
+            <TabPanel value={tabValue} index={0} onSubmit={validateAndSubmit} onSave={onSave}>
               <form>
                 <Grid container spacing={2}>
                   {/* Блок с фото профиля */}
                   <Grid container size={{ xs: 12, sm: 4 }} display="flex" justifyContent="center" alignItems="center">
-                    <PhotoUpload profilePhoto={profilePhoto} onProfilePhotoChangeAction={setProfilePhoto} />
+                    <PhotoUpload profilePhoto={profilePhoto} onProfilePhotoChangeAction={setProfilePhoto} onError={showAlert}/>
                   </Grid>
 
                   {/* Правая область с заголовком и полями */}
@@ -485,13 +557,13 @@ export default function GuestPassForm() {
             </TabPanel>
 
             {/* Содержимое таба "Очереди согласования" */}
-            <TabPanel value={tabValue} index={1} onSubmit={validateAndSubmit}>
+            <TabPanel value={tabValue} index={1} onSubmit={validateAndSubmit} onSave={onSave}>
               <ApprovalTab approvers={approvers} setApproversAction={setApprovers} />
             </TabPanel>
 
             {/* Содержимое таба "История" */}
-            <TabPanel value={tabValue} index={2} onSubmit={validateAndSubmit}>
-              <HistoryTab />
+            <TabPanel value={tabValue} index={2} onSubmit={validateAndSubmit} onSave={onSave}>
+              <HistoryTab operations={operations} />
             </TabPanel>
           </Card>
         </MainContainer>
@@ -507,6 +579,31 @@ export default function GuestPassForm() {
             {alert.message}
           </Alert>
         </Snackbar>
+
+        {/* Диалог с JSON данными */}
+        <Dialog open={jsonDialogOpen} onClose={handleCloseJsonDialog} maxWidth="md" fullWidth>
+          <DialogTitle>Данные заявки (JSON)</DialogTitle>
+          <DialogContent>
+            <Box
+              component="pre"
+              sx={{
+                p: 2,
+                bgcolor: "#f5f5f5",
+                borderRadius: 1,
+                overflow: "auto",
+                maxHeight: "400px",
+                fontSize: "0.875rem",
+              }}
+            >
+              {jsonData}
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <MuiButton onClick={handleCloseJsonDialog} color="primary">
+              Закрыть
+            </MuiButton>
+          </DialogActions>
+        </Dialog>
       </LocalizationProvider>
     </ThemeProvider>
   );

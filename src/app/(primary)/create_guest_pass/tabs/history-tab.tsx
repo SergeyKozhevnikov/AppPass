@@ -1,9 +1,9 @@
 "use client"
 
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
-import { operations } from "../data/historyData"
+import type { HistoryTabProps } from "../types"
 
-export default function HistoryTab() {
+export default function HistoryTab({ operations }: HistoryTabProps) {
   return (
     <Box sx={{ width: "100%" }}>
       {/* Подзаголовок для истории операций */}

@@ -6,6 +6,7 @@ export interface TabPanelProps {
   index: number
   value: number
   onSubmit?: () => void
+  onSave?: () => void
   [key: string]: unknown // Для остальных пропсов, если они есть
 }
 
@@ -34,4 +35,9 @@ export interface HistoryOperation {
   date: string
   action: string
   user: string
+}
+
+// Интерфейс для вкладки истории
+export interface HistoryTabProps {
+  operations: HistoryOperation[]
 }

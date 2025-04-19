@@ -7,7 +7,7 @@ import { scrollbarStyles } from "../styles/theme"
 
 // Компонент панели таба
 export default function TabPanel(props: TabPanelProps) {
-  const { children, value, index, onSubmit, ...other } = props
+  const { children, value, index, onSubmit, onSave, ...other } = props
 
   // Общие стили для всех табов, чтобы они имели одинаковый размер
   const panelStyles: React.CSSProperties = {
@@ -38,7 +38,7 @@ export default function TabPanel(props: TabPanelProps) {
             <Button type="submit" variant="contained" color="primary" onClick={onSubmit}>
               ОТПРАВИТЬ
             </Button>
-            <Button variant="contained" color="primary">
+            <Button variant="contained" color="primary" onClick={onSave}>
               СОХРАНИТЬ
             </Button>
             <Button variant="outlined">ОТМЕНИТЬ</Button>
