@@ -1,0 +1,8 @@
+.login {
+  display: flex;
+}
+
+.login-intro {
+  /* align-content: center; */
+  background-image: linear-gradient(#004062, #007ec0);
+}

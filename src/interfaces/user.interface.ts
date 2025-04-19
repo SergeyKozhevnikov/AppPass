@@ -4,7 +4,7 @@
 // Для регистрации пользователя
 export interface IRegisteredUser {
   surname: string;
-  forename: string;
+  name: string;
   patronymic: string;
   login: string;
   email: string;
