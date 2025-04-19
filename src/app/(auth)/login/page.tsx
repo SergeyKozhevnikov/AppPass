@@ -1,5 +1,6 @@
 // Страница авторизации пользователя (Сергей П)
 'use client';
+
 import {
   Box,
   Container,
@@ -13,10 +14,20 @@ import {
 } from '@mui/material';
 import './login.css';
 import Image from 'next/image';
+import { useState } from 'react';
 
-// Просто шаблон себе оставил
+// Что сделать?
+// - Валидация полей
+// - Начало с /login, если авторизован перенаправлять на /
+// - Временную авторизацию можно через state сделать, правда, это должно быть глобальным или в localStorage убираться
+
 export default function LoginPage() {
-  const handleSubmit = () => console.log('Login');
+  const [isAuth, setIsAuth] = useState(false); // временная авторизация
+  const handleSubmit = () => {
+    setIsAuth(true);
+    console.log('setAuth');
+  };
+
   return (
     <main>
       <section className="login">
