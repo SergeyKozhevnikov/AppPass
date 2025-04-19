@@ -6,6 +6,11 @@ export function Sidebar() {
   return (
     <aside className="sidebar border-2 rounded m-0.5 px-5 py-5 min-w-[340px] h-full" style={{ borderColor: "#007EC0" }}>
       <div className="sidebar__chto-to"></div>
+      <h1>This is change</h1>
+      <h1>This is change</h1>
+      <h1>This is change</h1>
+      <h1>This is change</h1>
+      <h1>This is change</h1>
       <nav>
         <li>
           <Link className="flex items-center mb-5" href="" title="Мои заявки"><Image className="mr-1" src="/assets/images/first-level.svg" alt="item" width={40} height={40} />Мои заявки</Link>
