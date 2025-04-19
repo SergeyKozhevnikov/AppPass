@@ -49,8 +49,8 @@ export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction }
   return (
     <Box
       sx={{
-        width: 250,
-        height: 250,
+        width: 300,
+        height: 400,
         bgcolor: "primary.main",
         display: "flex",
         flexDirection: "column",
