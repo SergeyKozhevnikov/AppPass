@@ -21,12 +21,12 @@ export default function Profile() {
     name: 'Сергей',
     surname: 'Петров',
     role: 'Менеджер',
-    avatar: '#', // Замените на URL аватара
   });
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault(); // Предотвращаем перезагрузку страницы
     console.log('submit', user);
+    setUser({ name: 'Алексей', surname: 'Иванов', role: 'Консультант' });
     // Здесь можно добавить логику отправки данных на сервер
   }
 

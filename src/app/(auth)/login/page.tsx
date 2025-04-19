@@ -25,7 +25,7 @@ export default function LoginPage() {
   const [isAuth, setIsAuth] = useState(false); // временная авторизация
   const handleSubmit = () => {
     setIsAuth(true);
-    console.log('setAuth');
+    console.log('setAuth', isAuth);
   };
 
   return (
