@@ -39,14 +39,14 @@ export function Sidebar() {
           <ListItemIcon>
             <InfoIcon />
           </ListItemIcon>
-          <ListItemText primary="About" />
+          <ListItemText primary="О системе" />
         </ListItemButton>
 
         <ListItemButton component={Link} href="/logout">
           <ListItemIcon>
             <ExitToAppIcon />
           </ListItemIcon>
-          <ListItemText primary="Logout" />
+          <ListItemText primary="Выйти" />
         </ListItemButton>
       </List>
     </div>
