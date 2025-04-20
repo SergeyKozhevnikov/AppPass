@@ -18,7 +18,7 @@ export function Sidebar() {
   return (
     <div
       style={{
-        width: 250,
+        width: 340,
         padding: "1rem",
         borderColor: "#007EC0",
         height: `calc(100vh - ${headerHeight}px)`,
