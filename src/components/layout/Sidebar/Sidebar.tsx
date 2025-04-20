@@ -1,32 +1,65 @@
+'use client';
+
 import Link from "next/link";
-import Image from "next/image";
-import "./Sidebar.css";
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+} from "@mui/material";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import LockIcon from "@mui/icons-material/Lock";
+import SettingsIcon from "@mui/icons-material/Settings";
+import InfoIcon from "@mui/icons-material/Info";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 export function Sidebar() {
   return (
-    <aside className="sidebar border-2 rounded m-0.5 px-5 py-5 min-w-[340px] h-full" style={{ borderColor: "#007EC0" }}>
-      <div className="sidebar__chto-to"></div>
-      <h1>This is change</h1>
-      <h1>This is change</h1>
-      <h1>This is change</h1>
-      <h1>This is change</h1>
-      <h1>This is change</h1>
-      <nav>
-        <li>
-          <Link className="flex items-center mb-5" href="" title="Мои заявки"><Image className="mr-1" src="/assets/images/first-level.svg" alt="item" width={40} height={40} />Мои заявки</Link>
+    <div
+      style={{ width: 250, padding: "1rem", borderColor: "#007EC0" }}
+      className="px-5 py-5 layout__main flex-1 min-h-screen h-full border border-2 m-0.5 rounded"
+    >
+      <List>
+        <ListItemButton component={Link} href="/dashboard">
+          <ListItemIcon>
+            <DashboardIcon />
+          </ListItemIcon>
+          <ListItemText primary="Dashboard" />
+        </ListItemButton>
 
-          <nav className="pl-10">
-            <li><Link className="flex items-center mb-5" href=""><Image className="mr-1" src="/assets/images/second-level.svg" alt="item" width={30} height={30} />Черновки</Link></li>
-            <li><Link className="flex items-center mb-5" href=""><Image className="mr-1" src="/assets/images/second-level.svg" alt="item" width={30} height={30} />На согласовании</Link></li>
-            <li><Link className="flex items-center mb-5" href=""><Image className="mr-1" src="/assets/images/second-level.svg" alt="item" width={30} height={30} />Согласованные</Link></li>
-            <li><Link className="flex items-center mb-5" href=""><Image className="mr-1" src="/assets/images/second-level.svg" alt="item" width={30} height={30} />Отклоненные</Link></li>
-          </nav>
+        <ListItemButton component={Link} href="/passwords">
+          <ListItemIcon>
+            <LockIcon />
+          </ListItemIcon>
+          <ListItemText primary="Passwords" />
+        </ListItemButton>
 
-        </li>
-        <li>
-          <Link className="flex items-center mb-5" href="" title="Мои заявки"><Image className="mr-1" src="/assets/images/first-level-settings.svg" alt="item" width={40} height={40} />Настройки</Link>
-        </li>
-      </nav>
-    </aside>
+        <ListItemButton component={Link} href="/settings">
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Settings" />
+        </ListItemButton>
+      </List>
+
+      <Divider sx={{ my: 2 }} />
+
+      <List>
+        <ListItemButton component={Link} href="/about">
+          <ListItemIcon>
+            <InfoIcon />
+          </ListItemIcon>
+          <ListItemText primary="About" />
+        </ListItemButton>
+
+        <ListItemButton component={Link} href="/logout">
+          <ListItemIcon>
+            <ExitToAppIcon />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </ListItemButton>
+      </List>
+    </div>
   );
 }
