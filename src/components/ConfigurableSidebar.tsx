@@ -10,12 +10,13 @@ export function ConfigurableSidebar() {
 
   // Логика для изменения списка в зависимости от пути
   const renderMenuItems = () => {
-    // Проверяем, если путь содержит /dashboard или /profile
-    if (pathname.includes("/dashboard") || pathname.includes("/profile")) {
-      return <DashboardMenu />;
+    switch (true) {
+      case pathname.includes("/dashboard"):
+      case pathname.includes("/profile"):
+        return <DashboardMenu />;
+      default:
+        return <DefaultMenu />;
     }
-
-    return <DefaultMenu />;
   };
 
   return <List>{renderMenuItems()}</List>;
