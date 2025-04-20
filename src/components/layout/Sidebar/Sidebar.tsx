@@ -15,10 +15,17 @@ import InfoIcon from "@mui/icons-material/Info";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 export function Sidebar() {
+  const headerHeight = process.env.NEXT_PUBLIC_HEADER_HEIGHT;
+
   return (
     <div
-      style={{ width: 250, padding: "1rem", borderColor: "#007EC0" }}
-      className="px-5 py-5 layout__main flex-1 min-h-screen h-full border border-2 m-0.5 rounded"
+      style={{
+        width: 250,
+        padding: "1rem",
+        borderColor: "#007EC0",
+        height: `calc(100vh - ${headerHeight}px)`,  // Используем переменную окружения
+      }}
+      className="px-5 py-5 layout__main flex-1 h-full border border-2 m-0.5 rounded"
     >
       <List>
         <ListItemButton component={Link} href="/dashboard">
