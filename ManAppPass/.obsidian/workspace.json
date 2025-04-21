@@ -8,35 +8,20 @@
         "type": "tabs",
         "children": [
           {
-            "id": "47902029e0f5f320",
+            "id": "e7a7b303c61786dc",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Project AppPass/Home.md",
+                "file": "Project AppPass/Инструкции/Запуск проекта.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Home"
-            }
-          },
-          {
-            "id": "a59eddb6a91c02ff",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Project AppPass/Home.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Home"
+              "title": "Запуск проекта"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -211,10 +196,10 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "a59eddb6a91c02ff",
+  "active": "e7a7b303c61786dc",
   "lastOpenFiles": [
-    "Project AppPass/Инструкции/Начало работы в GIT.md",
     "Project AppPass/Home.md",
+    "Project AppPass/Инструкции/Начало работы в GIT.md",
     "Project AppPass/Инструкции/Запуск проекта.md",
     "Home.md",
     "Без названия 1.canvas",
