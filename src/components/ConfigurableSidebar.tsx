@@ -12,7 +12,10 @@ export function ConfigurableSidebar() {
   const renderMenuItems = () => {
     switch (true) {
       case pathname.includes("/dashboard"):
+        return <DashboardMenu />;
       case pathname.includes("/profile"):
+        return <DashboardMenu />;
+      case pathname.includes("/roles"):
         return <DashboardMenu />;
       default:
         return <DefaultMenu />;
