@@ -17,5 +17,11 @@ export const DashboardMenu = () => (
       </ListItemIcon>
       <ListItemText primary="Passwords" />
     </ListItemButton>
+    <ListItemButton component={Link} href="/roles">
+      <ListItemIcon>
+        <LockIcon />
+      </ListItemIcon>
+      <ListItemText primary="Roles" />
+    </ListItemButton>
   </>
 );
