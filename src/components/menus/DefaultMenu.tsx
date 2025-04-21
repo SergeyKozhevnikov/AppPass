@@ -36,19 +36,19 @@ export const DefaultMenu = () => {
       {/* Подменю для "Мои заявки" */}
       <Collapse in={openRequests} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <ListItemButton sx={{ pl: 4 }} component={Link} href="/drafts">
+          <ListItemButton sx={{ pl: 4 }} component={Link} href="/requests/drafts">
             <ListItemIcon><TextSnippetIcon /></ListItemIcon>
             <ListItemText primary="Черновики" />
           </ListItemButton>
-          <ListItemButton sx={{ pl: 4 }} component={Link} href="/pending">
+          <ListItemButton sx={{ pl: 4 }} component={Link} href="/requests/inreview">
             <ListItemIcon><TextSnippetIcon /></ListItemIcon>
             <ListItemText primary="На согласовании" />
           </ListItemButton>
-          <ListItemButton sx={{ pl: 4 }} component={Link} href="/approved">
+          <ListItemButton sx={{ pl: 4 }} component={Link} href="/requests/approved">
             <ListItemIcon><TextSnippetIcon /></ListItemIcon>
             <ListItemText primary="Согласованные" />
           </ListItemButton>
-          <ListItemButton sx={{ pl: 4 }} component={Link} href="/rejected">
+          <ListItemButton sx={{ pl: 4 }} component={Link} href="/requests/rejected">
             <ListItemIcon><TextSnippetIcon /></ListItemIcon>
             <ListItemText primary="Отклоненные" />
           </ListItemButton>

@@ -8,32 +8,48 @@ export type Request = {
   middleName: string;
   hasCar: boolean;
   hasMaterials: boolean;
+  status: 'drafts' | 'inReview' | 'approved' | 'rejected';
 };
 
-const firstNames = [
-  'Александр', 'Дмитрий', 'Иван', 'Сергей', 'Михаил', 'Андрей', 'Евгений', 'Павел', 'Виктор', 'Николай',
+export const mockRequests: Request[] = [
+  {
+    id: 1,
+    date: '2025-04-20',
+    lastName: 'Иванов',
+    firstName: 'Александр',
+    middleName: 'Александрович',
+    hasCar: true,
+    hasMaterials: false,
+    status: 'drafts', // Черновик
+  },
+  {
+    id: 2,
+    date: '2025-04-19',
+    lastName: 'Петров',
+    firstName: 'Дмитрий',
+    middleName: 'Дмитриевич',
+    hasCar: false,
+    hasMaterials: true,
+    status: 'inReview', // На согласовании
+  },
+  {
+    id: 3,
+    date: '2025-04-18',
+    lastName: 'Сидоров',
+    firstName: 'Михаил',
+    middleName: 'Александрович',
+    hasCar: true,
+    hasMaterials: true,
+    status: 'approved', // Согласованный
+  },
+  {
+    id: 4,
+    date: '2025-04-17',
+    lastName: 'Кузнецов',
+    firstName: 'Иван',
+    middleName: 'Иванович',
+    hasCar: false,
+    hasMaterials: false,
+    status: 'rejected', // Отклоненный
+  },
 ];
-
-const lastNames = [
-  'Иванов', 'Петров', 'Сидоров', 'Смирнов', 'Кузнецов', 'Попов', 'Соколов', 'Лебедев', 'Козлов', 'Новиков',
-];
-
-const middleNames = [
-  'Александрович', 'Дмитриевич', 'Иванович', 'Сергеевич', 'Михайлович', 'Андреевич', 'Евгеньевич', 'Павлович', 'Викторович', 'Николаевич',
-];
-
-export const mockRequests: Request[] = Array.from({ length: 40 }, (_, i) => {
-  const first = firstNames[i % firstNames.length];
-  const last = lastNames[i % lastNames.length];
-  const middle = middleNames[i % middleNames.length];
-
-  return {
-    id: i + 1,
-    date: new Date(Date.now() - i * 86400000).toISOString().slice(0, 10),
-    firstName: first,
-    lastName: last,
-    middleName: middle,
-    hasCar: i % 2 === 0,
-    hasMaterials: i % 3 === 0,
-  };
-});
