@@ -12,7 +12,7 @@ export default function TabPanel(props: TabPanelProps) {
   // Общие стили для всех табов, чтобы они имели одинаковый размер
   const panelStyles: React.CSSProperties = {
     width: "100%",
-    height: "600px", // Фиксированная высота для всех панелей
+    height: "95%", // Фиксированная высота для всех панелей
     position: "relative",
     display: value === index ? "flex" : "none",
     flexDirection: "column" as const,
