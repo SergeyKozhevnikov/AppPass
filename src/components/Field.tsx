@@ -1,11 +1,13 @@
 // Шаблон поля
 import { PROFILE_FIELDS } from '@/lib/constants';
 import { Grid, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
 
 // объединенный тип из значений объекта + интерфейс для пропсов
 type ProfileFieldValue = (typeof PROFILE_FIELDS)[keyof typeof PROFILE_FIELDS];
 interface FieldProps {
-  fieldName: ProfileFieldValue;
+  field: ProfileFieldValue;
+  currentUrl?: string;
 }
 
 // Стили поля
@@ -14,43 +16,52 @@ const getFieldStyles = (isDisabled: boolean) => ({
   borderRadius: '8px',
   '& fieldset': { border: 'none' },
   mt: 0.7,
+  // цвет текста для disabled полей
+  '.MuiInputBase-input.Mui-disabled': {
+    WebkitTextFillColor: '#000',
+  },
 });
 
-export default function Field({ fieldName }: FieldProps) {
+export default function Field({ field, currentUrl }: FieldProps) {
+  const [showPassword, setShowPassword] = useState(false);
   // необязательные и закрытые для изменения поля
   const optionalFields =
-    fieldName === PROFILE_FIELDS.pos ||
-    fieldName === PROFILE_FIELDS.phoneNum ||
-    fieldName === PROFILE_FIELDS.department;
-  const disableFields =
-    fieldName === PROFILE_FIELDS.tabNum ||
-    fieldName === PROFILE_FIELDS.login ||
-    fieldName === PROFILE_FIELDS.email;
+    field === PROFILE_FIELDS.pos ||
+    field === PROFILE_FIELDS.phoneNum ||
+    field === PROFILE_FIELDS.department;
+  const profileDisableFields =
+    currentUrl === '/profile' &&
+    (field === PROFILE_FIELDS.tabNum ||
+      field === PROFILE_FIELDS.login ||
+      field === PROFILE_FIELDS.email);
 
   // изменение падежа для фамилии и почты
   const getPlaceholder = (field: ProfileFieldValue): string => {
-    switch (field) {
+    switch (field.label) {
       case 'Фамилия':
         return 'фамилию';
       case 'Почта':
         return 'почту';
       default:
-        return field.toLowerCase();
+        return field.label.toLowerCase();
     }
   };
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   return (
     <Grid container size={1}>
       <Typography variant="caption" color="initial">
-        {fieldName}
+        {field.label}
       </Typography>
       <TextField
-        placeholder={`Введите ${getPlaceholder(fieldName)}`}
+        placeholder={`Введите ${getPlaceholder(field)}`}
         fullWidth
+        type={field.type}
         required={!optionalFields}
-        disabled={disableFields}
-        autoFocus
-        sx={getFieldStyles(disableFields)}
+        disabled={profileDisableFields}
+        autoFocus={currentUrl !== '/profile'}
+        sx={getFieldStyles(profileDisableFields)}
       />
     </Grid>
   );
