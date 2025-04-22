@@ -1,20 +1,91 @@
 // Страница создания нового пользователя (Сергей П)
+'use client';
 
-// - Модальное окно по центру
-// - Закрытие на Esc, крестик, щелчек вне поля (если вбиты данные, запросить подтверждение отмены?)
-// - Скролл по полям, как у Сергея в форме
+import {
+  Grid,
+  Button,
+  Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+} from '@mui/material';
+import { useState } from 'react';
+import { Close } from '@mui/icons-material';
+import { REGISTER_FIELDS } from '@/lib/constants';
+import Field from '@/components/Field';
+
+// Модальное окно вызывается на странице добавления пользователя (туда компонент и состояние isOpen)
+// - Логин подставляется автоматически пользователя (если время много не займет)
 // - Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
-// - Логин подставляется автоматически из ФИО пользователя (если время много не займет)
 // - Автоматически роль - пользователь (нужно ли делать выбор при создании или просто в таблице ролей потом)
-// - Кнопка отмены - красная, форма сощдать зеленая/синяя
 // При создании пользователя сначала запрос в БД нет ли такого же логина (а соответсвенно и почты), если есть, информировать в поле, исправить вручную
 // а также смотрим последний табельный и прибавляем к нему +1
 export default function Register() {
+  const [isOpen, setIsOpen] = useState(true);
+
+  function handleSubmit(evt: { preventDefault: () => void }): void {
+    evt.preventDefault();
+    setIsOpen(false);
+    alert('Пользователь создан (тест)');
+  }
+
   return (
-    <main>
-      <section className="register">
-        <h1 className="register__title">Регистрация</h1>
-      </section>
-    </main>
+    <Container component="section">
+      <Dialog
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        sx={{ p: 2 }}
+        maxWidth="md"
+        fullWidth
+      >
+        <Grid
+          container
+          sx={{ p: 2, alignItems: 'start', justifyContent: 'space-between' }}
+        >
+          <DialogTitle sx={{ p: 0, mb: 2 }}>Создание пользователя</DialogTitle>
+          <DialogActions sx={{ p: 0 }}>
+            <IconButton
+              aria-label="delete"
+              sx={{ p: 0.25, border: '1px solid', borderRadius: '8px' }}
+            >
+              <Close
+                onClick={() => setIsOpen(false)}
+                sx={{ height: 22, width: 22 }}
+              />
+            </IconButton>
+          </DialogActions>
+        </Grid>
+        <DialogContent>
+          <Grid
+            component="form"
+            onSubmit={handleSubmit}
+            container
+            spacing={3}
+            columns={2}
+            sx={{ justifyContent: 'flex-end' }}
+          >
+            {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
+            {Object.values(REGISTER_FIELDS).map((f) => (
+              <Field field={f} key={f.label}></Field>
+            ))}
+
+            <DialogActions sx={{ p: 0 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setIsOpen(false)}
+              >
+                Отмена
+              </Button>
+              <Button variant="contained" color="primary" type="submit">
+                Отправить
+              </Button>
+            </DialogActions>
+          </Grid>
+        </DialogContent>
+      </Dialog>
+    </Container>
   );
 }

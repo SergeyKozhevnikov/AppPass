@@ -2,6 +2,7 @@
 'use client';
 
 import Field from '@/components/Field';
+import { usePathname } from 'next/navigation';
 import { PROFILE_FIELDS } from '@/lib/constants';
 import { scrollbarStyles } from '@/styles/shared-styles';
 import {
@@ -16,6 +17,8 @@ import {
 import { useState } from 'react';
 
 export default function Profile() {
+  // Текущий путь url
+  const pathname = usePathname();
   // Пример состояния пользователя
   const [user, setUser] = useState({
     name: 'Сергей',
@@ -66,8 +69,8 @@ export default function Profile() {
         columns={2}
       >
         {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
-        {Object.values(PROFILE_FIELDS).map((field) => (
-          <Field fieldName={field} key={field}></Field>
+        {Object.values(PROFILE_FIELDS).map((f) => (
+          <Field field={f} currentUrl={pathname} key={f.label}></Field>
         ))}
         <Container
           disableGutters
