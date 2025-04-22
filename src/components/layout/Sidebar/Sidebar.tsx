@@ -1,7 +1,6 @@
 'use client';
 
 import Link from "next/link";
-import Image from "next/image";
 import {
     List,
     ListItemButton,
@@ -34,23 +33,6 @@ export function Sidebar() {
 
             <Divider sx={{ my: 2 }} />
 
-            {/* Первый список: Настройки и О программе */}
-            <nav>
-                <ul>
-                    <li>
-                        <Link className="flex items-center mb-5" href="/my-requests" title="Мои заявки">
-                            <Image className="mr-1" src="/assets/images/first-level-settings.svg" alt="item" width={40} height={40} />
-                            Настройки
-                        </Link>
-                    </li>
-                    <li>
-                        <Link className="flex items-center mb-5" href="/about" title="О программе">
-                            <Image className="mr-1" src="/assets/images/about.svg" alt="item" width={40} height={40} />
-                            О программе
-                        </Link>
-                    </li>
-                </ul>
-            </nav>
 
             {/* Второй список прижат к низу */}
             <List style={{ marginTop: 'auto' }}>
