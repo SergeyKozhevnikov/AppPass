@@ -15,17 +15,15 @@ import {
 import './login.css';
 import Image from 'next/image';
 import { useState } from 'react';
-
-// Что сделать?
-// - Валидация полей
-// - Начало с /login, если авторизован перенаправлять на /
-// - Временную авторизацию можно через state сделать, правда, это должно быть глобальным или в localStorage убираться
+import { redirect } from 'next/navigation';
 
 export default function LoginPage() {
   const [isAuth, setIsAuth] = useState(false); // временная авторизация
-  const handleSubmit = () => {
+  const handleSubmit = (evt: any) => {
+    evt.preventDefault();
     setIsAuth(true);
     console.log('setAuth', isAuth);
+    redirect('/');
   };
 
   return (
