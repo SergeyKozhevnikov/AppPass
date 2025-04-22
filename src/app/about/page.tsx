@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 
-const AboutPage: React.FC = () => {
+const AboutPage = () => {
     return (
         <>
             <Head>
@@ -34,7 +34,7 @@ const AboutPage: React.FC = () => {
 
                     {/* Кнопка "Написать в поддержку" по центру */}
                     <div className="flex justify-center">
-                        <Button variant="contained" color="primary" className="px-8 py-2">
+                        <Button variant="contained" href="/create_support_request" color="primary" className="px-8 py-2">
                             Написать в поддержку
                         </Button>
                     </div>
