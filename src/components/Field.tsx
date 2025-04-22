@@ -1,7 +1,7 @@
 // Шаблон поля
 import { PROFILE_FIELDS } from '@/lib/constants';
 import { Grid, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+// import { useState } from 'react';
 
 // объединенный тип из значений объекта + интерфейс для пропсов
 type ProfileFieldValue = (typeof PROFILE_FIELDS)[keyof typeof PROFILE_FIELDS];
@@ -23,7 +23,7 @@ const getFieldStyles = (isDisabled: boolean) => ({
 });
 
 export default function Field({ field, currentUrl }: FieldProps) {
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   // необязательные и закрытые для изменения поля
   const optionalFields =
     field === PROFILE_FIELDS.pos ||
@@ -47,7 +47,7 @@ export default function Field({ field, currentUrl }: FieldProps) {
     }
   };
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  // const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   return (
     <Grid container size={1}>

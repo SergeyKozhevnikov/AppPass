@@ -12,9 +12,9 @@ import {
   IconButton,
 } from '@mui/material';
 import { useState } from 'react';
+import { Close } from '@mui/icons-material';
 import { REGISTER_FIELDS } from '@/lib/constants';
 import Field from '@/components/Field';
-import { Close } from '@mui/icons-material';
 
 // Модальное окно вызывается на странице добавления пользователя (туда компонент и состояние isOpen)
 // - Логин подставляется автоматически пользователя (если время много не займет)
@@ -25,7 +25,7 @@ import { Close } from '@mui/icons-material';
 export default function Register() {
   const [isOpen, setIsOpen] = useState(true);
 
-  function handleSubmit(evt: any): void {
+  function handleSubmit(evt: { preventDefault: () => void }): void {
     evt.preventDefault();
     setIsOpen(false);
     alert('Пользователь создан (тест)');

@@ -19,7 +19,7 @@ import { redirect } from 'next/navigation';
 
 export default function LoginPage() {
   const [isAuth, setIsAuth] = useState(false); // временная авторизация
-  const handleSubmit = (evt: any) => {
+  const handleSubmit = (evt: { preventDefault: () => void }) => {
     evt.preventDefault();
     setIsAuth(true);
     console.log('setAuth', isAuth);
