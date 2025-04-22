@@ -93,7 +93,7 @@ export default function LoginPage() {
                   control={<Checkbox value="remember" color="primary" />}
                   label="Запомнить меня"
                 />
-                <Link underline="hover" href="/" color="inherit">
+                <Link underline="hover" href="#" color="inherit">
                   Забыли пароль?
                 </Link>
               </Box>
