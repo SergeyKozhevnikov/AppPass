@@ -227,7 +227,7 @@ export default function GuestPassForm() {
       <CssBaseline />
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
         <MainContainer>
-          <Card sx={{ width: '100%', maxWidth: '100%', margin: '0 auto' }}>
+          <Card sx={{ height: '100%', width: '100%', maxWidth: '100%', margin: '0 auto' }}>
             {/* Табы для переключения между разделами */}
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs
