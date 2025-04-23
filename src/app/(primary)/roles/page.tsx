@@ -1,11 +1,14 @@
-// Страница управления ролями (Федор Г)
 
-export default function RoleManage() {
+import React from 'react';
+import UsersList from '@/components/UsersList';
+
+const UsersPage: React.FC = () => {
   return (
-    <main>
-      <section className="role-manage">
-        <h1 className="role-manage__title">Управление ролями</h1>
-      </section>
-    </main>
+    <div>
+      <h1>Управление ролями</h1>
+      <UsersList />
+    </div>
   );
-}
+};
+
+export default UsersPage;
