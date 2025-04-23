@@ -1,6 +1,6 @@
 **Начало работы в GIT**
 шаг 0 - сделать локальную копию проекта  
-git clone [https://github.com/DenSakharov/impuls.git](https://github.com/DenSakharov/impuls.git)
+git clone https://github.com/SergeyKozhevnikov/AppPass.git
 
 шаг 0 - Профиль
   git config --global user.email "you@example.com"
@@ -24,4 +24,3 @@ git checkout main
 git merge develop  
 git push
 
-Create sub-issue
