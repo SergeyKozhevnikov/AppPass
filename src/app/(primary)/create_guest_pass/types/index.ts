@@ -7,6 +7,7 @@ export interface TabPanelProps {
   value: number
   onSubmit?: () => void
   onSave?: () => void
+  onCancel?: () => void
   [key: string]: unknown // Для остальных пропсов, если они есть
 }
 
