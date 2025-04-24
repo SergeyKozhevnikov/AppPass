@@ -1,18 +1,16 @@
 // Страница управления ролями (Федор Г)
 'use client'; // определяет компонент как клиентский
 
-import Register from '@/app/(auth)/register/page';
+import Register from '@/components/RegisterModal';
 import { Button } from '@mui/material';
 import { useState } from 'react';
 import React from 'react';
 import UsersList from '@/components/UsersList';
 
 const UsersPage: React.FC = () => {
-
-    // для открытия диалоговвого окна
-    const [isOpen, setIsOpen] = useState(false);
+  // для открытия диалоговвого окна
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    
     <div>
       <h1>Управление пользователями</h1>
       <section className="role-manage">
@@ -35,5 +33,3 @@ const UsersPage: React.FC = () => {
 };
 
 export default UsersPage;
-
-

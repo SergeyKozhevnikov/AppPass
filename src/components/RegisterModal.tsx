@@ -11,20 +11,22 @@ import {
   DialogActions,
   IconButton,
 } from '@mui/material';
-import { useState } from 'react';
 import { Close } from '@mui/icons-material';
 import { REGISTER_FIELDS } from '@/lib/constants';
 import Field from '@/components/Field';
+import { Dispatch, SetStateAction } from 'react';
 
-// Модальное окно вызывается на странице добавления пользователя (туда компонент и состояние isOpen)
 // - Логин подставляется автоматически пользователя (если время много не займет)
 // - Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
-// - Автоматически роль - пользователь (нужно ли делать выбор при создании или просто в таблице ролей потом)
 // При создании пользователя сначала запрос в БД нет ли такого же логина (а соответсвенно и почты), если есть, информировать в поле, исправить вручную
 // а также смотрим последний табельный и прибавляем к нему +1
-export default function Register() {
-  const [isOpen, setIsOpen] = useState(true);
+interface IProps {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+}
 
+export default function RegisterModal(props: IProps) {
+  const { isOpen, setIsOpen } = props;
   function handleSubmit(evt: { preventDefault: () => void }): void {
     evt.preventDefault();
     setIsOpen(false);
