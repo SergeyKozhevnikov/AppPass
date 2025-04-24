@@ -6,12 +6,6 @@ import Link from "next/link";
 
 export const DashboardMenu = () => (
   <>
-    <ListItemButton component={Link} href="/dashboard">
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Dashboard" />
-    </ListItemButton>
     <ListItemButton component={Link} href="/passwords">
       <ListItemIcon>
         <LockIcon />
