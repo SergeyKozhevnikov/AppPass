@@ -23,11 +23,10 @@ const UsersPage: React.FC = () => {
           Создать пользователя
         </Button>
 
-        {/* Условие, если isOpen-true, открыть диалоговое окно и передать ему параметры isOpen и setIsOpen*/}
-        {isOpen && <Register isOpen={isOpen} setIsOpen={setIsOpen} />}
-
-        <h1 className="role-manage__title">Управление ролями</h1>
+      {/* Условие, если isOpen-true, открыть диалоговое окно и передать ему параметры isOpen и setIsOpen*/}
+      {isOpen && <Register isOpen={isOpen} setIsOpen={setIsOpen} />}
       </section>
+      
       <UsersList />
     </div>
   );
