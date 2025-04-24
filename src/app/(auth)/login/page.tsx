@@ -38,6 +38,7 @@ export default function LoginPage() {
     if (res && !res.error) {
       router.push('/');
     } else {
+      alert(`Ошибка ${res?.error}. Проверьте введенные данные`);
       console.log(res);
     }
   };
