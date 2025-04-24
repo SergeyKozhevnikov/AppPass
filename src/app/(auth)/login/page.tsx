@@ -14,16 +14,32 @@ import {
 } from '@mui/material';
 import './login.css';
 import Image from 'next/image';
-import { useState } from 'react';
-import { redirect } from 'next/navigation';
+import { FormEventHandler } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { AUTH_FIELDS } from '@/lib/constants';
 
 export default function LoginPage() {
-  const [isAuth, setIsAuth] = useState(false); // временная авторизация
-  const handleSubmit = (evt: { preventDefault: () => void }) => {
-    evt.preventDefault();
-    setIsAuth(true);
-    console.log('setAuth', isAuth);
-    redirect('/');
+  const router = useRouter();
+
+  // обработка отправки
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+
+    const res = await signIn('credentials', {
+      login: formData.get('login'),
+      password: formData.get('password'),
+      redirect: false, // чтобы в случае ошибки не перебрасывало на встроенную форму nextauth
+    });
+
+    // есть ответ и нет ошибки
+    if (res && !res.error) {
+      router.push('/');
+    } else {
+      console.log(res);
+    }
   };
 
   return (
@@ -55,6 +71,8 @@ export default function LoginPage() {
               <TextField
                 placeholder="Введите логин"
                 fullWidth
+                name={AUTH_FIELDS.login.label}
+                type={AUTH_FIELDS.login.type}
                 required
                 autoFocus
                 sx={{
@@ -72,7 +90,8 @@ export default function LoginPage() {
                 placeholder="Введите пароль"
                 fullWidth
                 required
-                type="password"
+                name={AUTH_FIELDS.password.label}
+                type={AUTH_FIELDS.password.type}
                 sx={{
                   mt: 0.5,
                   mb: 1,
