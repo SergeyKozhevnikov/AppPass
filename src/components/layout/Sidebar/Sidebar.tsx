@@ -11,6 +11,7 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { ConfigurableSidebar } from "@/components/ConfigurableSidebar"; // Подключаем новый компонент
+import { signOut } from "next-auth/react";
 
 export function Sidebar() {
     const headerHeight = process.env.NEXT_PUBLIC_HEADER_HEIGHT;
@@ -43,7 +44,15 @@ export function Sidebar() {
                     <ListItemText primary="О системе" />
                 </ListItemButton>
 
-                <ListItemButton component={Link} href="/logout">
+                <ListItemButton
+                    component={Link}
+                    href="#"
+                    onClick={() =>
+                        signOut({
+                            callbackUrl: "/login",
+                        })
+                    }
+                >
                     <ListItemIcon>
                         <ExitToAppIcon />
                     </ListItemIcon>
