@@ -1,6 +1,6 @@
-// src/components/RequestList.tsx
+"use client"
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Card,
@@ -21,21 +21,35 @@ import { mockRequests } from '@/mock/requests';
 import RequestFilter from './RequestFilter';
 
 type RequestListProps = {
-  status?: 'drafts' | 'inReview' | 'approved' | 'rejected'; // Сделать status опциональным
+  status?: 'drafts' | 'inReview' | 'approved' | 'rejected';
 };
 
 const RequestList: React.FC<RequestListProps> = ({ status }) => {
-  // Фильтруем заявки, если статус передан
-  const filteredRequests = status
-    ? mockRequests.filter((req) => req.status === status)
-    : mockRequests; // Если статус не передан, показываем все заявки
+  const [filters, setFilters] = useState<{ date: string; search: string }>({ date: '', search: '' });
+
+  const handleFilterChange = (newFilters: { date: string; search: string }) => {
+    setFilters(newFilters);
+  };
+
+  const filteredRequests = useMemo(() => {
+    return mockRequests.filter((req) => {
+      const matchesStatus = status ? req.status === status : true;
+      const matchesDate = filters.date ? req.date === filters.date : true;
+      const matchesSearch = filters.search
+        ? `${req.firstName} ${req.lastName} ${req.middleName}`.toLowerCase().includes(filters.search.toLowerCase())
+        : true;
+
+      return matchesStatus && matchesDate && matchesSearch;
+    });
+  }, [filters, status]);
 
   return (
     <div>
-      <RequestFilter />
+      <RequestFilter onFilterChange={handleFilterChange} />
+
       <Card sx={{ boxShadow: 'none', border: 'none' }}>
-        <CardContent sx={{ boxShadow: 'none', border: 'none', p: 0  }}>
-          <Box sx={{ boxShadow: 'none', border: 'none' }} mt={2} className="overflow-x-auto">
+        <CardContent sx={{ boxShadow: 'none', border: 'none', p: 0 }}>
+          <Box mt={2} className="overflow-x-auto">
             <Paper sx={{ boxShadow: 'none', border: 'none' }}>
               <Table>
                 <TableHead className="bg-gray-100">
@@ -46,8 +60,8 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                     <TableCell>Отчество</TableCell>
                     <TableCell>Авто</TableCell>
                     <TableCell>Материалы</TableCell>
-                    <TableCell className="w-[15px]" align="center"></TableCell>
-                    <TableCell className="w-[15px]" align="center"></TableCell>
+                    <TableCell align="center" className="w-[15px]"></TableCell>
+                    <TableCell align="center" className="w-[15px]"></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -77,6 +91,11 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                   ))}
                 </TableBody>
               </Table>
+              {filteredRequests.length === 0 && (
+                <Box textAlign="center" py={4} color="gray">
+                  Ничего не найдено по текущим фильтрам
+                </Box>
+              )}
             </Paper>
           </Box>
         </CardContent>

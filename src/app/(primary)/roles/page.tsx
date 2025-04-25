@@ -12,7 +12,6 @@ const UsersPage: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div>
-      <h1>Управление пользователями</h1>
       <section className="role-manage">
         {/* Кнопка создания нового пользователя */}
         <Button
