@@ -55,13 +55,9 @@ export const DefaultMenu = () => {
         </List>
       </Collapse>
 
-      {/* Пункт "Настройки" */}
-      <ListItemButton onClick={handleSettingsClick}>
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-        <ListItemText primary="Настройки" />
-        {openSettings ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+      <ListItemButton component={Link} href="/dashboard">
+        <ListItemIcon><TextSnippetIcon /></ListItemIcon>
+        <ListItemText primary="Дашборд" />
       </ListItemButton>
 
       {/* Подменю для "Настройки" (пока пустое, как в макете) */}
