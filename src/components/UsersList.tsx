@@ -23,7 +23,7 @@ const UsersList = () => {
      
       <Card sx={{ boxShadow: 'none', border: 'none' }}>
         <CardContent sx={{ boxShadow: 'none', border: 'none', p: 0  }}>
-          <Box sx={{ boxShadow: 'none', border: 'none' }} mt={2}>
+          <Box sx={{ boxShadow: 'none', border: 'none' }} mt={2} className="overflow-x-auto">
             <Paper sx={{ boxShadow: 'none', border: 'none' }}>
               <Table>
                 <TableHead className="bg-gray-100">
