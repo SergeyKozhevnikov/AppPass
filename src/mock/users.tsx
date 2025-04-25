@@ -33,5 +33,24 @@ export const mockUsers: UsersRequest[] = [
     email: '222@mail.ru',
     role: 'Согласующий',
   },
-
+  {
+    id: 3,
+    tnumber: '34567092',
+    lastName: 'Александров',
+    firstName: 'Иван',
+    middleName: 'Петрович',
+    spiciality: 'Старший специалист',
+    email: '333@mail.ru',
+    role: 'Администратор',
+  },
+  {
+    id: 4,
+    tnumber: '20455091',
+    lastName: 'Камов',
+    firstName: 'Семён',
+    middleName: 'Алексеевич',
+    spiciality: 'Ведущий Инженер',
+    email: '444@mail.ru',
+    role: 'Согласующий',
+  },
 ];

@@ -48,7 +48,7 @@ const UsersList = () => {
                       <TableCell>{req.middleName}</TableCell>
                       <TableCell>{req.spiciality}</TableCell>
                       <TableCell>{req.email}</TableCell>
-                      <TableCell><select><option>Администратор</option><option>Согласующий</option></select></TableCell>
+                      <TableCell><select><option>Администратор</option><option>Согласующий</option><option>Пользователь</option></select></TableCell>
                       <TableCell align="center">
                         <IconButton color="primary" aria-label="редактировать">
                           <EditIcon />

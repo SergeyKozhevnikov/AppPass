@@ -14,13 +14,13 @@ export const DashboardMenu = () => (
       <ListItemIcon>
         <LockIcon />
       </ListItemIcon>
-      <ListItemText primary="Passwords" />
+      <ListItemText primary="Новый пользователь" />
     </ListItemButton>
     <ListItemButton component={Link} href="/roles">
       <ListItemIcon>
         <GroupIcon />
       </ListItemIcon>
-      <ListItemText primary="Roles" />
+      <ListItemText primary="Управление ролями" />
     </ListItemButton>
   </>
 );
