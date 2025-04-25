@@ -7,21 +7,15 @@ import {
   Collapse
 } from "@mui/material";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import SettingsIcon from "@mui/icons-material/Settings";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Link from "next/link";
 
 export const DefaultMenu = () => {
   const [openRequests, setOpenRequests] = useState(true);
-  const [openSettings, setOpenSettings] = useState(false);
 
   const handleRequestsClick = () => {
     setOpenRequests(!openRequests);
-  };
-
-  const handleSettingsClick = () => {
-    setOpenSettings(!openSettings);
   };
 
   return (
@@ -55,21 +49,11 @@ export const DefaultMenu = () => {
         </List>
       </Collapse>
 
-      {/* Пункт "Настройки" */}
-      <ListItemButton onClick={handleSettingsClick}>
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-        <ListItemText primary="Настройки" />
-        {openSettings ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+      <ListItemButton component={Link} href="/dashboard">
+        <ListItemIcon><TextSnippetIcon /></ListItemIcon>
+        <ListItemText primary="Дашборд" />
       </ListItemButton>
-
-      {/* Подменю для "Настройки" (пока пустое, как в макете) */}
-      <Collapse in={openSettings} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          {/* Здесь могут быть подпункты настроек */}
-        </List>
-      </Collapse>
+      
     </List>
   );
 };
