@@ -64,7 +64,7 @@ export default function LoginPage() {
   const fieldStyle = {
     mb: 2,
     '& fieldset': { border: 'none' },
-    '& .MuiInputBase-input': {
+    '& .MuiInputBase-root .MuiInputBase-input': {
       bgcolor: '#F9F9F9',
       borderRadius: '8px',
     },
