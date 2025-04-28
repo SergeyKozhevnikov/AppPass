@@ -4,7 +4,7 @@
 
 // Константа для авторизации пользователя
 export const AUTH_FIELDS = {
-  login: { label: 'login', type: 'login' },
+  login: { label: 'login', type: 'text' },
   password: { label: 'password', type: 'password' },
 } as const;
 

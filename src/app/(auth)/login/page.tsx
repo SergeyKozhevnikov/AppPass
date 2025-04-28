@@ -14,23 +14,40 @@ import {
 } from '@mui/material';
 import './login.css';
 import Image from 'next/image';
-import { FormEventHandler } from 'react';
 import { useRouter } from 'next/navigation';
+import { FormEventHandler } from 'react';
 import { signIn } from 'next-auth/react';
 import { AUTH_FIELDS } from '@/lib/constants';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { authFields, authSchema } from '../../../interfaces/zod-types';
 
 export default function LoginPage() {
   const router = useRouter();
 
-  // обработка отправки
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
+  // получаем register и errors деструкторизацией
+  // zodResolver интегрирует zod схему в форму
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<authFields>({
+    resolver: zodResolver(authSchema),
+    defaultValues: {
+      login: '',
+      password: '',
+    },
+    mode: 'onChange', // Валидация при изменении полей
+  });
 
-    const formData = new FormData(event.currentTarget);
+  // Обработчик отправки формы
+  const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(async () => {
+    const formData = getValues();
 
     const res = await signIn('credentials', {
-      login: formData.get('login'),
-      password: formData.get('password'),
+      login: formData.login,
+      password: formData.password,
       redirect: false, // чтобы в случае ошибки не перебрасывало на встроенную форму nextauth
     });
 
@@ -41,6 +58,23 @@ export default function LoginPage() {
       alert(`Ошибка ${res?.error}. Проверьте введенные данные`);
       console.log(res);
     }
+  });
+
+  // стиль для полей
+  const fieldStyle = {
+    mb: 2,
+    '& fieldset': { border: 'none' },
+    '& .MuiInputBase-input': {
+      bgcolor: '#F9F9F9',
+      borderRadius: '8px',
+    },
+    // для ошибки
+    '& .MuiFormHelperText-root.Mui-error': {
+      m: 0,
+      pt: 1,
+      pl: 2,
+      bgcolor: '#E5E5E5',
+    },
   };
 
   return (
@@ -64,7 +98,7 @@ export default function LoginPage() {
                 maxWidth: '400px',
               }}
             >
-              {/* Логотип для экранов менее 900 */}
+              {/* Логотип - для экранов менее 900 */}
               <ImageListItem
                 sx={{
                   d: 'flex',
@@ -83,24 +117,21 @@ export default function LoginPage() {
               <Typography component="h1" variant="h5" sx={{ mb: 5 }}>
                 Вход в систему
               </Typography>
-              <Box component="form" onSubmit={handleSubmit} noValidate>
+
+              {/* Поля ввода */}
+              <Box component="form" onSubmit={onSubmit} noValidate>
                 <Typography variant="caption" color="initial">
                   Логин
                 </Typography>
                 <TextField
                   placeholder="Введите логин"
                   fullWidth
-                  name={AUTH_FIELDS.login.label}
-                  type={AUTH_FIELDS.login.type}
-                  required
                   autoFocus
-                  sx={{
-                    mt: 0.5,
-                    mb: 2,
-                    bgcolor: '#F9F9F9',
-                    '& fieldset': { border: 'none' },
-                    borderRadius: '8px',
-                  }}
+                  type={AUTH_FIELDS.login.type}
+                  {...register('login')}
+                  error={!!errors.login} // двойное отрицание для преобразование в булевое
+                  helperText={errors.login?.message}
+                  sx={fieldStyle}
                 />
                 <Typography variant="caption" color="initial">
                   Пароль
@@ -108,17 +139,14 @@ export default function LoginPage() {
                 <TextField
                   placeholder="Введите пароль"
                   fullWidth
-                  required
-                  name={AUTH_FIELDS.password.label}
                   type={AUTH_FIELDS.password.type}
-                  sx={{
-                    mt: 0.5,
-                    mb: 1,
-                    bgcolor: '#F9F9F9',
-                    '& fieldset': { border: 'none' },
-                    borderRadius: '8px',
-                  }}
+                  {...register('password')}
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                  sx={fieldStyle}
                 />
+
+                {/* Чекбокс и Забыли пароль */}
                 <Box
                   sx={{
                     display: 'flex',
@@ -135,6 +163,8 @@ export default function LoginPage() {
                     Забыли пароль?
                   </Link>
                 </Box>
+
+                {/* Кнопка войти */}
                 <Button
                   type="submit"
                   variant="contained"
@@ -147,7 +177,7 @@ export default function LoginPage() {
             </Box>
           </Grid>
 
-          {/* Логотип для экранов более 900 */}
+          {/* Логотип - для экранов более 900 */}
           <Grid
             sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }}
             className="login-intro"
