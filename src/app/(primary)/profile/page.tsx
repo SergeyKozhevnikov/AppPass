@@ -106,7 +106,8 @@ export default function Profile() {
         onSubmit={onSubmit}
         container
         spacing={3}
-        columns={2}
+        columns={{ xs: 1, md: 2 }}
+        sx={{ justifyContent: { xs: 'center', md: 'end' } }}
       >
         {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
         {Object.values(PROFILE_FIELDS).map((f) => (
@@ -118,14 +119,13 @@ export default function Profile() {
             key={f.label}
           ></Field>
         ))}
-        <Container
-          disableGutters
+        <Grid
+          container
+          size={{ xs: 1, md: 2 }}
           sx={{
             display: 'flex',
-            justifyContent: 'space-between',
             color: '#007EC0',
-            mt: 2.5,
-            mb: 3,
+            justifyContent: { xs: 'center', md: 'end' },
           }}
         >
           <Link underline="hover" href="#" color="inherit">
@@ -135,11 +135,11 @@ export default function Profile() {
             type="submit"
             variant="contained"
             fullWidth
-            sx={{ width: '250px' }}
+            sx={{ width: { xs: '100%', sm: '250px'} }}
           >
             Применить
           </Button>
-        </Container>
+        </Grid>
       </Grid>
     </Container>
   );
