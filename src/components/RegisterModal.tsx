@@ -14,10 +14,12 @@ import {
 import { Close } from '@mui/icons-material';
 import { REGISTER_FIELDS } from '@/lib/constants';
 import Field from '@/components/Field';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, FormEventHandler, SetStateAction } from 'react';
+import { useForm } from 'react-hook-form';
+import { newUserFields, newUserSchema } from '@/interfaces/zod-types';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-// - Логин подставляется автоматически пользователя (если время много не займет)
-// - Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
+// Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
 // При создании пользователя сначала запрос в БД нет ли такого же логина (а соответсвенно и почты), если есть, информировать в поле, исправить вручную
 // а также смотрим последний табельный и прибавляем к нему +1
 interface IProps {
@@ -27,11 +29,37 @@ interface IProps {
 
 export default function RegisterModal(props: IProps) {
   const { isOpen, setIsOpen } = props;
-  function handleSubmit(evt: { preventDefault: () => void }): void {
-    evt.preventDefault();
-    setIsOpen(false);
-    alert('Пользователь создан (тест)');
-  }
+
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<newUserFields>({
+    resolver: zodResolver(newUserSchema),
+    defaultValues: {
+      surname: '',
+      name: '',
+      patronymic: '',
+      login: '',
+      email: '', // @atom.ru
+      password: '',
+    },
+    mode: 'onChange', // Валидация при изменении полей
+  });
+
+  // Обработчик отправки формы
+  const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
+    const formData = getValues();
+    console.log(formData);
+
+    if (formData) {
+      setIsOpen(false);
+      alert(`Пользователь успешно создан`);
+    } else {
+      alert(`Что-то пошло не так. Проверьте введенные данные`);
+    }
+  });
 
   return (
     <Container component="section">
@@ -62,7 +90,8 @@ export default function RegisterModal(props: IProps) {
         <DialogContent>
           <Grid
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
+            noValidate
             container
             spacing={3}
             columns={2}
@@ -70,7 +99,12 @@ export default function RegisterModal(props: IProps) {
           >
             {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
             {Object.values(REGISTER_FIELDS).map((f) => (
-              <Field field={f} key={f.label}></Field>
+              <Field
+                field={f}
+                errors={errors[f.label]}
+                register={register}
+                key={f.label}
+              ></Field>
             ))}
 
             <DialogActions sx={{ p: 0 }}>

@@ -16,7 +16,7 @@ export interface IUserProfile extends IRegisteredUser {
   tabNum: number;
   pos?: string;
   department?: string;
-  phoneNumber?: number;
+  phoneNum?: string;
 }
 
 // Остальные свойства (т.е. все свойства пользователя)
