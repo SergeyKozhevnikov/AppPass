@@ -11,10 +11,14 @@
             "id": "e23f401f21e18e60",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Project AppPass/Инструкции/Начало работы в GIT.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "Новая вкладка"
+              "title": "Начало работы в GIT"
             }
           }
         ]
@@ -192,14 +196,14 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "a1a4b43981d0a807",
+  "active": "e23f401f21e18e60",
   "lastOpenFiles": [
-    "Project AppPass/Home.md",
+    "Project AppPass/Инструкции/Запуск проекта.md",
     "Project AppPass/Инструкции/Деплой системы на сервер.md",
     "Project AppPass/Инструкции/Начало работы в GIT.md",
-    "Project AppPass/Инструкции/Запуск проекта.md",
     "Project AppPass/Защита/Защита Фронт.md",
     "Project AppPass/Защита/Pasted image 20250423155002.png",
+    "Project AppPass/Home.md",
     "Project AppPass/Защита",
     "Home.md",
     "Без названия 1.canvas",
