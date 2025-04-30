@@ -4,30 +4,30 @@
 
 // Константа для авторизации пользователя
 export const AUTH_FIELDS = {
-  login: { label: 'login', type: 'login' },
+  login: { label: 'login', type: 'text' },
   password: { label: 'password', type: 'password' },
 } as const;
 
 // Константа для полей создания пользователя
 export const REGISTER_FIELDS = {
-  surname: { label: 'Фамилия', type: 'text' },
-  name: { label: 'Имя', type: 'text' },
-  patronymic: { label: 'Отчество', type: 'text' },
-  login: { label: 'Логин', type: 'text' },
-  email: { label: 'Почта', type: 'email' },
-  password: { label: 'Пароль', type: 'password' },
+  surname: { label: 'surname', labelRu: 'Фамилия', type: 'text' },
+  name: { label: 'name', labelRu: 'Имя', type: 'text' },
+  patronymic: { label: 'patronymic', labelRu: 'Отчество', type: 'text' },
+  login: { label: 'login', labelRu: 'Логин', type: 'text' },
+  email: { label: 'email', labelRu: 'Почта', type: 'email' },
+  password: { label: 'password', labelRu: 'Пароль', type: 'password' },
 } as const;
 
-// Константа для полей профиля
+// Константа для полей профиля (без roles, т.к. это не поле)
 export const PROFILE_FIELDS = {
-  tabNum: { label: 'Табельный номер', type: 'number' },
-  surname: { label: 'Фамилия', type: 'text' },
-  name: { label: 'Имя', type: 'text' },
-  patronymic: { label: 'Отчество', type: 'text' },
-  pos: { label: 'Должность', type: 'text' },
-  department: { label: 'Подразделение', type: 'text' },
-  login: { label: 'Логин', type: 'text' },
-  email: { label: 'Почта', type: 'email' },
-  password: { label: 'Пароль', type: 'password' },
-  phoneNum: { label: 'Телефон', type: 'number' },
+  tabNum: { label: 'tabNum', labelRu: 'Табельный номер', type: 'number' },
+  surname: { label: 'surname', labelRu: 'Фамилия', type: 'text' },
+  name: { label: 'name', labelRu: 'Имя', type: 'text' },
+  patronymic: { label: 'patronymic', labelRu: 'Отчество', type: 'text' },
+  pos: { label: 'pos', labelRu: 'Должность', type: 'text' },
+  department: { label: 'department', labelRu: 'Подразделение', type: 'text' },
+  login: { label: 'login', labelRu: 'Логин', type: 'text' },
+  email: { label: 'email', labelRu: 'Почта', type: 'email' },
+  password: { label: 'password', labelRu: 'Пароль', type: 'password' },
+  phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'string' },
 } as const;

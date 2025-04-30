@@ -14,24 +14,64 @@ import {
   Avatar,
   Grid,
 } from '@mui/material';
-import { useState } from 'react';
+import { FormEventHandler, useState } from 'react';
+import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 export default function Profile() {
   // Текущий путь url
   const pathname = usePathname();
   // Пример состояния пользователя
   const [user, setUser] = useState({
-    name: 'Сергей',
-    surname: 'Петров',
-    role: 'Менеджер',
+    tabNum: '0001',
+    surname: 'Фамилия',
+    name: 'Имя',
+    patronymic: 'Отчество',
+    pos: 'Инженер',
+    department: 'Отдел 3',
+    login: 'iofamiliya',
+    email: 'iofamiliya@atom.ru',
+    password: 'iofamiliya',
+    phoneNum: '3-33-33',
+    role: 'Пользователь',
   });
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
-    event.preventDefault(); // Предотвращаем перезагрузку страницы
-    console.log('submit', user);
-    setUser({ name: 'Алексей', surname: 'Иванов', role: 'Консультант' });
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<profileUserFields>({
+    resolver: zodResolver(profileUserSchema),
+    defaultValues: {
+      tabNum: '0001',
+      surname: '',
+      name: '',
+      patronymic: '',
+      pos: '',
+      department: '',
+      login: 'login',
+      email: `login@atom.ru`,
+      password: '',
+      phoneNum: '',
+      role: 'Пользователь',
+    },
+    mode: 'onChange', // Валидация при изменении полей
+  });
+
+  // Обработчик отправки формы
+  const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
+    const { ...formData } = getValues();
+    setUser(formData);
+
     // Здесь можно добавить логику отправки данных на сервер
-  }
+    if (formData) {
+      alert('Данные пользователя успешно изменены');
+    } else {
+      alert(`Что-то пошло не так. Проверьте введенные данные`);
+    }
+  });
 
   return (
     <Container
@@ -63,23 +103,29 @@ export default function Profile() {
       </Box>
       <Grid
         component="form"
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
         container
         spacing={3}
-        columns={2}
+        columns={{ xs: 1, md: 2 }}
+        sx={{ justifyContent: { xs: 'center', md: 'end' } }}
       >
         {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
         {Object.values(PROFILE_FIELDS).map((f) => (
-          <Field field={f} currentUrl={pathname} key={f.label}></Field>
+          <Field
+            field={f}
+            currentUrl={pathname}
+            errors={errors[f.label]}
+            register={register}
+            key={f.label}
+          ></Field>
         ))}
-        <Container
-          disableGutters
+        <Grid
+          container
+          size={{ xs: 1, md: 2 }}
           sx={{
             display: 'flex',
-            justifyContent: 'space-between',
             color: '#007EC0',
-            mt: 2.5,
-            mb: 3,
+            justifyContent: { xs: 'center', md: 'end' },
           }}
         >
           <Link underline="hover" href="#" color="inherit">
@@ -89,11 +135,11 @@ export default function Profile() {
             type="submit"
             variant="contained"
             fullWidth
-            sx={{ width: '250px' }}
+            sx={{ width: { xs: '100%', sm: '250px'} }}
           >
             Применить
           </Button>
-        </Container>
+        </Grid>
       </Grid>
     </Container>
   );

@@ -14,10 +14,13 @@ import {
 import { Close } from '@mui/icons-material';
 import { REGISTER_FIELDS } from '@/lib/constants';
 import Field from '@/components/Field';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, FormEventHandler, SetStateAction } from 'react';
+import { useForm } from 'react-hook-form';
+import { newUserFields, newUserSchema } from '@/interfaces/zod-types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { scrollbarStyles } from '@/styles/shared-styles';
 
-// - Логин подставляется автоматически пользователя (если время много не займет)
-// - Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
+// Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
 // При создании пользователя сначала запрос в БД нет ли такого же логина (а соответсвенно и почты), если есть, информировать в поле, исправить вручную
 // а также смотрим последний табельный и прибавляем к нему +1
 interface IProps {
@@ -27,18 +30,44 @@ interface IProps {
 
 export default function RegisterModal(props: IProps) {
   const { isOpen, setIsOpen } = props;
-  function handleSubmit(evt: { preventDefault: () => void }): void {
-    evt.preventDefault();
-    setIsOpen(false);
-    alert('Пользователь создан (тест)');
-  }
+
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<newUserFields>({
+    resolver: zodResolver(newUserSchema),
+    defaultValues: {
+      surname: '',
+      name: '',
+      patronymic: '',
+      login: '',
+      email: '', // @atom.ru
+      password: '',
+    },
+    mode: 'onChange', // Валидация при изменении полей
+  });
+
+  // Обработчик отправки формы
+  const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
+    const formData = getValues();
+    console.log(formData);
+
+    if (formData) {
+      setIsOpen(false);
+      alert(`Пользователь успешно создан`);
+    } else {
+      alert(`Что-то пошло не так. Проверьте введенные данные`);
+    }
+  });
 
   return (
     <Container component="section">
       <Dialog
         open={isOpen}
         onClose={() => setIsOpen(false)}
-        sx={{ p: 2 }}
+        sx={{ p: 2, maxHeight: '80%', margin: 'auto' }}
         maxWidth="md"
         fullWidth
       >
@@ -46,7 +75,7 @@ export default function RegisterModal(props: IProps) {
           container
           sx={{ p: 2, alignItems: 'start', justifyContent: 'space-between' }}
         >
-          <DialogTitle sx={{ p: 0, mb: 2 }}>Создание пользователя</DialogTitle>
+          <DialogTitle sx={{ p: 0 }}>Создание пользователя</DialogTitle>
           <DialogActions sx={{ p: 0 }}>
             <IconButton
               aria-label="delete"
@@ -59,34 +88,64 @@ export default function RegisterModal(props: IProps) {
             </IconButton>
           </DialogActions>
         </Grid>
-        <DialogContent>
-          <Grid
-            component="form"
-            onSubmit={handleSubmit}
-            container
-            spacing={3}
-            columns={2}
-            sx={{ justifyContent: 'flex-end' }}
-          >
-            {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
-            {Object.values(REGISTER_FIELDS).map((f) => (
-              <Field field={f} key={f.label}></Field>
-            ))}
+        <Container
+          component="section"
+          disableGutters
+          sx={{
+            height: '100%',
+            maxWidth: '1200px',
+            minHeight: '100%',
+            pt: 1,
+            flexGrow: 1,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            ...scrollbarStyles,
+            // [theme.breakpoints.up('sm')]: {}, - применить стили выше размера экрана sm (600px)
+          }}
+        >
+          <DialogContent>
+            <Grid
+              component="form"
+              onSubmit={onSubmit}
+              noValidate
+              container
+              spacing={3}
+              columns={{ xs: 1, md: 2 }}
+              sx={{ justifyContent: { xs: 'center', sm: 'end' } }}
+            >
+              {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
+              {Object.values(REGISTER_FIELDS).map((f) => (
+                <Field
+                  field={f}
+                  errors={errors[f.label]}
+                  register={register}
+                  key={f.label}
+                ></Field>
+              ))}
 
-            <DialogActions sx={{ p: 0 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setIsOpen(false)}
-              >
-                Отмена
-              </Button>
-              <Button variant="contained" color="primary" type="submit">
-                Отправить
-              </Button>
-            </DialogActions>
-          </Grid>
-        </DialogContent>
+              <DialogActions sx={{ p: 0 }}>
+                <Grid
+                  container
+                  spacing={2}
+                  columns={{ xs: 1, sm: 2 }}
+                  wrap="wrap"
+                  justifyContent={{ xs: 'center', md: 'space-between' }}
+                >
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Отмена
+                  </Button>
+                  <Button variant="contained" color="primary" type="submit">
+                    Отправить
+                  </Button>
+                </Grid>
+              </DialogActions>
+            </Grid>
+          </DialogContent>
+        </Container>
       </Dialog>
     </Container>
   );
