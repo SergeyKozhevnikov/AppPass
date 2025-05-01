@@ -108,7 +108,6 @@ export default function LoginPage() {
                     m: 'auto',
                   }}
                 >
-                  {/* action useEffect or Timer на set(false) */}
                   Ошибка. Проверьте введенные данные
                 </Alert>
               </Box>
