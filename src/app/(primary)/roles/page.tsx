@@ -6,6 +6,7 @@ import { Alert, Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import React from 'react';
 import UsersList from '@/components/UsersList';
+import { alertStyle } from '@/styles/shared-styles';
 
 const UsersPage: React.FC = () => {
   // для открытия диалоговвого окна
@@ -37,17 +38,6 @@ const UsersPage: React.FC = () => {
       setIsOpenErrorAlert(false);
     }
   }, [isOpen]);
-
-  // Стиль для Alert
-  const alertStyle = {
-    justifyContent: 'center',
-    position: 'absolute',
-    maxWidth: '368px',
-    bottom: 20,
-    right: 20,
-    m: 'auto',
-    zIndex: 1301,
-  };
 
   return (
     <div>
