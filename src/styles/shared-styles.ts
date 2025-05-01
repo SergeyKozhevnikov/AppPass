@@ -9,7 +9,7 @@ export const scrollbarStyles = {
     borderRadius: '4px',
   },
   '&::-webkit-scrollbar-thumb': {
-    background: '#3b82f6',
+    background: '#1976d2',
     borderRadius: '4px',
   },
   '&::-webkit-scrollbar-thumb:hover': {
