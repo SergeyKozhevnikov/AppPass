@@ -4,7 +4,7 @@
 import Field from '@/components/Field';
 import { usePathname } from 'next/navigation';
 import { PROFILE_FIELDS } from '@/lib/constants';
-import { scrollbarStyles } from '@/styles/shared-styles';
+import { alertStyle, scrollbarStyles } from '@/styles/shared-styles';
 import {
   Box,
   Typography,
@@ -13,8 +13,9 @@ import {
   Container,
   Avatar,
   Grid,
+  Alert,
 } from '@mui/material';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -22,6 +23,26 @@ import { useForm } from 'react-hook-form';
 export default function Profile() {
   // Текущий путь url
   const pathname = usePathname();
+  const [result, setResult] = useState('');
+  const [isOpenErrorAlert, setIsOpenErrorAlert] = useState(false);
+  const [isOpenSuccessAlert, setIsOpenSuccessAlert] = useState(false);
+
+  // Если успешно и, если ошибка
+  useEffect(() => {
+    if (result === 'success') {
+      setIsOpenSuccessAlert(true);
+      setTimeout(() => {
+        setIsOpenSuccessAlert(false);
+        setResult('');
+      }, 5000); // исчезает через 7 сек
+    } else if (result === 'error') {
+      setIsOpenErrorAlert(true);
+      setTimeout(() => {
+        setResult('');
+      }, 5000);
+    }
+  }, [result]);
+
   // Пример состояния пользователя
   const [user, setUser] = useState({
     tabNum: '0001',
@@ -67,9 +88,9 @@ export default function Profile() {
 
     // Здесь можно добавить логику отправки данных на сервер
     if (formData) {
-      alert('Данные пользователя успешно изменены');
+      setResult('success');
     } else {
-      alert(`Что-то пошло не так. Проверьте введенные данные`);
+      setResult('error');
     }
   });
 
@@ -87,6 +108,33 @@ export default function Profile() {
         ...scrollbarStyles,
       }}
     >
+      {/* Сообщения об успехе и ошибке */}
+      {isOpenSuccessAlert && (
+        <Alert
+          severity="success"
+          sx={{
+            ...alertStyle,
+            top: '20%',
+            bottom: '',
+          }}
+        >
+          Данные пользователя изменены
+        </Alert>
+      )}
+      {isOpenErrorAlert && (
+        <Alert
+          severity="error"
+          sx={{
+            ...alertStyle,
+            top: '20%',
+            bottom: '',
+          }}
+        >
+          Ошибка. Проверьте введенные данные
+        </Alert>
+      )}
+
+      {/* Основное содержимое */}
       <Box display={'flex'} sx={{ mb: 3 }}>
         <Avatar
           src={'...'}
@@ -135,7 +183,7 @@ export default function Profile() {
             type="submit"
             variant="contained"
             fullWidth
-            sx={{ width: { xs: '100%', sm: '250px'} }}
+            sx={{ width: { xs: '100%', sm: '250px' } }}
           >
             Применить
           </Button>

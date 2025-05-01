@@ -14,11 +14,7 @@ import {
 import { Close } from '@mui/icons-material';
 import { REGISTER_FIELDS } from '@/lib/constants';
 import Field from '@/components/Field';
-import {
-  Dispatch,
-  FormEventHandler,
-  SetStateAction,
-} from 'react';
+import { Dispatch, FormEventHandler, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 import { newUserFields, newUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';

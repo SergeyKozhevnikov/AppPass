@@ -22,8 +22,8 @@ export const alertStyle = {
   justifyContent: 'center',
   position: 'absolute',
   maxWidth: '368px',
+  zIndex: 1301,
   bottom: 20,
   right: 20,
   m: 'auto',
-  zIndex: 1301,
 };
