@@ -169,21 +169,26 @@ export default function Profile() {
         ))}
         <Grid
           container
-          size={{ xs: 1, md: 2 }}
+          size={2}
           sx={{
             display: 'flex',
             color: '#007EC0',
             justifyContent: { xs: 'center', md: 'end' },
           }}
         >
-          <Link underline="hover" href="#" color="inherit">
+          <Link
+            underline="hover"
+            href="#"
+            color="inherit"
+            alignContent={'center'}
+          >
             Изменить пароль
           </Link>
           <Button
             type="submit"
             variant="contained"
             fullWidth
-            sx={{ width: { xs: '100%', sm: '250px' } }}
+            sx={{ width: { xs: '100%', md: '220px' } }}
           >
             Применить
           </Button>

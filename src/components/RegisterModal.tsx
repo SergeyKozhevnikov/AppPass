@@ -124,22 +124,27 @@ export default function RegisterModal(props: IProps) {
                 ></Field>
               ))}
 
-              <DialogActions sx={{ p: 0 }}>
+              <DialogActions sx={{ p: 0, width: { xs: '100%', sm: 'auto' } }}>
                 <Grid
+                  size={{ xs: 1, md: 2 }}
                   container
                   spacing={2}
-                  columns={{ xs: 1, sm: 2 }}
-                  wrap="wrap"
                   justifyContent={{ xs: 'center', md: 'space-between' }}
                 >
                   <Button
                     variant="contained"
                     color="primary"
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
                     onClick={() => setIsOpen(false)}
                   >
                     Отмена
                   </Button>
-                  <Button variant="contained" color="primary" type="submit">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  >
                     Отправить
                   </Button>
                 </Grid>
