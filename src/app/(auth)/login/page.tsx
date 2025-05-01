@@ -24,18 +24,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { authFields, authSchema } from '../../../interfaces/zod-types';
 
 export default function LoginPage() {
+  // Alert исчезает, когда если вводишь новые данные (onChangeCapture)
   const [isOpenAlert, setIsOpenAlert] = useState(false);
   const router = useRouter();
 
-  // получаем register и errors деструкторизацией
-  // zodResolver интегрирует zod схему в форму
+  // деструкторизация
   const {
     register,
     getValues,
     handleSubmit,
     formState: { errors },
   } = useForm<authFields>({
-    resolver: zodResolver(authSchema),
+    resolver: zodResolver(authSchema), // zodResolver интегрирует zod схему в форму
     defaultValues: {
       login: '',
       password: '',
@@ -155,6 +155,7 @@ export default function LoginPage() {
                   error={!!errors.login} // двойное отрицание для преобразование в булевое
                   helperText={errors.login?.message}
                   sx={fieldStyle}
+                  onChangeCapture={() => setIsOpenAlert(false)}
                 />
                 <Typography variant="caption" color="initial">
                   Пароль
@@ -167,6 +168,7 @@ export default function LoginPage() {
                   error={!!errors.password}
                   helperText={errors.password?.message}
                   sx={fieldStyle}
+                  onChangeCapture={() => setIsOpenAlert(false)}
                 />
 
                 {/* Чекбокс и Забыли пароль */}
