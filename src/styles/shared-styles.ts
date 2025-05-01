@@ -16,3 +16,14 @@ export const scrollbarStyles = {
     background: '#757575',
   },
 };
+
+// Стиль для Alert (стр. профиль и создание пользователя)
+export const alertStyle = {
+  justifyContent: 'center',
+  position: 'absolute',
+  maxWidth: '368px',
+  bottom: 20,
+  right: 20,
+  m: 'auto',
+  zIndex: 1301,
+};
