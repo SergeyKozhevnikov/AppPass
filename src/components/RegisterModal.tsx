@@ -10,7 +10,6 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Alert,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { REGISTER_FIELDS } from '@/lib/constants';
@@ -19,8 +18,6 @@ import {
   Dispatch,
   FormEventHandler,
   SetStateAction,
-  useEffect,
-  useState,
 } from 'react';
 import { useForm } from 'react-hook-form';
 import { newUserFields, newUserSchema } from '@/interfaces/zod-types';

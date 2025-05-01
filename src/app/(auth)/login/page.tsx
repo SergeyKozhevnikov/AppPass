@@ -128,10 +128,9 @@ export default function LoginPage() {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
+                {/* eslint-disable-next-line */}
                 <img
-                  style={{
-                    width: '80%',
-                  }}
+                  style={{ width: '80%' }}
                   src="/assets/svg/textLogoBlue.svg"
                   alt={'Логотип'}
                 />
