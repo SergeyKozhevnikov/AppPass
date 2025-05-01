@@ -14,7 +14,11 @@ import {
 import { Close } from '@mui/icons-material';
 import { REGISTER_FIELDS } from '@/lib/constants';
 import Field from '@/components/Field';
-import { Dispatch, FormEventHandler, SetStateAction } from 'react';
+import {
+  Dispatch,
+  FormEventHandler,
+  SetStateAction,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { newUserFields, newUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,10 +30,11 @@ import { scrollbarStyles } from '@/styles/shared-styles';
 interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setResult: Dispatch<SetStateAction<string>>;
 }
 
 export default function RegisterModal(props: IProps) {
-  const { isOpen, setIsOpen } = props;
+  const { isOpen, setIsOpen, setResult } = props;
 
   const {
     register,
@@ -55,11 +60,11 @@ export default function RegisterModal(props: IProps) {
     console.log(formData);
 
     if (formData) {
-      setIsOpen(false);
-      alert(`Пользователь успешно создан`);
+      setResult('success');
     } else {
-      alert(`Что-то пошло не так. Проверьте введенные данные`);
+      setResult('error');
     }
+    setIsOpen(false);
   });
 
   return (

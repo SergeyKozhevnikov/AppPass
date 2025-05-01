@@ -11,11 +11,12 @@ import {
   Link,
   ImageListItem,
   Grid,
+  Alert,
 } from '@mui/material';
 import './login.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { AUTH_FIELDS } from '@/lib/constants';
 import { useForm } from 'react-hook-form';
@@ -23,17 +24,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { authFields, authSchema } from '../../../interfaces/zod-types';
 
 export default function LoginPage() {
+  // Alert исчезает, когда если вводишь новые данные (onChangeCapture)
+  const [isOpenAlert, setIsOpenAlert] = useState(false);
   const router = useRouter();
 
-  // получаем register и errors деструкторизацией
-  // zodResolver интегрирует zod схему в форму
+  // деструкторизация
   const {
     register,
     getValues,
     handleSubmit,
     formState: { errors },
   } = useForm<authFields>({
-    resolver: zodResolver(authSchema),
+    resolver: zodResolver(authSchema), // zodResolver интегрирует zod схему в форму
     defaultValues: {
       login: '',
       password: '',
@@ -55,7 +57,7 @@ export default function LoginPage() {
     if (res && !res.error) {
       router.push('/');
     } else {
-      alert(`Ошибка ${res?.error}. Проверьте введенные данные`);
+      setIsOpenAlert(true);
       console.log(res);
     }
   });
@@ -91,6 +93,25 @@ export default function LoginPage() {
               flexGrow: 1,
             }}
           >
+            {/* Alert сообщение об ошибке авторизации */}
+            {isOpenAlert && (
+              <Box height={0}>
+                <Alert
+                  severity="error"
+                  sx={{
+                    justifyContent: 'center',
+                    position: 'relative',
+                    maxWidth: '368px',
+                    left: 0,
+                    right: 0,
+                    bottom: { xs: '55px', sm: '45px', md: '70px' },
+                    m: 'auto',
+                  }}
+                >
+                  Ошибка. Проверьте введенные данные
+                </Alert>
+              </Box>
+            )}
             <Box
               sx={{
                 p: 2,
@@ -107,9 +128,9 @@ export default function LoginPage() {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                <Image
-                  height={320}
-                  width={320}
+                {/* eslint-disable-next-line */}
+                <img
+                  style={{ width: '80%' }}
                   src="/assets/svg/textLogoBlue.svg"
                   alt={'Логотип'}
                 />
@@ -132,6 +153,7 @@ export default function LoginPage() {
                   error={!!errors.login} // двойное отрицание для преобразование в булевое
                   helperText={errors.login?.message}
                   sx={fieldStyle}
+                  onChangeCapture={() => setIsOpenAlert(false)}
                 />
                 <Typography variant="caption" color="initial">
                   Пароль
@@ -144,6 +166,7 @@ export default function LoginPage() {
                   error={!!errors.password}
                   helperText={errors.password?.message}
                   sx={fieldStyle}
+                  onChangeCapture={() => setIsOpenAlert(false)}
                 />
 
                 {/* Чекбокс и Забыли пароль */}
