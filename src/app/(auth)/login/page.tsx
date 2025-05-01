@@ -11,11 +11,12 @@ import {
   Link,
   ImageListItem,
   Grid,
+  Alert,
 } from '@mui/material';
 import './login.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { AUTH_FIELDS } from '@/lib/constants';
 import { useForm } from 'react-hook-form';
@@ -23,6 +24,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { authFields, authSchema } from '../../../interfaces/zod-types';
 
 export default function LoginPage() {
+  const [isOpenAlert, setIsOpenAlert] = useState(false);
   const router = useRouter();
 
   // получаем register и errors деструкторизацией
@@ -55,7 +57,7 @@ export default function LoginPage() {
     if (res && !res.error) {
       router.push('/');
     } else {
-      alert(`Ошибка ${res?.error}. Проверьте введенные данные`);
+      setIsOpenAlert(true);
       console.log(res);
     }
   });
@@ -91,6 +93,26 @@ export default function LoginPage() {
               flexGrow: 1,
             }}
           >
+            {/* Alert сообщение об ошибке авторизации */}
+            {isOpenAlert && (
+              <Box height={0}>
+                <Alert
+                  severity="error"
+                  sx={{
+                    justifyContent: 'center',
+                    position: 'relative',
+                    maxWidth: '368px',
+                    left: 0,
+                    right: 0,
+                    bottom: { xs: '55px', sm: '45px', md: '70px' },
+                    m: 'auto',
+                  }}
+                >
+                  {/* action useEffect or Timer на set(false) */}
+                  Ошибка. Проверьте введенные данные
+                </Alert>
+              </Box>
+            )}
             <Box
               sx={{
                 p: 2,
@@ -107,9 +129,10 @@ export default function LoginPage() {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                <Image
-                  height={320}
-                  width={320}
+                <img
+                  style={{
+                    width: '80%',
+                  }}
                   src="/assets/svg/textLogoBlue.svg"
                   alt={'Логотип'}
                 />
