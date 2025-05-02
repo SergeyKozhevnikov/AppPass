@@ -53,12 +53,7 @@ import TabPanel from "./TabPanel"
 import PhotoUpload from "./PhotoUpload"
 import ApprovalTab from "../tabs/approval-tab"
 import HistoryTab from "../tabs/history-tab"
-import type { Approver, AlertState, HistoryOperation } from "../types"
-
-// Интерфейс для пропсов компонента
-export interface GuestPassFormProps {
-    onClose?: () => void
-}
+import type { Approver, AlertState, HistoryOperation, GuestPassFormProps } from '../types';
 
 // Основной компонент формы
 export default function GuestPassForm({ onClose }: GuestPassFormProps) {
@@ -589,7 +584,7 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
                     open={alert.open}
                     autoHideDuration={6000}
                     onClose={handleCloseAlert}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 >
                     <Alert onClose={handleCloseAlert} severity={alert.severity} sx={{ width: "100%" }}>
                         {alert.message}
