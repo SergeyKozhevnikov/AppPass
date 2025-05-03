@@ -19,29 +19,36 @@
     "@mui/styled-engine-sc": "^7.0.1",
     "@mui/x-date-pickers": "^7.28.3",
     "@radix-ui/react-popover": "^1.1.11",
+    "@types/express": "^5.0.1",
     "date-fns": "^2.30.0",
+    "express": "^5.1.0",
     "lucide-react": "^0.503.0",
     "next": "^15.3.1",
     "next-auth": "^4.24.11",
+    "pg": "^8.15.6",
     "react": "^19.0.0",
     "react-day-picker": "^9.6.7",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
     "recharts": "^2.15.3",
     "scss": "^0.2.4",
+    "sequelize": "^6.37.7",
     "styled-components": "^6.1.17",
+    "ts-node": "^10.9.2",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.17.32",
     "@types/react": "19.1.2",
     "@types/react-dom": "^19",
+    "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "eslint-config-prettier": "^10.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tslint": "^5.20.1",
+    "typescript": "^5.8.3"
   }
 }
