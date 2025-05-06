@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from 'react';
 import {
@@ -10,19 +10,54 @@ import {
   TextField,
   styled,
 } from '@mui/material';
-import type { TransitionProps } from "@mui/material/transitions";
+import type { TransitionProps } from '@mui/material/transitions';
 import AddIcon from '@mui/icons-material/Add';
-import GuestPassForm from "@/app/(primary)/create_guest_pass/components/GuestPassForm";
+import GuestPassForm from '@/app/(primary)/create_guest_pass/components/GuestPassForm';
 
 type RequestFilterProps = {
   onFilterChange: (filters: { date: string; search: string }) => void;
 };
 
-const BlurredBackdrop = styled('div')({
-  backdropFilter: 'blur(8px)',
-  backgroundColor: 'rgba(0,0,0,0.1)',
-});
+// Кастомный Backdrop с анимацией появления/исчезания
+const BlurredBackdrop = styled('div')(() => ({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  backdropFilter: 'blur(0px)',
+  zIndex: 1200,
+  opacity: 0,
+  pointerEvents: 'none',
+  animation: 'fadeInBackdrop 0.4s ease forwards',
+  '@keyframes fadeInBackdrop': {
+    from: {
+      opacity: 0,
+      backdropFilter: 'blur(0px)',
+    },
+    to: {
+      opacity: 1,
+      backdropFilter: 'blur(8px)',
+    },
+  },
+  '.MuiDialog-root &': {
+    animation: 'fadeOutBackdrop 0.3s ease forwards',
+    animationPlayState: 'paused',
+    '@keyframes fadeOutBackdrop': {
+      from: {
+        opacity: 1,
+        backdropFilter: 'blur(8px)',
+      },
+      to: {
+        opacity: 0,
+        backdropFilter: 'blur(0px)',
+      },
+    },
+  },
+}));
 
+// Анимация перехода для диалога
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
@@ -36,7 +71,7 @@ const Transition = React.forwardRef(function Transition(
       timeout={{ enter: 450, exit: 300 }}
       easing={{
         enter: 'cubic-bezier(0.16, 1, 0.3, 1)',
-        exit: 'cubic-bezier(0.7, 0, 0.84, 0)'
+        exit: 'cubic-bezier(0.7, 0, 0.84, 0)',
       }}
     />
   );
@@ -126,7 +161,7 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
-        slots={{ backdrop: BlurredBackdrop }}
+        slots={{ backdrop: BlurredBackdrop }} // Используем кастомный бэкдроп с анимацией
         sx={{
           '& .MuiDialog-container': {
             alignItems: 'flex-start',
@@ -141,6 +176,7 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
             maxWidth: 'lg',
             margin: 2,
             height: 'calc(100% - 32px)',
+            zIndex: 1301,
           },
         }}
       >
@@ -152,8 +188,8 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
               opacity: 0,
               animation: 'fadeIn 0.5s ease-out forwards',
               '@keyframes fadeIn': {
-                '0%': { opacity: 0 },
-                '100%': { opacity: 1 },
+                from: { opacity: 0 },
+                to: { opacity: 1 },
               },
             }}
           >

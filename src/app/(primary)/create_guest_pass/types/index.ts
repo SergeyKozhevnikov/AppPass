@@ -42,3 +42,8 @@ export interface HistoryOperation {
 export interface HistoryTabProps {
   operations: HistoryOperation[]
 }
+
+// Интерфейс для пропсов компонента
+export interface GuestPassFormProps {
+  onClose?: () => void
+}

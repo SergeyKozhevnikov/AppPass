@@ -12,11 +12,11 @@ export default function TabPanel(props: TabPanelProps) {
     // Общие стили для всех табов
     const panelStyles: React.CSSProperties = {
         width: "100%",
-        height: "95%",
+        height: "96%",
         position: "relative",
         display: value === index ? "flex" : "none",
         flexDirection: "column",
-        overflow: "hidden",
+        overflow: "visible",
     }
 
     return (
@@ -53,7 +53,7 @@ export default function TabPanel(props: TabPanelProps) {
                             position: "sticky",
                             bottom: 0,
                             width: "100%",
-                            minHeight: "72px", // Минимальная высота панели
+                            minHeight: "100px", // Минимальная высота панели
                             boxSizing: "border-box", // Учитываем padding в высоте
                         }}
                     >
@@ -76,8 +76,8 @@ export default function TabPanel(props: TabPanelProps) {
                                 sx={{
                                     width: "150px",
                                     height: "40px", // Фиксированная высота
-                                    minHeight: "40px", // Минимальная высота
                                     padding: "6px 16px", // Стандартные отступы MUI
+                                    margin: "0 0 16px 0",
                                 }}
                             >
                                 ОТПРАВИТЬ
@@ -90,8 +90,8 @@ export default function TabPanel(props: TabPanelProps) {
                                 sx={{
                                     width: "150px",
                                     height: "40px",
-                                    minHeight: "40px",
                                     padding: "6px 16px",
+                                    margin: "0 0 16px 0",
                                 }}
                             >
                                 СОХРАНИТЬ
@@ -103,8 +103,8 @@ export default function TabPanel(props: TabPanelProps) {
                                 sx={{
                                     width: "150px",
                                     height: "40px",
-                                    minHeight: "40px",
                                     padding: "6px 16px",
+                                    margin: "0 0 16px 0",
                                 }}
                             >
                                 ОТМЕНИТЬ
