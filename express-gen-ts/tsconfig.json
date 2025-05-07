@@ -5,10 +5,14 @@
     "lib": ["ES2020"],                   
     "strict": true,
     "baseUrl": "./",
+    "paths": {
+      "@src/*": ["src/*"],
+      "@/*": ["src/*"]
+    },
     "esModuleInterop": true,                 
     "skipLibCheck": true,                     
     "forceConsistentCasingInFileNames": true,
-    "paths": {
+    "pat": {
       "@src/*": ["src/*"]
     },
     "useUnknownInCatchVariables": false,

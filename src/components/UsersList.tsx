@@ -1,3 +1,7 @@
+'use client'; // определяет компонент как клиентский
+
+import { useState } from 'react';
+import EditUser from './EditUser';
 
 import React from 'react';
 import {
@@ -17,7 +21,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { mockUsers } from '@/mock/users';
 
 const UsersList = () => {
- 
+
+  // Обработчик 
+  //const handleEdit = () => {
+    const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div>
      
@@ -50,7 +58,7 @@ const UsersList = () => {
                       <TableCell>{req.email}</TableCell>
                       <TableCell><select><option>Администратор</option><option>Согласующий</option><option>Пользователь</option></select></TableCell>
                       <TableCell align="center">
-                        <IconButton color="primary" aria-label="редактировать">
+                        <IconButton color="primary" aria-label="редактировать" onClick={() => setIsOpen(true)} >
                           <EditIcon />
                         </IconButton>
                       </TableCell>
@@ -67,6 +75,8 @@ const UsersList = () => {
           </Box>
         </CardContent>
       </Card>
+                                                          {/* Условие, если isOpen-true, открыть диалоговое окно и передать ему параметры isOpen и setIsOpen*/}
+                                                          {isOpen && <EditUser isOpen={isOpen} setIsOpen={setIsOpen} />}
     </div>
   );
 };

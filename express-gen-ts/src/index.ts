@@ -4,8 +4,10 @@ import dotenv from 'dotenv';
 import { sequelize } from './config/database';
 import passRoutes from './routes/passRoutes';
 import path from 'path';
-import Pass from './models/Pass';
-import Approver from './models/Approver';
+import Paths from "./common/constants/Paths"
+
+// Register module aliases
+import "module-alias/register"
 
 // Загрузка переменных окружения
 dotenv.config();
@@ -22,7 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Маршруты
-app.use('/api/passes', passRoutes);
+app.use(Paths.Base.Api + Paths.Api.Passes, passRoutes)
 
 // Проверка соединения с базой данных и синхронизация моделей
 sequelize
