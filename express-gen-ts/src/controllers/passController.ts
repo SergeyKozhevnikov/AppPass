@@ -28,7 +28,7 @@ interface PassData {
 /**
  * Создает новый пропуск
  */
-export const createPass = async (req: Request, res: Response) => {
+export const createPass = async (req: Request, res: Response): Promise<void> => {
   // Создаем транзакцию перед любыми операциями с базой данных
   let transaction: Transaction | undefined;
 
@@ -37,7 +37,7 @@ export const createPass = async (req: Request, res: Response) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     if (!req.body || Object.keys(req.body).length === 0) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Отсутствуют данные для создания пропуска',
       });
@@ -47,7 +47,7 @@ export const createPass = async (req: Request, res: Response) => {
 
     // Проверка обязательных полей
     if (!passData.fullName || !passData.phone || !passData.organization || !passData.email) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Не заполнены обязательные поля',
       });
