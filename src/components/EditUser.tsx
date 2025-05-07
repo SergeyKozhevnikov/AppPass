@@ -12,9 +12,12 @@ import {
   IconButton,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { REGISTER_FIELDS } from '@/lib/constants';
+import { PROFILE_FIELDS } from '@/lib/constants';
 import Field from '@/components/Field';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, FormEventHandler, SetStateAction } from 'react';
+import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 // - Логин подставляется автоматически пользователя (если время много не займет)
 // - Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
@@ -22,16 +25,49 @@ import { Dispatch, SetStateAction } from 'react';
 // а также смотрим последний табельный и прибавляем к нему +1
 interface IProps {
   isOpen: boolean;
+  setResult: Dispatch<SetStateAction<string>>;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function EditUser(props: IProps) {
-  const { isOpen, setIsOpen } = props;
-  function handleSubmit(evt: { preventDefault: () => void }): void {
-    evt.preventDefault();
+  const { isOpen, setIsOpen, setResult } = props;
+
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<profileUserFields>({
+    resolver: zodResolver(profileUserSchema),
+    defaultValues: {
+      tabNum: '0001',
+      surname: '',
+      name: '',
+      patronymic: '',
+      pos: '',
+      department: '',
+      login: 'login',
+      email: `login@atom.ru`,
+      password: '',
+      phoneNum: '',
+      role: 'Пользователь',
+    },
+    mode: 'onChange', // Валидация при изменении полей
+  });
+
+  // Обработчик отправки формы
+  const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
+    const { ...formData } = getValues();
+    console.log(formData);
+
+    // Здесь можно добавить логику отправки данных на сервер
+    if (formData) {
+      setResult('success');
+    } else {
+      setResult('error');
+    }
     setIsOpen(false);
-    alert('Пользователь создан (тест)');
-  }
+  });
 
   return (
     <Container component="section">
@@ -62,15 +98,20 @@ export default function EditUser(props: IProps) {
         <DialogContent>
           <Grid
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
             container
             spacing={3}
             columns={2}
             sx={{ justifyContent: 'flex-end' }}
           >
             {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
-            {Object.values(REGISTER_FIELDS).map((f) => (
-              <Field field={f} key={f.label}></Field>
+            {Object.values(PROFILE_FIELDS).map((f) => (
+              <Field
+                field={f}
+                errors={errors[f.label]}
+                register={register}
+                key={f.label}
+              ></Field>
             ))}
 
             <DialogActions sx={{ p: 0 }}>
