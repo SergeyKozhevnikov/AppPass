@@ -72,7 +72,7 @@ const UsersPage: React.FC = () => {
         )}
       </section>
 
-      <UsersList />
+      <UsersList setResult={setRequestResult} />
     </div>
   );
 };

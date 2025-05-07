@@ -1,6 +1,6 @@
 'use client'; // определяет компонент как клиентский
 
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import EditUser from './EditUser';
 
 import React from 'react';
@@ -20,18 +20,26 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { mockUsers } from '@/mock/users';
 
-const UsersList = () => {
+interface IProps {
+  setResult: Dispatch<SetStateAction<string>>;
+}
 
-  // Обработчик 
+const UsersList = (props: IProps) => {
+  const { setResult } = props;
+
+  // Обработчик
   //const handleEdit = () => {
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div>
-     
       <Card sx={{ boxShadow: 'none', border: 'none' }}>
-        <CardContent sx={{ boxShadow: 'none', border: 'none', p: 0  }}>
-          <Box sx={{ boxShadow: 'none', border: 'none' }} mt={2} className="overflow-x-auto">
+        <CardContent sx={{ boxShadow: 'none', border: 'none', p: 0 }}>
+          <Box
+            sx={{ boxShadow: 'none', border: 'none' }}
+            mt={2}
+            className="overflow-x-auto"
+          >
             <Paper sx={{ boxShadow: 'none', border: 'none' }}>
               <Table>
                 <TableHead className="bg-gray-100">
@@ -56,9 +64,19 @@ const UsersList = () => {
                       <TableCell>{req.middleName}</TableCell>
                       <TableCell>{req.spiciality}</TableCell>
                       <TableCell>{req.email}</TableCell>
-                      <TableCell><select><option>Администратор</option><option>Согласующий</option><option>Пользователь</option></select></TableCell>
+                      <TableCell>
+                        <select>
+                          <option>Администратор</option>
+                          <option>Согласующий</option>
+                          <option>Пользователь</option>
+                        </select>
+                      </TableCell>
                       <TableCell align="center">
-                        <IconButton color="primary" aria-label="редактировать" onClick={() => setIsOpen(true)} >
+                        <IconButton
+                          color="primary"
+                          aria-label="редактировать"
+                          onClick={() => setIsOpen(true)}
+                        >
                           <EditIcon />
                         </IconButton>
                       </TableCell>
@@ -75,8 +93,10 @@ const UsersList = () => {
           </Box>
         </CardContent>
       </Card>
-                                                          {/* Условие, если isOpen-true, открыть диалоговое окно и передать ему параметры isOpen и setIsOpen*/}
-                                                          {isOpen && <EditUser isOpen={isOpen} setIsOpen={setIsOpen} />}
+      {/* Условие, если isOpen-true, открыть диалоговое окно и передать ему параметры isOpen и setIsOpen*/}
+      {isOpen && (
+        <EditUser isOpen={isOpen} setIsOpen={setIsOpen} setResult={setResult} />
+      )}
     </div>
   );
 };
