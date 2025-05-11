@@ -23,4 +23,6 @@ export interface IUserProfile extends IRegisteredUser {
 export interface IUser extends IUserProfile {
   id: number;
   role: 'user' | 'admin';
+  createdAt: string; // или Date?
+  updatedAt?: string;
 }

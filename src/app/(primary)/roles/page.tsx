@@ -9,8 +9,7 @@ import UsersList from '@/components/UsersList';
 import { alertStyle } from '@/styles/shared-styles';
 
 const UsersPage: React.FC = () => {
-  // для открытия диалоговвого окна
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // для диалоговвого окна
   const [requestResult, setRequestResult] = useState('');
   const [isOpenErrorAlert, setIsOpenErrorAlert] = useState(false);
   const [isOpenSuccessAlert, setIsOpenSuccessAlert] = useState(false);

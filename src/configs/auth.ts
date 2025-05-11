@@ -1,9 +1,11 @@
 import type { AuthOptions, User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials'; // ввод логина и пароля
 import { AUTH_FIELDS } from '@/lib/constants';
+import { userApi } from '@/lib/userApi';
+import { IUser } from '@/interfaces/user.interface';
 
-// пользователи - тест
-const users = [
+// Тестовые пользователи
+const testUsers = [
   { id: '1', login: 'admin', password: 'admin' },
   { id: '2', login: 'user', password: 'user' },
 ];
@@ -30,9 +32,13 @@ export const authConfig: AuthOptions = {
         if (!credentials?.login || !credentials.password) return null;
 
         // если данные есть, но пользователя не существует
-        const currentUser = users.find(
-          (user) => user.login === credentials.login
-        );
+        const currentUser = await userApi
+          .getUsers()
+          .then((res) =>
+            res.data
+              .concat(testUsers)
+              .find((user: IUser) => user.login === credentials.login)
+          );
 
         // если логин и пароль совпадают -> возвращаем пользователя без пароля
         if (currentUser && currentUser.password === credentials.password) {
