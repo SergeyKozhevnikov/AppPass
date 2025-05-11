@@ -41,7 +41,7 @@ export const authConfig: AuthOptions = {
           return userWithoutPass as User;
         }
 
-        return true; // если не авторизован
+        return null; // если не авторизован
       },
     }),
   ],
