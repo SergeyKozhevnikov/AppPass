@@ -1,6 +1,8 @@
 export type Pass = {
   id: number;
   date: string;
+  createdAt: string;
+  fullName: string,
   lastName: string;
   firstName: string;
   middleName: string;
