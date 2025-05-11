@@ -53,13 +53,17 @@ export default function LoginPage() {
       redirect: false, // чтобы в случае ошибки не перебрасывало на встроенную форму nextauth
     });
 
+    console.log(res);
+
     // есть ответ и нет ошибки
-    if (res && !res.error) {
+/*    if (res && !res.error) {
       router.push('/');
     } else {
       setIsOpenAlert(true);
       console.log(res);
-    }
+    }*/
+
+    router.push('/');
   });
 
   // стиль для полей
