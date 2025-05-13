@@ -19,6 +19,7 @@ import { FormEventHandler, useEffect, useState } from 'react';
 import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useSession } from 'next-auth/react';
 
 export default function Profile() {
   // Текущий путь url
@@ -26,6 +27,8 @@ export default function Profile() {
   const [result, setResult] = useState('');
   const [isOpenErrorAlert, setIsOpenErrorAlert] = useState(false);
   const [isOpenSuccessAlert, setIsOpenSuccessAlert] = useState(false);
+  const user = useSession().data?.user;
+  console.log(user);
 
   // Если успешно и, если ошибка
   useEffect(() => {
@@ -43,30 +46,16 @@ export default function Profile() {
     }
   }, [result]);
 
-  // Пример состояния пользователя
-  const [user, setUser] = useState({
-    tabNum: '0001',
-    surname: 'Фамилия',
-    name: 'Имя',
-    patronymic: 'Отчество',
-    pos: 'Инженер',
-    department: 'Отдел 3',
-    login: 'iofamiliya',
-    email: 'iofamiliya@atom.ru',
-    password: 'iofamiliya',
-    phoneNum: '3-33-33',
-    role: 'Пользователь',
-  });
-
   const {
     register,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm<profileUserFields>({
     resolver: zodResolver(profileUserSchema),
     defaultValues: {
-      tabNum: '0001',
+      tabNum: 0,
       surname: '',
       name: '',
       patronymic: '',
@@ -74,17 +63,33 @@ export default function Profile() {
       department: '',
       login: 'login',
       email: `login@atom.ru`,
-      password: '',
       phoneNum: '',
       role: 'Пользователь',
     },
     mode: 'onChange', // Валидация при изменении полей
   });
 
+  useEffect(() => {
+    setValue('tabNum', user!.tabNum);
+    setValue('surname', user!.surname);
+    setValue('name', user!.name);
+    setValue('patronymic', user!.patronymic);
+    if (user!.pos) {
+      setValue('pos', user!.pos);
+    }
+    if (user!.department) {
+      setValue('department', user!.department);
+    }
+    setValue('login', user!.login);
+    setValue('email', user!.email);
+    if (user!.phoneNum) {
+      setValue('phoneNum', user!.phoneNum);
+    }
+  }, [user]);
+
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const { ...formData } = getValues();
-    setUser(formData);
 
     // Здесь можно добавить логику отправки данных на сервер
     if (formData) {
@@ -142,10 +147,10 @@ export default function Profile() {
         ></Avatar>
         <Box>
           <Typography component="h1" color="initial" fontSize={18}>
-            {`${user.name} ${user.surname}`}
+            {`${user?.name} ${user?.surname}`}
           </Typography>
           <Typography component="h2" color="initial" fontSize={14}>
-            {`${user.role}`}
+            {`${user?.role}`}
           </Typography>
         </Box>
       </Box>

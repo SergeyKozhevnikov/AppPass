@@ -1,6 +1,6 @@
 'use client'; // определяет компонент как клиентский
 
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import EditUser from './EditUser';
 
 import React from 'react';
@@ -19,6 +19,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { mockUsers } from '@/mock/users';
+import { userApi } from '@/lib/userApi';
 
 interface IProps {
   setResult: Dispatch<SetStateAction<string>>;
@@ -26,10 +27,21 @@ interface IProps {
 
 const UsersList = (props: IProps) => {
   const { setResult } = props;
-
-  // Обработчик
-  //const handleEdit = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [users, setUsers] = useState(); // список пользователей
+
+  // Получение пользователей с сервера при открытии страницы
+  useEffect(() => {
+    userApi
+      .getUsers() // получаем пользователей
+      .then((res) => {
+        setUsers(res.data); // обновляем пользователей
+      })
+      .catch((err: Error) => {
+        console.log(`Ошибка: ${err}`);
+      });
+  }, []);
+  console.log(users)
 
   return (
     <div>

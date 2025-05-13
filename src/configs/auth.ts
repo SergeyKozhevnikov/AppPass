@@ -1,14 +1,39 @@
-import type { AuthOptions, User } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials'; // ввод логина и пароля
+import type { AuthOptions } from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
 import { AUTH_FIELDS } from '@/lib/constants';
 import { userApi } from '@/lib/userApi';
-import { IUser } from '@/interfaces/user.interface';
+import { TRole } from '@/interfaces/user.interface';
 
-// Тестовые пользователи
-const testUsers = [
-  { id: '1', login: 'admin', password: 'admin' },
-  { id: '2', login: 'user', password: 'user' },
-];
+// Интерфейс для пользователя
+interface ICustomUser {
+  id: number;
+  tabNum: number;
+  role: TRole;
+  surname: string;
+  name: string;
+  patronymic: string;
+  login: string;
+  email: string;
+  // password: string;
+  pos?: string;
+  department?: string;
+  phoneNum?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// Создаем модуль для расширения типов NextAuth
+declare module 'next-auth' {
+  interface User extends ICustomUser {
+    id: number; // по умолчанию string
+    name: string; // по умолчанию string | null | undefined
+  }
+  interface Session {
+    session: ICustomUser; // Session
+    token: ICustomUser; // JWT
+    user: ICustomUser; // AdapterUser
+  }
+}
 
 export const authConfig: AuthOptions = {
   providers: [
@@ -27,29 +52,48 @@ export const authConfig: AuthOptions = {
       },
 
       async authorize(credentials) {
-        // должно проверять на соответствие данным в БД - это временное
         // если данных нет
         if (!credentials?.login || !credentials.password) return null;
 
-        // если данные есть, но пользователя не существует
+        // запрашиваем пользователя из БД
         const currentUser = await userApi
-          .getUsers()
-          .then((res) =>
-            res.data
-              .concat(testUsers)
-              .find((user: IUser) => user.login === credentials.login)
-          );
+          .getUserByLogin({
+            login: credentials.login,
+            password: credentials.password,
+          })
+          .then((res) => res.user)
+          .catch(() => {
+            throw new Error('Неверный пароль или Пользователь не найден');
+          });
 
-        // если логин и пароль совпадают -> возвращаем пользователя без пароля
-        if (currentUser && currentUser.password === credentials.password) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { password, ...userWithoutPass } = currentUser;
-          return userWithoutPass as User;
+        if (currentUser) {
+          console.log(currentUser);
+          return currentUser as ICustomUser;
         }
 
         return null; // если не авторизован
       },
     }),
   ],
-  pages: { signIn: '/login' },
+  callbacks: {
+    //   jwt callback is only called when token is created
+    async jwt({ token, user }) {
+      if (user) {
+        token = user;
+        token.user = user;
+      }
+      return Promise.resolve(token);
+    },
+    async session({ session, token }) {
+      // session callback is called whenever a session for that particular user is checked
+      // in above function we created token.user=user
+      session.user = token.user;
+      // you might return this in new version
+      return Promise.resolve(session);
+    },
+  },
+  pages: {
+    signIn: '/login',
+    // error: '/login'
+  },
 };
