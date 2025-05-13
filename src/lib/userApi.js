@@ -22,20 +22,22 @@ class UserApi {
     }
   }
 
-  // Загрузка информации о пользователе
-  getUser(id) {
-    // по умолчанию метод get
-    return fetch(`${this.#url}/users${id}`, {
+  // Загрузка информации о пользователе по логину
+  getUserByLogin(data) {
+    return fetch(`${this.#url}/users/login/${data.login}`, {
+      method: 'POST',
       headers: this.#headers,
-      // credentials: 'include', // теперь куки посылаются вместе с запросом
+      // credentials: 'include',
+      body: JSON.stringify(data), // {login, password}
     }).then(this.#handleResponse);
   }
 
-  // Загрузка информации о текущем пользователе
-  getCurrentUser() {
-    return fetch(`${this.#url}/users/me`, {
+  // Загрузка информации о пользователе
+  getUser(id) {
+    // по умолчанию метод get
+    return fetch(`${this.#url}/users/${id}`, {
       headers: this.#headers,
-      // credentials: 'include'
+      // credentials: 'include', // теперь куки посылаются вместе с запросом
     }).then(this.#handleResponse);
   }
 
@@ -63,7 +65,7 @@ class UserApi {
       phoneNum,
     }
   ) {
-    return fetch(`${this.#url}/users/me`, {
+    return fetch(`${this.#url}/users/${id}`, {
       method: 'PATCH',
       headers: this.#headers,
       // credentials: 'include',
