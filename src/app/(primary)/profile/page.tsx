@@ -18,8 +18,8 @@ import {
 import { FormEventHandler, useEffect, useState } from 'react';
 import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
+import { useForm } from 'react-hook-form';
 
 export default function Profile() {
   // Текущий путь url

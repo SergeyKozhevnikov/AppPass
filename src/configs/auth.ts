@@ -28,9 +28,8 @@ declare module 'next-auth' {
     id: number; // по умолчанию string
     name: string; // по умолчанию string | null | undefined
   }
-  interface Session {
-    session: ICustomUser; // Session
-    token: ICustomUser; // JWT
+  interface Session extends ICustomUser {
+    session: ICustomUser;
     user: ICustomUser; // AdapterUser
   }
 }
@@ -75,23 +74,17 @@ export const authConfig: AuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    //   jwt callback is only called when token is created
-    async jwt({ token, user }) {
-      if (user) {
-        token = user;
-        token.user = user;
-      }
-      return Promise.resolve(token);
-    },
-    async session({ session, token }) {
-      // session callback is called whenever a session for that particular user is checked
-      // in above function we created token.user=user
-      session.user = token.user;
-      // you might return this in new version
-      return Promise.resolve(session);
-    },
-  },
+  // callbacks: {
+  //   // Возвращаемое значение будет зашифровано и сохранено в файле cookie
+  //   async jwt({ token, user }) {
+  //     if (user) {
+  //     }
+  //     return token;
+  //   },
+  //   async session({ session, token, user }) {
+  //     return session;
+  //   },
+  // },
   pages: {
     signIn: '/login',
     // error: '/login'
