@@ -52,7 +52,7 @@ export type newUserFields = z.infer<typeof newUserSchema>;
 
 // схема для страницы пользователя
 export const profileUserSchema = z.object({
-  tabNum: z.string(), // заполняется из БД - наверное, пользователю проверка не нужна
+  tabNum: z.number(), // заполняется из БД - наверное, пользователю проверка не нужна
   surname: z
     .string()
     .min(2, { message: 'Фамилия не может быть менее 2 символов' })
