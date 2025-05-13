@@ -3,7 +3,7 @@
  */
 
 // Базовый URL API - используется в бэкенде
-const API_BASE_URL = "http://localhost:3001/api"
+const API_BASE_URL = "http://195.133.147.112:3001/api"
 
 // Интерфейс для данных пропуска
 export interface PassData {

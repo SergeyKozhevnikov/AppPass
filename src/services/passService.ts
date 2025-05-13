@@ -12,7 +12,7 @@ export type Pass = {
 };
 
 export const fetchPasses = async (): Promise<Pass[]> => {
-  const response = await fetch('http://localhost:3001/api/passes');
+  const response = await fetch('http://195.133.147.112:3001/api/passes');
   if (!response.ok) {
     throw new Error('Ошибка при получении заявок');
   }
