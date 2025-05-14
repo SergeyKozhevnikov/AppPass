@@ -74,19 +74,21 @@ export const authConfig: AuthOptions = {
       },
     }),
   ],
-  // callbacks: {
-  //   // Возвращаемое значение будет зашифровано и сохранено в файле cookie
-  //   async jwt({ token, user }) {
-  //     if (user) {
-  //     }
-  //     return token;
-  //   },
-  //   async session({ session, token, user }) {
-  //     return session;
-  //   },
-  // },
-  pages: {
-    signIn: '/login',
-    // error: '/login'
+  // NextAuth автоматически возвращает только поля name и email
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        // Добавляем все поля из профиля пользователя
+        token.user = user as ICustomUser;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Добавляем все поля из JWT в сессию
+      session.user = token.user as ICustomUser;
+
+      return session;
+    },
   },
+  pages: { signIn: '/login' },
 };

@@ -61,8 +61,8 @@ export default function Profile() {
       patronymic: '',
       pos: '',
       department: '',
-      login: 'login',
-      email: `login@atom.ru`,
+      login: '',
+      email: ``,
       phoneNum: '',
       role: 'Пользователь',
     },
@@ -70,20 +70,22 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    setValue('tabNum', user!.tabNum);
-    setValue('surname', user!.surname);
-    setValue('name', user!.name);
-    setValue('patronymic', user!.patronymic);
-    if (user!.pos) {
-      setValue('pos', user!.pos);
-    }
-    if (user!.department) {
-      setValue('department', user!.department);
-    }
-    setValue('login', user!.login);
-    setValue('email', user!.email);
-    if (user!.phoneNum) {
-      setValue('phoneNum', user!.phoneNum);
+    if (user) {
+      setValue('tabNum', user!.tabNum);
+      setValue('surname', user!.surname);
+      setValue('name', user!.name);
+      setValue('patronymic', user!.patronymic);
+      if (user!.pos) {
+        setValue('pos', user!.pos);
+      }
+      if (user!.department) {
+        setValue('department', user!.department);
+      }
+      setValue('login', user!.login);
+      setValue('email', user!.email);
+      if (user!.phoneNum) {
+        setValue('phoneNum', user!.phoneNum);
+      }
     }
   }, [user]);
 
