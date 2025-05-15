@@ -7,6 +7,8 @@ import User from '../models/user';
 // Текущая дата и время для timestamp-полей
 const now = new Date();
 
+interface ILogPass { login: string; password: string }
+
 // Интерфейс пользователя
 interface IUserProfile {
   id: number;
@@ -90,10 +92,10 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
 // Получает пользователя (по логину)
 export const getUserByLogin = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
-    const { login, password } = req.body;
+    const { login, password }: ILogPass = req.body as ILogPass;
     const user = await User.findOne({ where: { login: login } });
     let userWithoutPassword;
 
@@ -155,7 +157,7 @@ export const getUserByLogin = async (
 // Создаёт пользователя
 export const createUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Создаем транзакцию перед любыми операциями с базой данных
   let transaction: Transaction | undefined;
@@ -203,7 +205,7 @@ export const createUser = async (
           createdAt: now,
           updatedAt: now,
         },
-        { transaction }
+        { transaction },
       );
 
       // Если все операции успешны, фиксируем пользователя
@@ -267,7 +269,7 @@ export const createUser = async (
 // Удаляет пользователя (по логину)
 export const deleteUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Объявляем переменную для транзакции
   let transaction;
@@ -339,7 +341,7 @@ export const deleteUser = async (
 // Изменяет информацию о пользователе
 export const updateUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Объявляем переменную для транзакции
   let transaction: Transaction | undefined;
@@ -379,7 +381,7 @@ export const updateUser = async (
           phoneNum: userData.phoneNum,
           updatedAt: now,
         },
-        { transaction }
+        { transaction },
       );
 
       // Если все операции успешны, фиксируем транзакцию

@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import bodyParser from 'body-parser';
 import { sequelize } from './config/database';
 import passRoutes from './routes/passRoutes';
 import userRoutes from './routes/userRoutes';
 import path from 'path';
 import Paths from './common/constants/Paths';
-import bodyParser from 'body-parser';
 
 // Register module aliases
 import 'module-alias/register';
@@ -58,7 +58,8 @@ app.use(
     err: unknown,
     req: express.Request,
     res: express.Response,
-    next: express.NextFunction
+    // eslint-disable-next-line
+    next: express.NextFunction,
   ) => {
     console.error('Ошибка:', err);
 
@@ -76,7 +77,7 @@ app.use(
       // eslint-disable-next-line n/no-process-env
       error: process.env.NODE_ENV === 'development' ? message : undefined,
     });
-  }
+  },
 );
 
 // Обработка необработанных исключений
@@ -87,6 +88,7 @@ process.on('uncaughtException', (error) => {
 });
 
 // Обработка необработанных отклонений промисов
+// eslint-disable-next-line
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Необработанное отклонение промиса:', reason);
 });

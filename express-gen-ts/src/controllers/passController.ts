@@ -19,9 +19,9 @@ interface PassData {
   endDate: string;
   photo?: string;
   approvers: {
-    id?: number
-    name: string
-    position: string
+    id?: number,
+    name: string,
+    position: string,
   }[];
 }
 
