@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { sequelize } from '../config/database';
 // eslint-disable-next-line n/no-extraneous-import
 import { Transaction } from 'sequelize';
-import User from '../models/User';
+import User from '../models/user';
 
 // Текущая дата и время для timestamp-полей
 const now = new Date();

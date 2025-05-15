@@ -28,7 +28,6 @@ export default function Profile() {
   const [isOpenErrorAlert, setIsOpenErrorAlert] = useState(false);
   const [isOpenSuccessAlert, setIsOpenSuccessAlert] = useState(false);
   const user = useSession().data?.user;
-  console.log(user);
 
   // Уведомления о результате действий
   useEffect(() => {
@@ -87,7 +86,7 @@ export default function Profile() {
         setValue('phoneNum', user!.phoneNum);
       }
     }
-  }, [user]);
+  }, [user, setValue]);
 
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {

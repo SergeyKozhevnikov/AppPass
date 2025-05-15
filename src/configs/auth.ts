@@ -66,7 +66,6 @@ export const authConfig: AuthOptions = {
           });
 
         if (currentUser) {
-          console.log(currentUser);
           return currentUser as ICustomUser;
         }
 

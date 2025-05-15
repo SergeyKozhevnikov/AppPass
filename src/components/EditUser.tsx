@@ -40,15 +40,14 @@ export default function EditUser(props: IProps) {
   } = useForm<profileUserFields>({
     resolver: zodResolver(profileUserSchema),
     defaultValues: {
-      tabNum: '0001',
+      tabNum: 0,
       surname: '',
       name: '',
       patronymic: '',
       pos: '',
       department: '',
-      login: 'login',
-      email: `login@atom.ru`,
-      password: '',
+      login: '',
+      email: ``,
       phoneNum: '',
       role: 'Пользователь',
     },
