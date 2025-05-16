@@ -364,6 +364,12 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
     }
   };
 
+  // В компоненте GuestPassForm добавим функцию для передачи в ApprovalTab
+  const handleSubmitFromApprovalTab = () => {
+    // Эта функция будет вызвана из ApprovalTab при отправке формы
+    validateAndSubmit()
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -704,7 +710,11 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
 
             {/* Содержимое таба "Очереди согласования" */}
             <TabPanel value={tabValue} index={1} onSubmit={validateAndSubmit} onSave={onSave} onCancel={handleCancel}>
-              <ApprovalTab approvers={approvers} setApproversAction={setApprovers} />
+              <ApprovalTab
+                approvers={approvers}
+                setApproversAction={setApprovers}
+                onSubmitForm={handleSubmitFromApprovalTab}
+              />
             </TabPanel>
 
             {/* Содержимое таба "История" */}

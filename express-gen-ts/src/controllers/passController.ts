@@ -23,6 +23,8 @@ interface PassData {
     id?: number
     name: string
     position: string
+    login?: string
+    status_id?: number
   }[];
 }
 
@@ -127,8 +129,9 @@ export const createPass = async (req: Request, res: Response): Promise<void> => 
             {
               pass_id: pass.id,
               fullname: approver.name,
-              login: `user${index + 1}`, // Генерируем логин (в реальном приложении получаем из системы)
+              login: approver.login || `user${index + 1}`, // Используем логин из данных или генерируем
               position: approver.position,
+              status_id: approver.status_id || 2, // По умолчанию "На согласовании" при создании заявки
             },
             { transaction },
           );

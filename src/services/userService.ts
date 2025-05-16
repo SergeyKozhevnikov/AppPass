@@ -25,7 +25,7 @@ export type User = {
 };
 
 export const fetchUsers = async (): Promise<User[]> => {
-  const response = await fetch('http://195.133.147.112:3001/api/users');
+  const response = await fetch('http://localhost:3001/api/users');
   if (!response.ok) {
     throw new Error('Ошибка при получении пользователей');
   }

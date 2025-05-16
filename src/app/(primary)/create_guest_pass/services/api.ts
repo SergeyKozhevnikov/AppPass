@@ -3,35 +3,33 @@
  */
 
 // Базовый URL API - используется в бэкенде
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = "http://localhost:3001/api"
 
 // Интерфейс для данных пропуска
 export interface PassData {
-  fullName: string;
-  phone: string;
-  organization: string;
-  email: string;
-  birthDate: string;
-  hasCar: string;
-  justification: string;
-  startDate: string;
-  endDate: string;
-  photo?: string;
+  fullName: string
+  phone: string
+  organization: string
+  email: string
+  birthDate: string
+  hasCar: string
+  justification: string
+  startDate: string
+  endDate: string
+  photo?: string
   approvers: Array<{
     id?: number
     name: string
     position: string
-  }>;
+  }>
 }
 
 // Интерфейс для ответа API
 export interface ApiResponse<T = unknown> {
-  success: boolean;
-  message?: string;
-  data?: T;
-  error?: string;
-  duplicateFields?: string[];
-  existingPassId?: number;
+  success: boolean
+  message?: string
+  data?: T
+  error?: string
 }
 
 /**
@@ -41,78 +39,69 @@ export interface ApiResponse<T = unknown> {
  */
 export const createPass = async (passData: PassData): Promise<ApiResponse> => {
   try {
-    console.log('Отправка данных на сервер:', JSON.stringify(passData));
+    console.log("Отправка данных на сервер:", JSON.stringify(passData))
 
     const response = await fetch(`${API_BASE_URL}/passes`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(passData),
-    });
+    })
 
-    const responseData = await response.json();
+    const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('Ошибка ответа сервера:', response.status, responseData);
+      console.error("Ошибка ответа сервера:", response.status, responseData)
 
       // Формируем детальное сообщение об ошибке
-      let errorMessage = 'Ошибка при создании пропуска';
+      let errorMessage = "Ошибка при создании пропуска"
 
       if (responseData.error) {
-        errorMessage = responseData.error;
+        errorMessage = responseData.error
       } else if (responseData.message) {
-        errorMessage = responseData.message;
+        errorMessage = responseData.message
       }
 
       // Добавляем информацию о статусе ответа
       if (response.status === 400) {
-        errorMessage = `Ошибка валидации данных: ${errorMessage}`;
+        errorMessage = `Ошибка валидации данных: ${errorMessage}`
       } else if (response.status === 401 || response.status === 403) {
-        errorMessage = `Ошибка авторизации: ${errorMessage}`;
-      } else if (response.status === 409) {
-        // Специальная обработка для ошибки дублирования данных
-        return {
-          success: false,
-          message: 'Дублирование данных',
-          error: responseData.error || 'В системе уже существует заявка с такими данными',
-          duplicateFields: responseData.duplicateFields,
-          existingPassId: responseData.existingPassId,
-        };
+        errorMessage = `Ошибка авторизации: ${errorMessage}`
       } else if (response.status === 500) {
-        errorMessage = `Внутренняя ошибка сервера: ${errorMessage}`;
+        errorMessage = `Внутренняя ошибка сервера: ${errorMessage}`
       }
 
       return {
         success: false,
         message: errorMessage,
         error: responseData.error || `Ошибка сервера: ${response.status}`,
-      };
+      }
     }
 
-    return responseData;
+    return responseData
   } catch (error) {
-    console.error('Ошибка при создании пропуска:', error);
+    console.error("Ошибка при создании пропуска:", error)
 
     // Формируем детальное сообщение об ошибке
-    let errorMessage = 'Ошибка при отправке запроса';
+    let errorMessage = "Ошибка при отправке запроса"
 
     if (error instanceof Error) {
-      errorMessage = error.message;
+      errorMessage = error.message
 
       // Проверяем тип ошибки
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        errorMessage = 'Ошибка сети. Пожалуйста, проверьте подключение к интернету и доступность сервера.';
+      if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+        errorMessage = "Ошибка сети. Пожалуйста, проверьте подключение к интернету и доступность сервера."
       }
     }
 
     return {
       success: false,
-      message: 'Ошибка при отправке запроса',
+      message: "Ошибка при отправке запроса",
       error: errorMessage,
-    };
+    }
   }
-};
+}
 
 /**
  * Получает список всех пропусков
@@ -120,37 +109,37 @@ export const createPass = async (passData: PassData): Promise<ApiResponse> => {
  */
 export const getAllPasses = async (): Promise<ApiResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/passes`);
+    const response = await fetch(`${API_BASE_URL}/passes`)
 
-    const responseData = await response.json();
+    const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('Ошибка ответа сервера:', response.status, responseData);
+      console.error("Ошибка ответа сервера:", response.status, responseData)
 
       return {
         success: false,
         message: responseData.message || `Ошибка сервера: ${response.status}`,
         error: responseData.error || `Не удалось получить список пропусков. Код ошибки: ${response.status}`,
-      };
+      }
     }
 
-    return responseData;
+    return responseData
   } catch (error) {
-    console.error('Ошибка при получении списка пропусков:', error);
+    console.error("Ошибка при получении списка пропусков:", error)
 
-    let errorMessage = 'Ошибка при отправке запроса';
+    let errorMessage = "Ошибка при отправке запроса"
 
     if (error instanceof Error) {
-      errorMessage = error.message;
+      errorMessage = error.message
     }
 
     return {
       success: false,
-      message: 'Ошибка при получении списка пропусков',
+      message: "Ошибка при получении списка пропусков",
       error: errorMessage,
-    };
+    }
   }
-};
+}
 
 /**
  * Получает пропуск по ID
@@ -159,37 +148,37 @@ export const getAllPasses = async (): Promise<ApiResponse> => {
  */
 export const getPassById = async (id: number): Promise<ApiResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/passes/${id}`);
+    const response = await fetch(`${API_BASE_URL}/passes/${id}`)
 
-    const responseData = await response.json();
+    const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('Ошибка ответа сервера:', response.status, responseData);
+      console.error("Ошибка ответа сервера:", response.status, responseData)
 
       return {
         success: false,
         message: responseData.message || `Ошибка сервера: ${response.status}`,
         error: responseData.error || `Не удалось получить пропуск. Код ошибки: ${response.status}`,
-      };
+      }
     }
 
-    return responseData;
+    return responseData
   } catch (error) {
-    console.error('Ошибка при получении пропуска:', error);
+    console.error("Ошибка при получении пропуска:", error)
 
-    let errorMessage = 'Ошибка при отправке запроса';
+    let errorMessage = "Ошибка при отправке запроса"
 
     if (error instanceof Error) {
-      errorMessage = error.message;
+      errorMessage = error.message
     }
 
     return {
       success: false,
-      message: 'Ошибка при получении пропуска',
+      message: "Ошибка при получении пропуска",
       error: errorMessage,
-    };
+    }
   }
-};
+}
 
 /**
  * Обновляет пропуск
@@ -200,69 +189,42 @@ export const getPassById = async (id: number): Promise<ApiResponse> => {
 export const updatePass = async (id: number, passData: PassData): Promise<ApiResponse> => {
   try {
     const response = await fetch(`${API_BASE_URL}/passes/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(passData),
-    });
+    })
 
-    const responseData = await response.json();
+    const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('Ошибка ответа сервера:', response.status, responseData);
-
-      // Формируем детальное сообщение об ошибке
-      let errorMessage = 'Ошибка при обновлении пропуска';
-
-      if (responseData.error) {
-        errorMessage = responseData.error;
-      } else if (responseData.message) {
-        errorMessage = responseData.message;
-      }
-
-      // Добавляем информацию о статусе ответа
-      if (response.status === 400) {
-        errorMessage = `Ошибка валидации данных: ${errorMessage}`;
-      } else if (response.status === 401 || response.status === 403) {
-        errorMessage = `Ошибка авторизации: ${errorMessage}`;
-      } else if (response.status === 409) {
-        // Специальная обработка для ошибки дублирования данных
-        return {
-          success: false,
-          message: 'Дублирование данных',
-          error: responseData.error || 'В системе уже существует заявка с такими данными',
-          duplicateFields: responseData.duplicateFields,
-          existingPassId: responseData.existingPassId,
-        };
-      } else if (response.status === 500) {
-        errorMessage = `Внутренняя ошибка сервера: ${errorMessage}`;
-      }
+      console.error("Ошибка ответа сервера:", response.status, responseData)
 
       return {
         success: false,
-        message: errorMessage,
+        message: responseData.message || `Ошибка сервера: ${response.status}`,
         error: responseData.error || `Не удалось обновить пропуск. Код ошибки: ${response.status}`,
-      };
+      }
     }
 
-    return responseData;
+    return responseData
   } catch (error) {
-    console.error('Ошибка при обновлении пропуска:', error);
+    console.error("Ошибка при обновлении пропуска:", error)
 
-    let errorMessage = 'Ошибка при отправке запроса';
+    let errorMessage = "Ошибка при отправке запроса"
 
     if (error instanceof Error) {
-      errorMessage = error.message;
+      errorMessage = error.message
     }
 
     return {
       success: false,
-      message: 'Ошибка при обновлении пропуска',
+      message: "Ошибка при обновлении пропуска",
       error: errorMessage,
-    };
+    }
   }
-};
+}
 
 /**
  * Удаляет пропуск
@@ -272,35 +234,35 @@ export const updatePass = async (id: number, passData: PassData): Promise<ApiRes
 export const deletePass = async (id: number): Promise<ApiResponse> => {
   try {
     const response = await fetch(`${API_BASE_URL}/passes/${id}`, {
-      method: 'DELETE',
-    });
+      method: "DELETE",
+    })
 
-    const responseData = await response.json();
+    const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('Ошибка ответа сервера:', response.status, responseData);
+      console.error("Ошибка ответа сервера:", response.status, responseData)
 
       return {
         success: false,
         message: responseData.message || `Ошибка сервера: ${response.status}`,
         error: responseData.error || `Не удалось удалить пропуск. Код ошибки: ${response.status}`,
-      };
+      }
     }
 
-    return responseData;
+    return responseData
   } catch (error) {
-    console.error('Ошибка при удалении пропуска:', error);
+    console.error("Ошибка при удалении пропуска:", error)
 
-    let errorMessage = 'Ошибка при отправке запроса';
+    let errorMessage = "Ошибка при отправке запроса"
 
     if (error instanceof Error) {
-      errorMessage = error.message;
+      errorMessage = error.message
     }
 
     return {
       success: false,
-      message: 'Ошибка при удалении пропуска',
+      message: "Ошибка при удалении пропуска",
       error: errorMessage,
-    };
+    }
   }
-};
+}

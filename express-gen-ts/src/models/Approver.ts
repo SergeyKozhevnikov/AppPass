@@ -10,6 +10,7 @@ interface ApproverAttributes {
   fullname: string;
   login: string;
   position: string;
+  status_id?: number
 }
 
 // Интерфейс для создания нового Approver (id может быть опциональным)
@@ -22,6 +23,7 @@ class Approver extends Model<ApproverAttributes, ApproverCreationAttributes> imp
   public fullname!: string;
   public login!: string;
   public position!: string;
+  public status_id!: number;
 }
 
 Approver.init(
@@ -52,6 +54,14 @@ Approver.init(
     position: {
       type: DataTypes.TEXT,
       allowNull: false,
+    },
+    status_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "pass_statuses",
+        key: "id",
+      },
     },
   },
   {
