@@ -5,6 +5,7 @@ import { saveBase64Image } from '../services/fileService';
 import { sequelize } from '../config/database';
 // eslint-disable-next-line n/no-extraneous-import
 import { Transaction } from 'sequelize';
+import { Op } from 'sequelize';
 
 // Интерфейс для данных пропуска
 interface PassData {
@@ -41,6 +42,7 @@ export const createPass = async (req: Request, res: Response): Promise<void> => 
         success: false,
         message: 'Отсутствуют данные для создания пропуска',
       });
+      return;
     }
 
     const passData = req.body as PassData;
@@ -51,6 +53,36 @@ export const createPass = async (req: Request, res: Response): Promise<void> => 
         success: false,
         message: 'Не заполнены обязательные поля',
       });
+      return;
+    }
+
+    // Проверка на уникальность телефона и email
+    const existingPass = await Pass.findOne({
+      where: {
+        [Op.or]: [{ phone: passData.phone }, { email: passData.email }],
+      },
+    });
+
+    if (existingPass) {
+      // Определяем, какие именно данные дублируются
+      const duplicateFields = [];
+
+      if (existingPass.phone === passData.phone) {
+        duplicateFields.push('телефоном');
+      }
+
+      if (existingPass.email === passData.email) {
+        duplicateFields.push('почтовым адресом');
+      }
+
+      res.status(409).json({
+        success: false,
+        message: 'Дублирование данных',
+        error: `В системе уже существует заявка с таким же ${duplicateFields.join(' и ')}. ID заявки: ${existingPass.id}`,
+        duplicateFields: duplicateFields,
+        existingPassId: existingPass.id,
+      });
+      return;
     }
 
     // Начинаем транзакцию только после валидации данных
@@ -263,6 +295,41 @@ export const updatePass = async (req: Request, res: Response): Promise<void> => 
         success: false,
         message: 'Пропуск не найден',
         error: `Пропуск с ID ${id} не существует`,
+      });
+      return;
+    }
+
+    // Проверка на уникальность телефона и email при обновлении
+    // Исключаем текущий пропуск из проверки
+    const existingPass = await Pass.findOne({
+      where: {
+        [Op.and]: [
+          { id: { [Op.ne]: Number(id) } }, // Исключаем текущий пропуск
+          {
+            [Op.or]: [{ phone: passData.phone }, { email: passData.email }],
+          },
+        ],
+      },
+    });
+
+    if (existingPass) {
+      // Определяем, какие именно данные дублируются
+      const duplicateFields = [];
+
+      if (existingPass.phone === passData.phone) {
+        duplicateFields.push('телефон');
+      }
+
+      if (existingPass.email === passData.email) {
+        duplicateFields.push('почтовый адрес');
+      }
+
+      res.status(409).json({
+        success: false,
+        message: 'Дублирование данных',
+        error: `В системе уже существует заявка с таким же ${duplicateFields.join(' и ')}. ID заявки: ${existingPass.id}`,
+        duplicateFields: duplicateFields,
+        existingPassId: existingPass.id,
       });
       return;
     }
