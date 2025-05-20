@@ -61,7 +61,7 @@ const UsersList: React.FC<UsersListProps> = ({ }) => {
   }, [requests]); // !!!!!!!!!!!!!!!
 
   if (loading) {
-    return <div>Загрузка заявок...</div>; // !!!!!!!!!!!!!!!
+    return <div>Загрузка пользователей...</div>; // !!!!!!!!!!!!!!!
   }
   // Обработчик
   //const handleEdit = () => {
