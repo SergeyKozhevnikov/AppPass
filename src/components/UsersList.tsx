@@ -86,7 +86,7 @@ const UsersList: React.FC<UsersListProps> = ({ }) => {
                     <TableCell>Отчество</TableCell>
                     <TableCell>Должность</TableCell>
                     <TableCell>Почта</TableCell>
-                    <TableCell>Роли</TableCell>
+                    <TableCell>Роль</TableCell>
                     <TableCell className="w-[15px]" align="center"></TableCell>
                     <TableCell className="w-[15px]" align="center"></TableCell>
                   </TableRow>
@@ -94,12 +94,13 @@ const UsersList: React.FC<UsersListProps> = ({ }) => {
                 <TableBody>
                   {requests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>{req.role}</TableCell>
                       <TableCell>{req.tabNum}</TableCell>
-                      <TableCell>{req.surname}</TableCell>
+                      <TableCell>{req.patronymic}</TableCell>
                       <TableCell>{req.name}</TableCell>
+                      <TableCell>{req.surname}</TableCell>
+                      <TableCell>{req.pos}</TableCell>
                       <TableCell>{req.email}</TableCell>
-                      <TableCell>{req.login}</TableCell>
+                      <TableCell>{req.role}</TableCell>
                       <TableCell align="center">
                         <IconButton
                           color="primary"
