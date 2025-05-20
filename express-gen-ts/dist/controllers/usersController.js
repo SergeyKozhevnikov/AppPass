@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.deleteUser = exports.createUser = exports.getUser = exports.getAllUsers = exports.getUsers = void 0;
+exports.updateUser = exports.deleteUser = exports.createUser = exports.getUserByLogin = exports.getUser = exports.getAllUsers = exports.getUsers = void 0;
 const database_1 = require("../config/database");
 const user_1 = __importDefault(require("../models/user"));
 const now = new Date();
@@ -66,7 +66,7 @@ const getUser = async (req, res) => {
             res.status(404).json({
                 success: false,
                 message: 'Пользователь не найден',
-                error: `Пользователь с Id ${id} не существует`,
+                error: `Пользователь с id: ${id} не существует`,
             });
             return;
         }
@@ -89,6 +89,61 @@ const getUser = async (req, res) => {
     }
 };
 exports.getUser = getUser;
+const getUserByLogin = async (req, res) => {
+    try {
+        const { login, password } = req.body;
+        const user = await user_1.default.findOne({ where: { login: login } });
+        let userWithoutPassword;
+        if (!user) {
+            res.status(404).json({
+                success: false,
+                message: 'Пользователь не найден',
+                error: `Пользователь с логином: ${login} не существует`,
+            });
+            return;
+        }
+        if (password !== user.password) {
+            res.status(404).json({
+                success: false,
+                message: 'Неверный логин или пароль',
+            });
+        }
+        else if (password === user.password) {
+            userWithoutPassword = {
+                id: user.id,
+                role: user.role,
+                tabNum: user.tabNum,
+                surname: user.surname,
+                name: user.name,
+                patronymic: user.patronymic,
+                pos: user.pos,
+                department: user.department,
+                login: user.login,
+                email: user.email,
+                phoneNum: user.phoneNum,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+            };
+        }
+        res.status(200).json({
+            success: true,
+            user: userWithoutPassword,
+        });
+    }
+    catch (error) {
+        console.error('Ошибка при получении пользователя:', error);
+        let errorMessage = 'Ошибка при получении пользователя';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Ошибка при получении пользователя',
+            error: errorMessage,
+        });
+    }
+};
+exports.getUserByLogin = getUserByLogin;
 const createUser = async (req, res) => {
     let transaction;
     try {

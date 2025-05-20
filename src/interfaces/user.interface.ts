@@ -1,6 +1,8 @@
 // Интерфейсы пользователя
 // Приставка I вначале означает Interface
 
+export type TRole = 'Пользователь' | 'Администратор';
+
 // Для регистрации пользователя
 export interface IRegisteredUser {
   surname: string;
@@ -22,5 +24,7 @@ export interface IUserProfile extends IRegisteredUser {
 // Остальные свойства (т.е. все свойства пользователя)
 export interface IUser extends IUserProfile {
   id: number;
-  role: 'user' | 'admin';
+  role: TRole;
+  createdAt: string; // или Date?
+  updatedAt?: string;
 }

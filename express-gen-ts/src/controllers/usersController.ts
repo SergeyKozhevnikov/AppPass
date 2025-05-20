@@ -7,6 +7,8 @@ import User from '../models/user';
 // Текущая дата и время для timestamp-полей
 const now = new Date();
 
+interface ILogPass { login: string; password: string }
+
 // Интерфейс пользователя
 interface IUserProfile {
   id: number;
@@ -97,7 +99,7 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({
         success: false,
         message: 'Пользователь не найден',
-        error: `Пользователь с Id ${id} не существует`,
+        error: `Пользователь с id: ${id} не существует`,
       });
       return;
     }
@@ -123,10 +125,75 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Получает пользователя (по логину)
+export const getUserByLogin = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { login, password }: ILogPass = req.body as ILogPass;
+    const user = await User.findOne({ where: { login: login } });
+    let userWithoutPassword;
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден',
+        error: `Пользователь с логином: ${login} не существует`,
+      });
+      return;
+    }
+
+    if (password !== user.password) {
+      res.status(404).json({
+        success: false,
+        message: 'Неверный логин или пароль',
+      });
+    } else if (password === user.password) {
+      // const {password, ...other} = user
+      // userWithoutPassword = other
+      userWithoutPassword = {
+        id: user.id,
+        role: user.role,
+        tabNum: user.tabNum,
+        surname: user.surname,
+        name: user.name,
+        patronymic: user.patronymic,
+        pos: user.pos,
+        department: user.department,
+        login: user.login,
+        email: user.email,
+        phoneNum: user.phoneNum,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+    }
+
+    res.status(200).json({
+      success: true,
+      user: userWithoutPassword,
+    });
+  } catch (error) {
+    console.error('Ошибка при получении пользователя:', error);
+
+    let errorMessage = 'Ошибка при получении пользователя';
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при получении пользователя',
+      error: errorMessage,
+    });
+  }
+};
+
 // Создаёт пользователя
 export const createUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Создаем транзакцию перед любыми операциями с базой данных
   let transaction: Transaction | undefined;
@@ -174,7 +241,7 @@ export const createUser = async (
           createdAt: now,
           updatedAt: now,
         },
-        { transaction }
+        { transaction },
       );
 
       // Если все операции успешны, фиксируем пользователя
@@ -238,7 +305,7 @@ export const createUser = async (
 // Удаляет пользователя (по логину)
 export const deleteUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Объявляем переменную для транзакции
   let transaction;
@@ -310,7 +377,7 @@ export const deleteUser = async (
 // Изменяет информацию о пользователе
 export const updateUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Объявляем переменную для транзакции
   let transaction: Transaction | undefined;
@@ -350,7 +417,7 @@ export const updateUser = async (
           phoneNum: userData.phoneNum,
           updatedAt: now,
         },
-        { transaction }
+        { transaction },
       );
 
       // Если все операции успешны, фиксируем транзакцию

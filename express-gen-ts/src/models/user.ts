@@ -66,7 +66,8 @@ User.init(
     tabNum: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: literal('nextval("users_tab_num_seq")'),
+      // eslint-disable-next-line
+      defaultValue: literal("nextval('users_tab_num_seq')"),
     },
     surname: {
       type: DataTypes.STRING(255),
@@ -127,7 +128,7 @@ User.init(
         user.updatedAt = new Date();
       },
     },
-  }
+  },
 );
 
 sequelize.beforeSync(async () => {

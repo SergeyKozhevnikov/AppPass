@@ -37,12 +37,10 @@ export default tseslint.config(
       '@typescript-eslint/no-confusing-void-expression': 0,
       '@typescript-eslint/no-unnecessary-condition': 0,
       '@typescript-eslint/restrict-template-expressions': [
-        'error',
-        { allowNumber: true },
+        'error', { allowNumber: true },
       ],
       '@typescript-eslint/restrict-plus-operands': [
-        'warn',
-        { allowNumberAndString: true },
+        'warn', { allowNumberAndString: true },
       ],
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-unsafe-enum-comparison': 0,
@@ -51,47 +49,44 @@ export default tseslint.config(
       'max-len': [
         'warn',
         {
-          code: 150,
+          'code': 150,
         },
       ],
       '@stylistic/ts/semi': ['warn', 'always'],
-      '@stylistic/ts/member-delimiter-style': [
-        'warn',
-        {
-          multiline: {
-            delimiter: 'comma',
-            requireLast: true,
-          },
-          singleline: {
-            delimiter: 'comma',
-            requireLast: false,
-          },
-          overrides: {
-            interface: {
-              singleline: {
-                delimiter: 'semi',
-                requireLast: false,
-              },
-              multiline: {
-                delimiter: 'semi',
-                requireLast: true,
-              },
+      '@stylistic/ts/member-delimiter-style': ['warn', {
+        'multiline': {
+          'delimiter': 'comma',
+          'requireLast': true,
+        },
+        'singleline': {
+          'delimiter': 'comma',
+          'requireLast': false,
+        },
+        'overrides': {
+          'interface': {
+            'singleline': {
+              'delimiter': 'semi',
+              'requireLast': false,
+            },
+            'multiline': {
+              'delimiter': 'semi',
+              'requireLast': true,
             },
           },
         },
-      ],
+      }],
       '@typescript-eslint/no-non-null-assertion': 0,
       '@typescript-eslint/no-unused-expressions': 'warn',
       '@typescript-eslint/comma-dangle': 'off',
       'comma-dangle': 'off',
       'no-console': 0,
       'no-extra-boolean-cast': 0,
-      indent: ['warn', 2],
-      quotes: ['warn', 'single'],
+      'indent': ['warn', 2],
+      'quotes': ['warn', 'single'],
       'n/no-process-env': 1,
       'n/no-missing-import': 0,
       'n/no-unpublished-import': 0,
       'prefer-const': 'warn',
     },
-  }
+  },
 );

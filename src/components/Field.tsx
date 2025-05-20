@@ -70,6 +70,7 @@ export default function Field({
         disabled={profileDisableFields}
         autoFocus={currentUrl !== '/profile'}
         sx={getFieldStyles}
+        InputLabelProps={{ shrink: true }}
       />
     </Grid>
   );

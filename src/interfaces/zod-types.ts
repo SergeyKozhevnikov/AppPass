@@ -52,7 +52,7 @@ export type newUserFields = z.infer<typeof newUserSchema>;
 
 // схема для страницы пользователя
 export const profileUserSchema = z.object({
-  tabNum: z.string(), // заполняется из БД - наверное, пользователю проверка не нужна
+  tabNum: z.number(), // заполняется из БД - наверное, пользователю проверка не нужна
   surname: z
     .string()
     .min(2, { message: 'Фамилия не может быть менее 2 символов' })
@@ -92,8 +92,8 @@ export const profileUserSchema = z.object({
     .string()
     .min(5, { message: 'Номер телефона должен быть из 5 символов' })
     .max(5, { message: 'Номер телефона должен быть из 5 символов' }),
-  role: z.enum(['Пользователь', 'Админ'], {
-    message: 'Роль может быть "Пользователь" или "Админ"',
+  role: z.enum(['Пользователь', 'Администратор'], {
+    message: 'Роль может быть "Пользователь" или "Администратор"',
   }),
 });
 
