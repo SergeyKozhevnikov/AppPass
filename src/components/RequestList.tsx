@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // !!!!!!!!!!!!!!!
 import {
   Box,
   Card,
@@ -17,8 +17,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import InventoryIcon from '@mui/icons-material/Inventory';
-import { mockRequests } from '@/mock/requests';
+// import { mockRequests } from '@/mock/requests'; // !!!!!!!!!!!!!!!
 import RequestFilter from './RequestFilter';
+import { fetchPasses, Pass } from '@/services/passService'; // !!!!!!!!!!!!!!!
 
 type RequestListProps = {
   status?: 'drafts' | 'inReview' | 'approved' | 'rejected';
@@ -26,13 +27,27 @@ type RequestListProps = {
 
 const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const [filters, setFilters] = useState<{ date: string; search: string }>({ date: '', search: '' });
+  const [requests, setRequests] = useState<Pass[]>([]); // !!!!!!!!!!!!!!!
+  const [loading, setLoading] = useState(true); // !!!!!!!!!!!!!!!
+
+  useEffect(() => {
+    fetchPasses() // !!!!!!!!!!!!!!!
+      .then(data => {
+        setRequests(data); // !!!!!!!!!!!!!!!
+        setLoading(false); // !!!!!!!!!!!!!!!
+      })
+      .catch(err => {
+        console.error(err); // !!!!!!!!!!!!!!!
+        setLoading(false); // !!!!!!!!!!!!!!!
+      });
+  }, []); // !!!!!!!!!!!!!!!
 
   const handleFilterChange = (newFilters: { date: string; search: string }) => {
     setFilters(newFilters);
   };
 
   const filteredRequests = useMemo(() => {
-    return mockRequests.filter((req) => {
+    return requests.filter((req) => { // !!!!!!!!!!!!!!!
       const matchesStatus = status ? req.status === status : true;
       const matchesDate = filters.date ? req.date === filters.date : true;
       const matchesSearch = filters.search
@@ -41,7 +56,11 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
 
       return matchesStatus && matchesDate && matchesSearch;
     });
-  }, [filters, status]);
+  }, [filters, status, requests]); // !!!!!!!!!!!!!!!
+
+  if (loading) {
+    return <div>Загрузка заявок...</div>; // !!!!!!!!!!!!!!!
+  }
 
   return (
     <div>
@@ -55,9 +74,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                 <TableHead className="bg-gray-100">
                   <TableRow>
                     <TableCell>Дата</TableCell>
-                    <TableCell>Фамилия</TableCell>
-                    <TableCell>Имя</TableCell>
-                    <TableCell>Отчество</TableCell>
+                    <TableCell>ФИО</TableCell>
                     <TableCell>Авто</TableCell>
                     <TableCell>Материалы</TableCell>
                     <TableCell align="center" className="w-[15px]"></TableCell>
@@ -67,10 +84,8 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                 <TableBody>
                   {filteredRequests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>{req.date}</TableCell>
-                      <TableCell>{req.lastName}</TableCell>
-                      <TableCell>{req.firstName}</TableCell>
-                      <TableCell>{req.middleName}</TableCell>
+                      <TableCell>{req.createdAt}</TableCell>
+                      <TableCell>{req.fullName}</TableCell>
                       <TableCell>
                         {req.hasCar && <DirectionsCarIcon color="primary" />}
                       </TableCell>

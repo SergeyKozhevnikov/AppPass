@@ -16,12 +16,16 @@ export interface Approver {
   id: number
   name: string
   position: string
+  login: string
+  status_id?: number
+  status?: string
 }
 
 // Интерфейс для согласующих
 export interface ApprovalTabProps {
   approvers: Approver[]
   setApproversAction: React.Dispatch<React.SetStateAction<Approver[]>>
+  onSubmitForm?: () => void
 }
 
 // Интерфейс для уведомлений
@@ -46,4 +50,28 @@ export interface HistoryTabProps {
 // Интерфейс для пропсов компонента
 export interface GuestPassFormProps {
   onClose?: () => void
+}
+
+// Интерфейс для пользователя
+export interface User {
+  id: number
+  role: string
+  tabNum: string
+  surname: string
+  name: string
+  patronymic: string
+  pos: string
+  department: string
+  login: string
+  email: string
+  password: string
+  phoneNum: string
+}
+
+// Интерфейс для статуса согласования
+export interface ApprovalStatus {
+  id: number
+  name: string
+  description: string | null
+  color: string
 }

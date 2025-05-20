@@ -23,7 +23,7 @@ export const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
   logging: console.log,
   define: {
     // Автоматическое добавление полей createdAt и updatedAt
-    timestamps: true,
+    timestamps: false,
     // Используем точное имя таблицы без преобразования во множественное число
     freezeTableName: true,
   },

@@ -24,11 +24,6 @@ import {
   Snackbar,
   Alert,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button as MuiButton,
   CircularProgress,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -40,6 +35,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import BusinessIcon from '@mui/icons-material/Business';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import ClearIcon from '@mui/icons-material/Clear';
+import WarningIcon from '@mui/icons-material/Warning';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -69,6 +65,8 @@ interface CreatePassResponse {
   };
   message?: string;
   error?: string;
+  duplicateFields?: string[];
+  existingPassId?: number;
 }
 
 // Основной компонент формы
@@ -90,8 +88,8 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
   const [operations, setOperations] = useState<HistoryOperation[]>([]);
 
   // Состояние для отображения JSON данных
-  const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
-  const [jsonData, setJsonData] = useState('');
+  // const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
+  // const [jsonData, setJsonData] = useState('');
 
   // Состояние для хранения фотографии профиля
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
@@ -140,6 +138,18 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
 
   // Функция для форматирования сообщения об ошибке
   const formatErrorMessage = (error: unknown): string => {
+    // Если это ошибка дублирования данных
+    if (typeof error === 'object' && error !== null) {
+      if ('duplicateFields' in error && 'existingPassId' in error) {
+        const duplicateFields = (error as {
+          duplicateFields?: string[]
+        }).duplicateFields?.join(' и ') || 'неизвестные поля';
+        const existingPassId = (error as { existingPassId?: number }).existingPassId || 'неизвестный';
+
+        return `В системе уже существует заявка с таким же ${duplicateFields}. ID заявки: ${existingPassId}`;
+      }
+    }
+
     // Если это объект с полем 'error'
     if (typeof error === 'object' && error !== null && 'error' in error) {
       return `Ошибка: ${String((error as Record<string, unknown>).error)}`;
@@ -180,26 +190,26 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
   };
 
   // Функция для создания JSON данных
-  const createJsonData = () => {
-    const formData = getValues();
-
-    // Создаем объект с данными формы
-    const jsonObject = {
-      photo: profilePhoto || null,
-      fullName: formData.fullName,
-      phone: formData.phone,
-      organization: formData.organization,
-      email: formData.email,
-      birthDate: formData.birthDate instanceof Date ? formData.birthDate.toISOString().split('T')[0] : null,
-      hasCar: formData.hasCar,
-      justification: formData.justification,
-      startDate: formData.startDate instanceof Date ? formData.startDate.toISOString().split('T')[0] : null,
-      endDate: formData.endDate instanceof Date ? formData.endDate.toISOString().split('T')[0] : null,
-      approvers: approvers,
-    };
-
-    return JSON.stringify(jsonObject, null, 2);
-  };
+  // const createJsonData = () => {
+  //   const formData = getValues();
+  //
+  //   // Создаем объект с данными формы
+  //   const jsonObject = {
+  //     photo: profilePhoto || null,
+  //     fullName: formData.fullName,
+  //     phone: formData.phone,
+  //     organization: formData.organization,
+  //     email: formData.email,
+  //     birthDate: formData.birthDate instanceof Date ? formData.birthDate.toISOString().split('T')[0] : null,
+  //     hasCar: formData.hasCar,
+  //     justification: formData.justification,
+  //     startDate: formData.startDate instanceof Date ? formData.startDate.toISOString().split('T')[0] : null,
+  //     endDate: formData.endDate instanceof Date ? formData.endDate.toISOString().split('T')[0] : null,
+  //     approvers: approvers,
+  //   };
+  //
+  //   return JSON.stringify(jsonObject, null, 2);
+  // };
 
   // Обработчик отправки формы
   const onSubmit = handleSubmit(async () => {
@@ -258,12 +268,27 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
         showAlert(`Заявка успешно отправлена. ID: ${response.data?.id}`, 'success');
 
         // Создаем JSON данные для отображения
-        const jsonData = createJsonData();
-        setJsonData(jsonData);
-        setJsonDialogOpen(true);
+        // const jsonData = createJsonData();
+        // setJsonData(jsonData);
+        // setJsonDialogOpen(true);
+
+        // Закрываем карточку после небольшой задержки, чтобы пользователь успел увидеть уведомление
+        setTimeout(() => {
+          if (onClose) {
+            onClose();
+          }
+        }, 1500);
       } else {
-        // Показываем уведомление об ошибке
-        showAlert(`Ошибка при отправке заявки: ${response.message || response.error || 'Неизвестная ошибка'}`, 'error');
+        // Проверяем, является ли ошибка дублированием данных
+        if (response.duplicateFields && response.duplicateFields.length > 0) {
+          // Показываем предупреждение о дублировании данных
+          const errorMessage = formatErrorMessage(response);
+          showAlert(errorMessage, 'warning');
+        } else {
+          // Показываем детальное уведомление об ошибке
+          const errorMessage = formatErrorMessage(response);
+          showAlert(errorMessage, 'error');
+        }
       }
     } catch (error) {
       console.error('Ошибка при отправке формы:', error);
@@ -293,9 +318,9 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
   };
 
   // Обработчик закрытия диалога с JSON
-  const handleCloseJsonDialog = () => {
-    setJsonDialogOpen(false);
-  };
+  // const handleCloseJsonDialog = () => {
+  //   setJsonDialogOpen(false);
+  // };
 
   // Функция для проверки валидности формы и наличия согласующих
   const validateAndSubmit = async () => {
@@ -338,6 +363,12 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
       onClose();
     }
   };
+
+  // В компоненте GuestPassForm добавим функцию для передачи в ApprovalTab
+  const handleSubmitFromApprovalTab = () => {
+    // Эта функция будет вызвана из ApprovalTab при отправке формы
+    validateAndSubmit()
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -679,7 +710,11 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
 
             {/* Содержимое таба "Очереди согласования" */}
             <TabPanel value={tabValue} index={1} onSubmit={validateAndSubmit} onSave={onSave} onCancel={handleCancel}>
-              <ApprovalTab approvers={approvers} setApproversAction={setApprovers} />
+              <ApprovalTab
+                approvers={approvers}
+                setApproversAction={setApprovers}
+                onSubmitForm={handleSubmitFromApprovalTab}
+              />
             </TabPanel>
 
             {/* Содержимое таба "История" */}
@@ -699,6 +734,7 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
           <Alert
             onClose={handleCloseAlert}
             severity={alert.severity}
+            icon={alert.severity === 'warning' ? <WarningIcon /> : undefined}
             sx={{
               width: '100%',
               '& .MuiAlert-message': {
@@ -712,29 +748,29 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
         </Snackbar>
 
         {/* Диалог с JSON данными */}
-        <Dialog open={jsonDialogOpen} onClose={handleCloseJsonDialog} maxWidth="md" fullWidth>
-          <DialogTitle>Данные заявки (JSON)</DialogTitle>
-          <DialogContent>
-            <Box
-              component="pre"
-              sx={{
-                p: 2,
-                bgcolor: '#f5f5f5',
-                borderRadius: 1,
-                overflow: 'auto',
-                maxHeight: '400px',
-                fontSize: '0.875rem',
-              }}
-            >
-              {jsonData}
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <MuiButton onClick={handleCloseJsonDialog} color="primary">
-              Закрыть
-            </MuiButton>
-          </DialogActions>
-        </Dialog>
+        {/*<Dialog open={jsonDialogOpen} onClose={handleCloseJsonDialog} maxWidth="md" fullWidth>*/}
+        {/*  <DialogTitle>Данные заявки (JSON)</DialogTitle>*/}
+        {/*  <DialogContent>*/}
+        {/*    <Box*/}
+        {/*      component="pre"*/}
+        {/*      sx={{*/}
+        {/*        p: 2,*/}
+        {/*        bgcolor: '#f5f5f5',*/}
+        {/*        borderRadius: 1,*/}
+        {/*        overflow: 'auto',*/}
+        {/*        maxHeight: '400px',*/}
+        {/*        fontSize: '0.875rem',*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      {jsonData}*/}
+        {/*    </Box>*/}
+        {/*  </DialogContent>*/}
+        {/*  <DialogActions>*/}
+        {/*    <MuiButton onClick={handleCloseJsonDialog} color="primary">*/}
+        {/*      Закрыть*/}
+        {/*    </MuiButton>*/}
+        {/*  </DialogActions>*/}
+        {/*</Dialog>*/}
 
         {/* Индикатор загрузки при отправке формы */}
         {isSubmitting && (

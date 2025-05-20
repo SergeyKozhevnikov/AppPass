@@ -9,12 +9,8 @@ export default tseslint.config(
   nodePlugin.configs['flat/recommended-script'],
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
-  { 
-    ignores: [
-      '**/node_modules/*',
-      '**/*.mjs',
-      '**/*.js',
-    ],
+  {
+    ignores: ['**/node_modules/*', '**/*.mjs', '**/*.js'],
   },
   {
     languageOptions: {
@@ -49,7 +45,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-unsafe-enum-comparison': 0,
       '@typescript-eslint/no-unnecessary-type-parameters': 0,
-      '@stylistic/js/no-extra-semi': 'warn',
+      // '@stylistic/js/no-extra-semi': 'warn',
       'max-len': [
         'warn',
         {
@@ -81,7 +77,8 @@ export default tseslint.config(
       }],
       '@typescript-eslint/no-non-null-assertion': 0,
       '@typescript-eslint/no-unused-expressions': 'warn',
-      'comma-dangle': ['warn', 'always-multiline'],
+      '@typescript-eslint/comma-dangle': 'off',
+      'comma-dangle': 'off',
       'no-console': 0,
       'no-extra-boolean-cast': 0,
       'indent': ['warn', 2],

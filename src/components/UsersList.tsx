@@ -1,7 +1,7 @@
 'use client'; // определяет компонент как клиентский
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import EditUser from './EditUser';
+import { Dispatch, useEffect, useState } from 'react';
+//import EditUser from './EditUser';
 
 import React from 'react';
 import {
@@ -18,30 +18,49 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { mockUsers } from '@/mock/users';
-import { userApi } from '@/lib/userApi';
+import { fetchUsers, User } from '@/services/userService';
+//import { mockUsers } from '@/mock/users';
 
-interface IProps {
-  setResult: Dispatch<SetStateAction<string>>;
-}
+//interface IProps {
+//  setResult: Dispatch<SetStateAction<string>>;
+//}
 
-const UsersList = (props: IProps) => {
-  const { setResult } = props;
-  const [isOpen, setIsOpen] = useState(false);
-  const [users, setUsers] = useState(); // список пользователей
+type UsersListProps = {setResult: Dispatch<React.SetStateAction<string>>};
 
-  // Получение пользователей с сервера при открытии страницы
+const UsersList: React.FC<UsersListProps> = ({}) => {
+  //const UsersList = (props: IProps) => {
+  //  const { setResult } = props;
+
+  // Начало блока для бэка
+  const [requests, setRequests] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    userApi
-      .getUsers() // получаем пользователей
-      .then((res) => {
-        setUsers(res.data); // обновляем пользователей
+    fetchUsers()
+      .then((data) => {
+        setRequests(data);
+        setLoading(false);
+        console.log(data);
       })
-      .catch((err: Error) => {
-        console.log(`Ошибка: ${err}`);
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
       });
   }, []);
-  console.log(users)
+
+  // const userRequests = useMemo(() => {
+  //   return requests.filter((req) => {
+  //     // !!!!!!!!!!!!!!!
+  //     const matchesStatus = status ? req.status === status : true;
+  //   });
+  // }, [requests]); // !!!!!!!!!!!!!!!
+
+  if (loading) {
+    return <div>Загрузка пользователей...</div>; // !!!!!!!!!!!!!!!
+  }
+  // Обработчик
+  //const handleEdit = () => {
+  //const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div>
@@ -62,32 +81,26 @@ const UsersList = (props: IProps) => {
                     <TableCell>Отчество</TableCell>
                     <TableCell>Должность</TableCell>
                     <TableCell>Почта</TableCell>
-                    <TableCell>Роли</TableCell>
+                    <TableCell>Роль</TableCell>
                     <TableCell className="w-[15px]" align="center"></TableCell>
                     <TableCell className="w-[15px]" align="center"></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {mockUsers.map((req) => (
+                  {requests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>{req.tnumber}</TableCell>
-                      <TableCell>{req.lastName}</TableCell>
-                      <TableCell>{req.firstName}</TableCell>
-                      <TableCell>{req.middleName}</TableCell>
-                      <TableCell>{req.spiciality}</TableCell>
+                      <TableCell>{req.tabNum}</TableCell>
+                      <TableCell>{req.patronymic}</TableCell>
+                      <TableCell>{req.name}</TableCell>
+                      <TableCell>{req.surname}</TableCell>
+                      <TableCell>{req.pos}</TableCell>
                       <TableCell>{req.email}</TableCell>
-                      <TableCell>
-                        <select>
-                          <option>Администратор</option>
-                          <option>Согласующий</option>
-                          <option>Пользователь</option>
-                        </select>
-                      </TableCell>
+                      <TableCell>{req.role}</TableCell>
                       <TableCell align="center">
                         <IconButton
                           color="primary"
                           aria-label="редактировать"
-                          onClick={() => setIsOpen(true)}
+                          //onClick={() => setIsOpen(true)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -105,10 +118,6 @@ const UsersList = (props: IProps) => {
           </Box>
         </CardContent>
       </Card>
-      {/* Условие, если isOpen-true, открыть диалоговое окно и передать ему параметры isOpen и setIsOpen*/}
-      {isOpen && (
-        <EditUser isOpen={isOpen} setIsOpen={setIsOpen} setResult={setResult} />
-      )}
     </div>
   );
 };

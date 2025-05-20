@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { useState } from "react"
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -20,80 +20,176 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-} from "@mui/material"
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+  Divider,
+  CircularProgress,
+  Chip,
+  InputAdornment,
+} from '@mui/material';
 import {
   KeyboardArrowUp as ArrowUpIcon,
   KeyboardArrowDown as ArrowDownIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
-} from "@mui/icons-material"
-import type { ApprovalTabProps } from "../types"
+  Search as SearchIcon,
+  Person as PersonIcon,
+} from '@mui/icons-material';
+import type { ApprovalTabProps, User, ApprovalStatus } from '../types';
+import { getAllUsers } from '../services/userApi';
 
-export default function ApprovalTab({ approvers, setApproversAction }: ApprovalTabProps) {
+// Статусы согласования с цветами
+const approvalStatuses: ApprovalStatus[] = [
+  { id: 1, name: 'Ожидается', description: 'Ожидается согласование', color: '#FFA726' }, // Оранжевый
+  { id: 2, name: 'На согласовании', description: 'Заявка находится на согласовании', color: '#42A5F5' }, // Голубой
+  { id: 3, name: 'Согласован', description: 'Заявка согласована', color: '#66BB6A' }, // Зеленый
+  { id: 4, name: 'Отклонен', description: 'Заявка отклонена', color: '#EF5350' }, // Красный
+];
+
+export default function ApprovalTab({ approvers, setApproversAction, onSubmitForm }: ApprovalTabProps) {
   // Состояние для модального окна
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   // Получаем тему и проверяем, является ли устройство мобильным
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Состояние для нового согласующего
-  const [newApprover, setNewApprover] = useState({ name: "", position: "Сотрудник" })
+  // Состояние для списка пользователей
+  const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Функция добавления согласующего
-  const handleAddApprover = () => {
-    if (newApprover.name.trim() === "") return
+  // Загрузка списка пользователей при открытии модального окна
+  useEffect(() => {
+    if (open) {
+      loadUsers();
+    }
+  }, [open]);
 
-    const newId = approvers.length > 0 ? Math.max(...approvers.map((a) => a.id)) + 1 : 1
+  // Фильтрация пользователей при изменении поискового запроса
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredUsers(users);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = users.filter(
+        (user) =>
+          user.surname.toLowerCase().includes(query) ||
+          user.name.toLowerCase().includes(query) ||
+          (user.patronymic && user.patronymic.toLowerCase().includes(query)) ||
+          user.login.toLowerCase().includes(query) ||
+          user.pos.toLowerCase().includes(query),
+      );
+      setFilteredUsers(filtered);
+    }
+  }, [searchQuery, users]);
+
+  // Функция загрузки пользователей
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllUsers();
+      if (response.success && response.data) {
+        setUsers(response.data);
+        setFilteredUsers(response.data);
+      } else {
+        console.error('Ошибка при загрузке пользователей:', response.error);
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке пользователей:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Функция добавления согласующего из списка пользователей
+  const handleAddApproverFromList = (user: User) => {
+    const newId = approvers.length > 0 ? Math.max(...approvers.map((a) => a.id)) + 1 : 1;
+    const fullName = `${user.surname} ${user.name}${user.patronymic ? ' ' + user.patronymic : ''}`;
+
     setApproversAction([
       ...approvers,
       {
         id: newId,
-        name: newApprover.name,
-        position: newApprover.position,
+        name: fullName,
+        position: user.pos,
+        login: user.login,
+        status_id: 1, // По умолчанию "Ожидается"
+        status: 'Ожидается',
       },
-    ])
-    setNewApprover({ name: "", position: "Сотрудник" })
-    setOpen(false)
-  }
+    ]);
+
+    setOpen(false);
+  };
 
   // Функция удаления согласующего
   const handleDeleteApprover = (id: number) => {
-    setApproversAction(approvers.filter((approver) => approver.id !== id))
-  }
+    setApproversAction(approvers.filter((approver) => approver.id !== id));
+  };
 
   // Функция перемещения согласующего вверх
   const handleMoveUp = (index: number) => {
-    if (index === 0) return
-    const newApprovers = [...approvers]
-    const temp = newApprovers[index]
-    newApprovers[index] = newApprovers[index - 1]
-    newApprovers[index - 1] = temp
-    setApproversAction(newApprovers)
-  }
+    if (index === 0) return;
+    const newApprovers = [...approvers];
+    const temp = newApprovers[index];
+    newApprovers[index] = newApprovers[index - 1];
+    newApprovers[index - 1] = temp;
+    setApproversAction(newApprovers);
+  };
 
   // Функция перемещения согласующего вниз
   const handleMoveDown = (index: number) => {
-    if (index === approvers.length - 1) return
-    const newApprovers = [...approvers]
-    const temp = newApprovers[index]
-    newApprovers[index] = newApprovers[index + 1]
-    newApprovers[index + 1] = temp
-    setApproversAction(newApprovers)
-  }
+    if (index === approvers.length - 1) return;
+    const newApprovers = [...approvers];
+    const temp = newApprovers[index];
+    newApprovers[index] = newApprovers[index + 1];
+    newApprovers[index + 1] = temp;
+    setApproversAction(newApprovers);
+  };
+
+  // Функция для изменения статуса всех согласующих
+  const updateAllApproversStatus = (statusId: number) => {
+    const newApprovers = approvers.map((approver) => ({
+      ...approver,
+      status_id: statusId,
+      status: approvalStatuses.find((s) => s.id === statusId)?.name || 'Неизвестно',
+    }));
+    setApproversAction(newApprovers);
+  };
+
+  // Обработчик отправки формы
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleSubmitForm = () => {
+    // Изменяем статус всех согласующих на "На согласовании" (id=2)
+    updateAllApproversStatus(2);
+
+    // Вызываем функцию отправки формы, если она передана
+    if (onSubmitForm) {
+      onSubmitForm();
+    }
+  };
+
+  // Получаем цвет статуса согласования
+  const getStatusColor = (statusId?: number) => {
+    return approvalStatuses.find((s) => s.id === statusId)?.color || '#9E9E9E'; // Серый по умолчанию
+  };
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Typography variant="h6" component="h2" sx={{ fontWeight: "bold" }}>
+    <Box sx={{ width: '100%' }}>
+      <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
         Очередь согласования
       </Typography>
       {/* Заголовок секции и кнопка добавления */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexDirection: { xs: "column", sm: "row" },
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexDirection: { xs: 'column', sm: 'row' },
           mb: 3,
           gap: 2,
         }}
@@ -104,7 +200,7 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
           color="primary"
           onClick={() => setOpen(true)}
           startIcon={isMobile ? <AddIcon /> : null}
-          sx={{ alignSelf: { xs: "stretch", sm: "flex-end" }, whiteSpace: "nowrap", px: { xs: 2, sm: 3 } }}
+          sx={{ alignSelf: { xs: 'stretch', sm: 'flex-end' }, whiteSpace: 'nowrap', px: { xs: 2, sm: 3 } }}
         >
           Добавить согласующего
         </Button>
@@ -114,14 +210,14 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
       {approvers.length === 0 ? (
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "200px",
-            border: "1px dashed",
-            borderColor: "divider",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '200px',
+            border: '1px dashed',
+            borderColor: 'divider',
             borderRadius: 1,
-            backgroundColor: "#f9f9f9",
+            backgroundColor: '#f9f9f9',
           }}
         >
           <Typography variant="body1" color="text.secondary">
@@ -134,17 +230,17 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
           sx={{
             mb: 4,
             borderRadius: 1,
-            width: "100%",
+            width: '100%',
           }}
         >
-          <Table size={isMobile ? "small" : "medium"}>
-            <TableHead sx={{ bgcolor: "#f5f5f5" }}>
+          <Table size={isMobile ? 'small' : 'medium'}>
+            <TableHead sx={{ bgcolor: '#f5f5f5' }}>
               <TableRow>
                 <TableCell
                   sx={{
-                    width: isMobile ? "10%" : "10%",
-                    fontWeight: "bold",
-                    color: "#757575",
+                    width: isMobile ? '10%' : '10%',
+                    fontWeight: 'bold',
+                    color: '#757575',
                     padding: isMobile ? 1 : 2,
                   }}
                 >
@@ -152,9 +248,9 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                 </TableCell>
                 <TableCell
                   sx={{
-                    width: isMobile ? "40%" : "45%",
-                    fontWeight: "bold",
-                    color: "#757575",
+                    width: isMobile ? '40%' : '45%',
+                    fontWeight: 'bold',
+                    color: '#757575',
                     padding: isMobile ? 1 : 2,
                   }}
                 >
@@ -162,9 +258,9 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                 </TableCell>
                 <TableCell
                   sx={{
-                    width: isMobile ? "25%" : "30%",
-                    fontWeight: "bold",
-                    color: "#757575",
+                    width: isMobile ? '25%' : '30%',
+                    fontWeight: 'bold',
+                    color: '#757575',
                     padding: isMobile ? 1 : 2,
                   }}
                 >
@@ -172,9 +268,20 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                 </TableCell>
                 <TableCell
                   sx={{
-                    width: isMobile ? "25%" : "15%",
-                    fontWeight: "bold",
-                    color: "#757575",
+                    width: isMobile ? '0%' : '20%',
+                    fontWeight: 'bold',
+                    color: '#757575',
+                    padding: isMobile ? 1 : 2,
+                    display: { xs: 'none', md: 'table-cell' },
+                  }}
+                >
+                  СТАТУС
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: isMobile ? '25%' : '15%',
+                    fontWeight: 'bold',
+                    color: '#757575',
                     padding: isMobile ? 1 : 2,
                   }}
                 >
@@ -196,7 +303,7 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                   <TableCell
                     sx={{
                       borderBottom: index === approvers.length - 1 ? 0 : undefined,
-                      wordBreak: "break-word",
+                      wordBreak: 'break-word',
                       padding: isMobile ? 1 : 2,
                     }}
                   >
@@ -205,7 +312,7 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                   <TableCell
                     sx={{
                       borderBottom: index === approvers.length - 1 ? 0 : undefined,
-                      wordBreak: "break-word",
+                      wordBreak: 'break-word',
                       padding: isMobile ? 1 : 2,
                     }}
                   >
@@ -215,9 +322,26 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                     sx={{
                       borderBottom: index === approvers.length - 1 ? 0 : undefined,
                       padding: isMobile ? 1 : 2,
+                      display: { xs: 'none', md: 'table-cell' },
                     }}
                   >
-                    <Box sx={{ display: "flex", gap: isMobile ? 0 : 1 }}>
+                    <Chip
+                      label={approver.status || 'Ожидается'}
+                      sx={{
+                        backgroundColor: getStatusColor(approver.status_id),
+                        color: 'white',
+                        fontWeight: 'medium',
+                      }}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      borderBottom: index === approvers.length - 1 ? 0 : undefined,
+                      padding: isMobile ? 1 : 2,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', gap: isMobile ? 0 : 1 }}>
                       {/* Кнопка перемещения вверх */}
                       <IconButton
                         size="small"
@@ -226,7 +350,7 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                         color="default"
                         sx={{ padding: isMobile ? 0.5 : 1 }}
                       >
-                        <ArrowUpIcon fontSize={isMobile ? "small" : "medium"} />
+                        <ArrowUpIcon fontSize={isMobile ? 'small' : 'medium'} />
                       </IconButton>
                       {/* Кнопка перемещения вниз */}
                       <IconButton
@@ -236,7 +360,7 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                         color="default"
                         sx={{ padding: isMobile ? 0.5 : 1 }}
                       >
-                        <ArrowDownIcon fontSize={isMobile ? "small" : "medium"} />
+                        <ArrowDownIcon fontSize={isMobile ? 'small' : 'medium'} />
                       </IconButton>
                       {/* Кнопка удаления */}
                       <IconButton
@@ -245,7 +369,7 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
                         color="error"
                         sx={{ padding: isMobile ? 0.5 : 1 }}
                       >
-                        <DeleteIcon fontSize={isMobile ? "small" : "medium"} />
+                        <DeleteIcon fontSize={isMobile ? 'small' : 'medium'} />
                       </IconButton>
                     </Box>
                   </TableCell>
@@ -256,41 +380,86 @@ export default function ApprovalTab({ approvers, setApproversAction }: ApprovalT
         </TableContainer>
       )}
 
-      {/* Модальное окно для добавления согласующего */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Добавить согласующего</DialogTitle>
+      {/* Модальное окно для выбора пользователя */}
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
+        <DialogTitle>Выбор согласующего</DialogTitle>
         <DialogContent>
+          {/* Поле поиска */}
           <TextField
             autoFocus
             margin="dense"
-            id="name"
-            label="ФИО согласующего"
+            id="search"
+            label="Поиск пользователя"
             type="text"
             fullWidth
             variant="outlined"
-            value={newApprover.name}
-            onChange={(e) => setNewApprover({ ...newApprover, name: e.target.value })}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ mb: 2 }}
           />
-          <TextField
-            margin="dense"
-            id="position"
-            label="Должность"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={newApprover.position}
-            onChange={(e) => setNewApprover({ ...newApprover, position: e.target.value })}
-          />
+
+          {/* Список пользователей */}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <List sx={{ maxHeight: '400px', overflow: 'auto' }}>
+              {filteredUsers.length === 0 ? (
+                <Typography variant="body1" sx={{ p: 2, textAlign: 'center' }}>
+                  Пользователи не найдены
+                </Typography>
+              ) : (
+                filteredUsers.map((user, index) => (
+                  <Box key={user.id}>
+                    <ListItem
+                      component="li"
+                      disablePadding
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                        },
+                      }}
+                      onClick={() => handleAddApproverFromList(user)}
+                    >
+                      <ListItemAvatar>
+                        <Avatar>
+                          <PersonIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={
+                          <Typography variant="subtitle1" component="span">
+                            {user.surname} {user.name} {user.patronymic}
+                          </Typography>
+                        }
+                        secondary={
+                          <>
+                            {user.pos}
+                          </>
+                        }
+                      />
+                    </ListItem>
+                    {index < filteredUsers.length - 1 && <Divider variant="inset" component="li" />}
+                  </Box>
+                ))
+              )}
+            </List>
+          )}
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", padding: 2 }}>
-          <Button onClick={handleAddApprover} variant="contained" color="primary">
-            Добавить
-          </Button>
+        <DialogActions sx={{ justifyContent: 'center', padding: 2 }}>
           <Button onClick={() => setOpen(false)} variant="outlined">
             Отмена
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
-  )
+  );
 }

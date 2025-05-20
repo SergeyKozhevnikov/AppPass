@@ -53,6 +53,42 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/**
+ * Получает список всех активных пользователей
+ */
+export const getAllUsers = async (
+  _req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const users = await User.findAll({
+      order: [
+        ['surname', 'ASC'],
+        ['name', 'ASC'],
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    console.error('Ошибка при получении списка пользователей:', error);
+
+    let errorMessage = 'Ошибка при получении списка пользователей';
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при получении списка пользователей',
+      error: errorMessage,
+    });
+  }
+};
+
 // Получает пользователя (по Id)
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   try {
