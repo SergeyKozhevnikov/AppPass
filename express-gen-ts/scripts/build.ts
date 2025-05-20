@@ -40,7 +40,13 @@ function remove(loc: string): Promise<void> {
 /**
  * Copy file.
  */
-function copy(src: string, dest: string): Promise<void> {
+async function copy(src: string, dest: string): Promise<void> {
+  const exists = await fs.pathExists(src);
+  if (!exists) {
+    logger.info(`Директория ${src} не существует, пропускаем копирование`);
+    return;
+  }
+
   return new Promise((res, rej) => {
     return fs.copy(src, dest, err => {
       return (!!err ? rej(err) : res());
