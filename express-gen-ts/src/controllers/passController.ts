@@ -4,8 +4,7 @@ import Approver from '../models/Approver';
 import { saveBase64Image } from '../services/fileService';
 import { sequelize } from '../config/database';
 // eslint-disable-next-line n/no-extraneous-import
-import { Transaction } from 'sequelize';
-import { Op } from 'sequelize';
+import { Transaction, Op } from 'sequelize';
 
 // Интерфейс для данных пропуска
 interface PassData {
@@ -20,18 +19,21 @@ interface PassData {
   endDate: string;
   photo?: string;
   approvers: {
-    id?: number
-    name: string
-    position: string
-    login?: string
-    status_id?: number
+    id?: number,
+    name: string,
+    position: string,
+    login?: string,
+    status_id?: number,
   }[];
 }
 
 /**
  * Создает новый пропуск
  */
-export const createPass = async (req: Request, res: Response): Promise<void> => {
+export const createPass = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   // Создаем транзакцию перед любыми операциями с базой данных
   let transaction: Transaction | undefined;
 
@@ -50,7 +52,12 @@ export const createPass = async (req: Request, res: Response): Promise<void> => 
     const passData = req.body as PassData;
 
     // Проверка обязательных полей
-    if (!passData.fullName || !passData.phone || !passData.organization || !passData.email) {
+    if (
+      !passData.fullName ||
+      !passData.phone ||
+      !passData.organization ||
+      !passData.email
+    ) {
       res.status(400).json({
         success: false,
         message: 'Не заполнены обязательные поля',
@@ -80,7 +87,9 @@ export const createPass = async (req: Request, res: Response): Promise<void> => 
       res.status(409).json({
         success: false,
         message: 'Дублирование данных',
-        error: `В системе уже существует заявка с таким же ${duplicateFields.join(' и ')}. ID заявки: ${existingPass.id}`,
+        error: `В системе уже существует заявка с таким же ${duplicateFields.join(
+          ' и '
+        )}. ID заявки: ${existingPass.id}`,
         duplicateFields: duplicateFields,
         existingPassId: existingPass.id,
       });
@@ -119,7 +128,7 @@ export const createPass = async (req: Request, res: Response): Promise<void> => 
           date_created: now, // Явно устанавливаем дату создания
           date_modified: now, // При создании дата изменения равна дате создания
         },
-        { transaction },
+        { transaction }
       );
 
       // Создаем записи согласующих
@@ -129,11 +138,13 @@ export const createPass = async (req: Request, res: Response): Promise<void> => 
             {
               pass_id: pass.id,
               fullname: approver.name,
+              // eslint-disable-next-line
               login: approver.login || `user${index + 1}`, // Используем логин из данных или генерируем
               position: approver.position,
+              // eslint-disable-next-line
               status_id: approver.status_id || 2, // По умолчанию "На согласовании" при создании заявки
             },
-            { transaction },
+            { transaction }
           );
         });
 
@@ -165,9 +176,11 @@ export const createPass = async (req: Request, res: Response): Promise<void> => 
 
         // Проверяем тип ошибки для более информативного сообщения
         if (error.message.includes('violates foreign key constraint')) {
-          errorMessage = 'Ошибка связи с другими таблицами. Проверьте корректность указанных данных.';
+          errorMessage =
+            'Ошибка связи с другими таблицами. Проверьте корректность указанных данных.';
         } else if (error.message.includes('violates not-null constraint')) {
-          errorMessage = 'Не заполнены обязательные поля. Пожалуйста, проверьте форму.';
+          errorMessage =
+            'Не заполнены обязательные поля. Пожалуйста, проверьте форму.';
         } else if (error.message.includes('duplicate key value')) {
           errorMessage = 'Запись с такими данными уже существует.';
         }
@@ -236,7 +249,10 @@ export const getAllPasses = async (_req: Request, res: Response) => {
 /**
  * Получает пропуск по ID
  */
-export const getPassById = async (req: Request, res: Response): Promise<void> => {
+export const getPassById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -282,7 +298,10 @@ export const getPassById = async (req: Request, res: Response): Promise<void> =>
 /**
  * Обновляет пропуск
  */
-export const updatePass = async (req: Request, res: Response): Promise<void> => {
+export const updatePass = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   // Объявляем переменную для транзакции
   let transaction: Transaction | undefined;
 
@@ -330,7 +349,9 @@ export const updatePass = async (req: Request, res: Response): Promise<void> => 
       res.status(409).json({
         success: false,
         message: 'Дублирование данных',
-        error: `В системе уже существует заявка с таким же ${duplicateFields.join(' и ')}. ID заявки: ${existingPass.id}`,
+        error: `В системе уже существует заявка с таким же ${duplicateFields.join(
+          ' и '
+        )}. ID заявки: ${existingPass.id}`,
         duplicateFields: duplicateFields,
         existingPassId: existingPass.id,
       });
@@ -369,7 +390,7 @@ export const updatePass = async (req: Request, res: Response): Promise<void> => 
           photo: photoPath,
           date_modified: now,
         },
-        { transaction },
+        { transaction }
       );
 
       // Обновляем согласующих
@@ -389,7 +410,7 @@ export const updatePass = async (req: Request, res: Response): Promise<void> => 
               login: `user${index + 1}`,
               position: approver.position,
             },
-            { transaction },
+            { transaction }
           );
         });
 
@@ -420,9 +441,11 @@ export const updatePass = async (req: Request, res: Response): Promise<void> => 
 
         // Проверяем тип ошибки для более информативного сообщения
         if (error.message.includes('violates foreign key constraint')) {
-          errorMessage = 'Ошибка связи с другими таблицами. Проверьте корректность указанных данных.';
+          errorMessage =
+            'Ошибка связи с другими таблицами. Проверьте корректность указанных данных.';
         } else if (error.message.includes('violates not-null constraint')) {
-          errorMessage = 'Не заполнены обязательные поля. Пожалуйста, проверьте форму.';
+          errorMessage =
+            'Не заполнены обязательные поля. Пожалуйста, проверьте форму.';
         }
       }
 
@@ -453,7 +476,10 @@ export const updatePass = async (req: Request, res: Response): Promise<void> => 
 /**
  * Удаляет пропуск
  */
-export const deletePass = async (req: Request, res: Response): Promise<void> => {
+export const deletePass = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   // Объявляем переменную для транзакции
   let transaction;
 

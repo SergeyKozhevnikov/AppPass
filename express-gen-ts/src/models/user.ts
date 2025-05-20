@@ -66,7 +66,7 @@ User.init(
     tabNum: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: literal("nextval('users_tab_num_seq')"),
+      defaultValue: literal('nextval("users_tab_num_seq")'),
     },
     surname: {
       type: DataTypes.STRING(255),

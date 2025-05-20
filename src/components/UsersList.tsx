@@ -1,6 +1,6 @@
 'use client'; // определяет компонент как клиентский
 
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, useEffect, useState } from 'react';
 //import EditUser from './EditUser';
 
 import React from 'react';
@@ -18,7 +18,6 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-//import { mockUsers } from '@/mock/users';
 import { fetchUsers, User } from '@/services/userService';
 //import { mockUsers } from '@/mock/users';
 
@@ -26,39 +25,35 @@ import { fetchUsers, User } from '@/services/userService';
 //  setResult: Dispatch<SetStateAction<string>>;
 //}
 
-type UsersListProps = {
-  
-};
+type UsersListProps = {setResult: Dispatch<React.SetStateAction<string>>};
 
-const UsersList: React.FC<UsersListProps> = ({ }) => {
-//const UsersList = (props: IProps) => {
-//  const { setResult } = props;
+const UsersList: React.FC<UsersListProps> = ({}) => {
+  //const UsersList = (props: IProps) => {
+  //  const { setResult } = props;
 
   // Начало блока для бэка
-  const [requests, setRequests] = useState<User[]>([]); 
-  const [loading, setLoading] = useState(true); 
+  const [requests, setRequests] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-      fetchUsers() 
-        .then(data => {
-          setRequests(data); 
-          setLoading(false); 
-          console.log(data);
-        })
-        .catch(err => {
-          console.error(err); 
-          setLoading(false); 
-        });
-    }, []);
+    fetchUsers()
+      .then((data) => {
+        setRequests(data);
+        setLoading(false);
+        console.log(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
 
- const userRequests = useMemo(() => {
-    return requests.filter((req) => { // !!!!!!!!!!!!!!!
-      const matchesStatus = status ? req.status === status : true;
-   
-
-      
-    });
-  }, [requests]); // !!!!!!!!!!!!!!!
+  // const userRequests = useMemo(() => {
+  //   return requests.filter((req) => {
+  //     // !!!!!!!!!!!!!!!
+  //     const matchesStatus = status ? req.status === status : true;
+  //   });
+  // }, [requests]); // !!!!!!!!!!!!!!!
 
   if (loading) {
     return <div>Загрузка пользователей...</div>; // !!!!!!!!!!!!!!!
@@ -123,7 +118,6 @@ const UsersList: React.FC<UsersListProps> = ({ }) => {
           </Box>
         </CardContent>
       </Card>
-      
     </div>
   );
 };

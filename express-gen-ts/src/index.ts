@@ -58,6 +58,7 @@ app.use(
     err: unknown,
     req: express.Request,
     res: express.Response,
+    // eslint-disable-next-line
     next: express.NextFunction
   ) => {
     console.error('Ошибка:', err);
@@ -87,6 +88,7 @@ process.on('uncaughtException', (error) => {
 });
 
 // Обработка необработанных отклонений промисов
+// eslint-disable-next-line
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Необработанное отклонение промиса:', reason);
 });

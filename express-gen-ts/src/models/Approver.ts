@@ -10,14 +10,17 @@ interface ApproverAttributes {
   fullname: string;
   login: string;
   position: string;
-  status_id?: number
+  status_id?: number;
 }
 
 // Интерфейс для создания нового Approver (id может быть опциональным)
 type ApproverCreationAttributes = Optional<ApproverAttributes, 'id'>;
 
 // Определение модели Approver
-class Approver extends Model<ApproverAttributes, ApproverCreationAttributes> implements ApproverAttributes {
+class Approver
+  extends Model<ApproverAttributes, ApproverCreationAttributes>
+  implements ApproverAttributes
+{
   public id!: number;
   public pass_id!: number;
   public fullname!: string;
@@ -59,8 +62,8 @@ Approver.init(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: "pass_statuses",
-        key: "id",
+        model: 'pass_statuses',
+        key: 'id',
       },
     },
   },
@@ -68,7 +71,7 @@ Approver.init(
     sequelize,
     tableName: 'approvers',
     modelName: 'Approver',
-  },
+  }
 );
 
 // Определение отношений между моделями
