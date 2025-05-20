@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.deleteUser = exports.createUser = exports.getUser = exports.getUsers = void 0;
+exports.updateUser = exports.deleteUser = exports.createUser = exports.getUser = exports.getAllUsers = exports.getUsers = void 0;
 const database_1 = require("../config/database");
 const user_1 = __importDefault(require("../models/user"));
 const now = new Date();
@@ -31,6 +31,33 @@ const getUsers = async (req, res) => {
     }
 };
 exports.getUsers = getUsers;
+const getAllUsers = async (_req, res) => {
+    try {
+        const users = await user_1.default.findAll({
+            order: [
+                ['surname', 'ASC'],
+                ['name', 'ASC'],
+            ],
+        });
+        res.status(200).json({
+            success: true,
+            data: users,
+        });
+    }
+    catch (error) {
+        console.error('Ошибка при получении списка пользователей:', error);
+        let errorMessage = 'Ошибка при получении списка пользователей';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Ошибка при получении списка пользователей',
+            error: errorMessage,
+        });
+    }
+};
+exports.getAllUsers = getAllUsers;
 const getUser = async (req, res) => {
     try {
         const { id } = req.params;

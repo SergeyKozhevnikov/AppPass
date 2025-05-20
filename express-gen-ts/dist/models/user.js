@@ -22,7 +22,7 @@ User.init({
     tabNum: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: (0, sequelize_1.literal)("nextval('users_tab_num_seq')"),
+        defaultValue: (0, sequelize_1.literal)('nextval("users_tab_num_seq")'),
     },
     surname: {
         type: sequelize_1.DataTypes.STRING(255),

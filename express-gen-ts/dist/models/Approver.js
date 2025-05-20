@@ -35,6 +35,14 @@ Approver.init({
         type: sequelize_1.DataTypes.TEXT,
         allowNull: false,
     },
+    status_id: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'pass_statuses',
+            key: 'id',
+        },
+    },
 }, {
     sequelize: database_1.sequelize,
     tableName: 'approvers',

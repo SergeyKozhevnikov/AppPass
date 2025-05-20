@@ -9,9 +9,9 @@ const router = express_1.default.Router();
 const asyncHandler = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
 };
-router.post("/", asyncHandler(passController_1.createPass));
-router.get("/", asyncHandler(passController_1.getAllPasses));
-router.get("/:id", asyncHandler(passController_1.getPassById));
-router.put("/:id", asyncHandler(passController_1.updatePass));
-router.delete("/:id", asyncHandler(passController_1.deletePass));
+router.post('/', asyncHandler(passController_1.createPass));
+router.get('/', asyncHandler(passController_1.getAllPasses));
+router.get('/:id', asyncHandler(passController_1.getPassById));
+router.put('/:id', asyncHandler(passController_1.updatePass));
+router.delete('/:id', asyncHandler(passController_1.deletePass));
 exports.default = router;

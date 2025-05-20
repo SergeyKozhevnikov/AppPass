@@ -21,7 +21,7 @@ exports.sequelize = new sequelize_1.Sequelize(dbName, dbUser, dbPassword, {
     dialect: 'postgres',
     logging: console.log,
     define: {
-        timestamps: true,
+        timestamps: false,
         freezeTableName: true,
     },
 });

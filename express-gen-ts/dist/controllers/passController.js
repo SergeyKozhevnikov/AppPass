@@ -8,6 +8,7 @@ const Pass_1 = __importDefault(require("../models/Pass"));
 const Approver_1 = __importDefault(require("../models/Approver"));
 const fileService_1 = require("../services/fileService");
 const database_1 = require("../config/database");
+const sequelize_1 = require("sequelize");
 const createPass = async (req, res) => {
     let transaction;
     try {
@@ -17,13 +18,40 @@ const createPass = async (req, res) => {
                 success: false,
                 message: 'Отсутствуют данные для создания пропуска',
             });
+            return;
         }
         const passData = req.body;
-        if (!passData.fullName || !passData.phone || !passData.organization || !passData.email) {
+        if (!passData.fullName ||
+            !passData.phone ||
+            !passData.organization ||
+            !passData.email) {
             res.status(400).json({
                 success: false,
                 message: 'Не заполнены обязательные поля',
             });
+            return;
+        }
+        const existingPass = await Pass_1.default.findOne({
+            where: {
+                [sequelize_1.Op.or]: [{ phone: passData.phone }, { email: passData.email }],
+            },
+        });
+        if (existingPass) {
+            const duplicateFields = [];
+            if (existingPass.phone === passData.phone) {
+                duplicateFields.push('телефоном');
+            }
+            if (existingPass.email === passData.email) {
+                duplicateFields.push('почтовым адресом');
+            }
+            res.status(409).json({
+                success: false,
+                message: 'Дублирование данных',
+                error: `В системе уже существует заявка с таким же ${duplicateFields.join(' и ')}. ID заявки: ${existingPass.id}`,
+                duplicateFields: duplicateFields,
+                existingPassId: existingPass.id,
+            });
+            return;
         }
         transaction = await database_1.sequelize.transaction();
         try {
@@ -54,8 +82,9 @@ const createPass = async (req, res) => {
                     return Approver_1.default.create({
                         pass_id: pass.id,
                         fullname: approver.name,
-                        login: `user${index + 1}`,
+                        login: approver.login || `user${index + 1}`,
                         position: approver.position,
+                        status_id: approver.status_id || 2,
                     }, { transaction });
                 });
                 await Promise.all(approverPromises);
@@ -78,10 +107,12 @@ const createPass = async (req, res) => {
             if (error instanceof Error) {
                 errorMessage = error.message;
                 if (error.message.includes('violates foreign key constraint')) {
-                    errorMessage = 'Ошибка связи с другими таблицами. Проверьте корректность указанных данных.';
+                    errorMessage =
+                        'Ошибка связи с другими таблицами. Проверьте корректность указанных данных.';
                 }
                 else if (error.message.includes('violates not-null constraint')) {
-                    errorMessage = 'Не заполнены обязательные поля. Пожалуйста, проверьте форму.';
+                    errorMessage =
+                        'Не заполнены обязательные поля. Пожалуйста, проверьте форму.';
                 }
                 else if (error.message.includes('duplicate key value')) {
                     errorMessage = 'Запись с такими данными уже существует.';
@@ -190,6 +221,33 @@ const updatePass = async (req, res) => {
             });
             return;
         }
+        const existingPass = await Pass_1.default.findOne({
+            where: {
+                [sequelize_1.Op.and]: [
+                    { id: { [sequelize_1.Op.ne]: Number(id) } },
+                    {
+                        [sequelize_1.Op.or]: [{ phone: passData.phone }, { email: passData.email }],
+                    },
+                ],
+            },
+        });
+        if (existingPass) {
+            const duplicateFields = [];
+            if (existingPass.phone === passData.phone) {
+                duplicateFields.push('телефон');
+            }
+            if (existingPass.email === passData.email) {
+                duplicateFields.push('почтовый адрес');
+            }
+            res.status(409).json({
+                success: false,
+                message: 'Дублирование данных',
+                error: `В системе уже существует заявка с таким же ${duplicateFields.join(' и ')}. ID заявки: ${existingPass.id}`,
+                duplicateFields: duplicateFields,
+                existingPassId: existingPass.id,
+            });
+            return;
+        }
         transaction = await database_1.sequelize.transaction();
         try {
             let photoPath = pass.photo ?? '';
@@ -248,10 +306,12 @@ const updatePass = async (req, res) => {
             if (error instanceof Error) {
                 errorMessage = error.message;
                 if (error.message.includes('violates foreign key constraint')) {
-                    errorMessage = 'Ошибка связи с другими таблицами. Проверьте корректность указанных данных.';
+                    errorMessage =
+                        'Ошибка связи с другими таблицами. Проверьте корректность указанных данных.';
                 }
                 else if (error.message.includes('violates not-null constraint')) {
-                    errorMessage = 'Не заполнены обязательные поля. Пожалуйста, проверьте форму.';
+                    errorMessage =
+                        'Не заполнены обязательные поля. Пожалуйста, проверьте форму.';
                 }
             }
             res.status(500).json({
