@@ -1,7 +1,6 @@
 'use client'; // определяет компонент как клиентский
 
 import { useEffect, useState } from 'react';
-//import EditUser from './EditUser';
 
 import React from 'react';
 import {
@@ -19,53 +18,45 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { fetchUsers, User } from '@/services/userService';
-//import { mockUsers } from '@/mock/users';
 
-//interface IProps {
-//  setResult: Dispatch<SetStateAction<string>>;
-//}
 interface IProps {
   result: string;
   // setResult: Dispatch<React.SetStateAction<string>>;
 }
 
 const UsersList = (props: IProps) => {
-  //const UsersList = (props: IProps) => {
-  //  const { setResult } = props;
   const { result } = props;
   // Начало блока для бэка
   const [requests, setRequests] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //if (result==='' || result==="success") {
     console.log(result);
-    fetchUsers()
-      .then((data) => {
-        setRequests(data);
-        setLoading(false);
-        console.log(data);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-    //}
+    if (result === '' || result === 'success') {
+      fetchUsers()
+        .then((data) => {
+          setRequests(data);
+          setLoading(false);
+          console.log(data);
+        })
+        .catch((err) => {
+          console.error(err);
+          setLoading(false);
+        });
+    }
   }, [result]);
 
   // const userRequests = useMemo(() => {
   //   return requests.filter((req) => {
-  //     // !!!!!!!!!!!!!!!
   //     const matchesStatus = status ? req.status === status : true;
   //   });
-  // }, [requests]); // !!!!!!!!!!!!!!!
+  // }, [requests]);
 
   if (loading) {
-    return <div>Загрузка пользователей...</div>; // !!!!!!!!!!!!!!!
+    return <div>Загрузка пользователей...</div>;
   }
   // Обработчик
-  //const handleEdit = () => {
-  //const [isOpen, setIsOpen] = useState(false);
+  // const handleEdit = () => {}
 
   return (
     <div>
@@ -96,8 +87,8 @@ const UsersList = (props: IProps) => {
                     <TableRow key={req.id}>
                       <TableCell>{req.tabNum}</TableCell>
                       <TableCell>{req.patronymic}</TableCell>
-                      <TableCell>{req.name}</TableCell>
                       <TableCell>{req.surname}</TableCell>
+                      <TableCell>{req.name}</TableCell>
                       <TableCell>{req.pos}</TableCell>
                       <TableCell>{req.email}</TableCell>
                       <TableCell>{req.role}</TableCell>
