@@ -1,6 +1,6 @@
 'use client'; // определяет компонент как клиентский
 
-import { Dispatch, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 //import EditUser from './EditUser';
 
 import React from 'react';
@@ -24,31 +24,34 @@ import { fetchUsers, User } from '@/services/userService';
 //interface IProps {
 //  setResult: Dispatch<SetStateAction<string>>;
 //}
-interface IProps{result:string, setResult: Dispatch<React.SetStateAction<string>>};
+interface IProps {
+  result: string;
+  // setResult: Dispatch<React.SetStateAction<string>>;
+}
 
-const UsersList=(props:IProps) => {
+const UsersList = (props: IProps) => {
   //const UsersList = (props: IProps) => {
   //  const { setResult } = props;
-  const { result, setResult } = props;
+  const { result } = props;
   // Начало блока для бэка
   const [requests, setRequests] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { 
+  useEffect(() => {
     //if (result==='' || result==="success") {
-    console.log(result)
-      fetchUsers()
-        .then((data) => {
-          setRequests(data);
-          setLoading(false);
-          console.log(data);
-        })
-        .catch((err) => {
-          console.error(err);
-          setLoading(false);
-        });
+    console.log(result);
+    fetchUsers()
+      .then((data) => {
+        setRequests(data);
+        setLoading(false);
+        console.log(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
     //}
-  }, [setResult] );
+  }, [result]);
 
   // const userRequests = useMemo(() => {
   //   return requests.filter((req) => {
