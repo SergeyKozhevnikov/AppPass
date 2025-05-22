@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import { newUserFields, newUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { scrollbarStyles } from '@/styles/shared-styles';
+import { userApi } from '@/lib/userApi';
 
 // Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
 // При создании пользователя сначала запрос в БД нет ли такого же логина (а соответсвенно и почты), если есть, информировать в поле, исправить вручную
@@ -54,12 +55,12 @@ export default function RegisterModal(props: IProps) {
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const formData = getValues();
     console.log(formData);
-
-    if (formData) {
-      setResult('success');
-    } else {
-      setResult('error');
-    }
+    userApi.createUser(formData).then((res) => {setResult('success'); console.log(res) }) // res.user)
+          .catch(() => {
+            setResult('error');
+            throw new Error('что то пошло не так');
+          });
+    
     setIsOpen(false);
   });
 
