@@ -25,12 +25,12 @@ import { fetchUsers, User } from '@/services/userService';
 //  setResult: Dispatch<SetStateAction<string>>;
 //}
 
-type UsersListProps = {setResult: Dispatch<React.SetStateAction<string>>};
+type UsersListProps = {result:string, setResult: Dispatch<React.SetStateAction<string>>};
 
-const UsersList: React.FC<UsersListProps> = ({}) => {
+const UsersList: React.FC<UsersListProps> = ({result}) => {
   //const UsersList = (props: IProps) => {
   //  const { setResult } = props;
-
+  const { result } = 
   // Начало блока для бэка
   const [requests, setRequests] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +46,7 @@ const UsersList: React.FC<UsersListProps> = ({}) => {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [result] );
 
   // const userRequests = useMemo(() => {
   //   return requests.filter((req) => {

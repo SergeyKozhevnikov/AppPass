@@ -108,7 +108,7 @@ export default UserApi;
 
 // Класс UserApi, отвечающий за запросы к серверу
 export const userApi = new UserApi({
-  url: 'http://localhost:3001/api',
+  url: 'http://195.133.147.112:3001/api',
   headers: {
     'Content-Type': 'application/json',
   },
