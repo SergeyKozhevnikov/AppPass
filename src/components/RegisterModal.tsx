@@ -54,13 +54,18 @@ export default function RegisterModal(props: IProps) {
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const formData = getValues();
-    console.log(formData);
-    userApi.createUser(formData).then((res) => {setResult('success'); console.log(res) }) // res.user)
-          .catch(() => {
-            setResult('error');
-            throw new Error('что то пошло не так');
-          });
-    
+    console.log('RegisterModal_onSubmit', formData);
+    userApi
+      .createUser(formData)
+      .then((res) => {
+        console.log('RegisterModal_createUser', res);
+        setResult('success');
+      })
+      .catch(() => {
+        setResult('error');
+        throw new Error('что то пошло не так');
+      });
+
     setIsOpen(false);
   });
 
