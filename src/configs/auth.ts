@@ -18,7 +18,7 @@ interface ICustomUser {
   pos?: string;
   department?: string;
   phoneNum?: string;
-  createdAt: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 
