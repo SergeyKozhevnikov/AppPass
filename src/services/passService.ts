@@ -8,7 +8,7 @@ export type Pass = {
   lastName: string;
   firstName: string;
   middleName: string;
-  hasCar: boolean;
+  hasCar: string;
   hasMaterials: boolean;
   status: 'drafts' | 'inReview' | 'approved' | 'rejected'; // Добавлено свойство status
 };

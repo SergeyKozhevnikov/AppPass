@@ -86,16 +86,16 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                     <TableRow key={req.id}>
                       <TableCell>
                       {new Date(req.date_created).toLocaleString('ru-RU', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                       </TableCell>
                       <TableCell>{req.fullName}</TableCell>
                       <TableCell>
-                        {req.hasCar && <DirectionsCarIcon color="primary" />}
+                        { (req.hasCar === 'Yes') && <DirectionsCarIcon color="primary" />}
                       </TableCell>
                       <TableCell>
                         {req.hasMaterials && <InventoryIcon color="secondary" />}
