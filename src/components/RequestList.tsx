@@ -84,7 +84,15 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                 <TableBody>
                   {filteredRequests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>{req.createdAt}</TableCell>
+                      <TableCell>
+                      {new Date(req.date_created).toLocaleString('ru-RU', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                      </TableCell>
                       <TableCell>{req.fullName}</TableCell>
                       <TableCell>
                         {req.hasCar && <DirectionsCarIcon color="primary" />}

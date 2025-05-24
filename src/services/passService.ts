@@ -3,7 +3,7 @@ import { BACKEND_ADDRESS } from '@/lib/constants';
 export type Pass = {
   id: number;
   date: string;
-  createdAt: string;
+  date_created: string;
   fullName: string;
   lastName: string;
   firstName: string;
