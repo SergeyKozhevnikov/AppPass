@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useMemo } from 'react'; // !!!!!!!!!!!!!!!
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Card,
@@ -17,9 +17,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import InventoryIcon from '@mui/icons-material/Inventory';
-// import { mockRequests } from '@/mock/requests'; // !!!!!!!!!!!!!!!
+
 import RequestFilter from './RequestFilter';
-import { fetchPasses, Pass } from '@/services/passService'; // !!!!!!!!!!!!!!!
+import { fetchPasses, Pass } from '@/services/passService';
+import Loader from './Loader'; // 👈 добавили импорт
 
 type RequestListProps = {
   status?: 'drafts' | 'inReview' | 'approved' | 'rejected';
@@ -27,27 +28,27 @@ type RequestListProps = {
 
 const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const [filters, setFilters] = useState<{ date: string; search: string }>({ date: '', search: '' });
-  const [requests, setRequests] = useState<Pass[]>([]); // !!!!!!!!!!!!!!!
-  const [loading, setLoading] = useState(true); // !!!!!!!!!!!!!!!
+  const [requests, setRequests] = useState<Pass[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPasses() // !!!!!!!!!!!!!!!
+    fetchPasses()
       .then(data => {
-        setRequests(data); // !!!!!!!!!!!!!!!
-        setLoading(false); // !!!!!!!!!!!!!!!
+        setRequests(data);
+        setLoading(false);
       })
       .catch(err => {
-        console.error(err); // !!!!!!!!!!!!!!!
-        setLoading(false); // !!!!!!!!!!!!!!!
+        console.error(err);
+        setLoading(false);
       });
-  }, []); // !!!!!!!!!!!!!!!
+  }, []);
 
   const handleFilterChange = (newFilters: { date: string; search: string }) => {
     setFilters(newFilters);
   };
 
   const filteredRequests = useMemo(() => {
-    return requests.filter((req) => { // !!!!!!!!!!!!!!!
+    return requests.filter((req) => {
       const matchesStatus = status ? req.status === status : true;
       const matchesDate = filters.date ? req.date === filters.date : true;
       const matchesSearch = filters.search
@@ -56,16 +57,15 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
 
       return matchesStatus && matchesDate && matchesSearch;
     });
-  }, [filters, status, requests]); // !!!!!!!!!!!!!!!
+  }, [filters, status, requests]);
 
   if (loading) {
-    return <div>Загрузка заявок...</div>; // !!!!!!!!!!!!!!!
+    return <Loader />; // 👈 заменили текст на компонент
   }
 
   return (
     <div>
       <RequestFilter onFilterChange={handleFilterChange} />
-
       <Card sx={{ boxShadow: 'none', border: 'none' }}>
         <CardContent sx={{ boxShadow: 'none', border: 'none', p: 0 }}>
           <Box mt={2} className="overflow-x-auto">
@@ -84,10 +84,18 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                 <TableBody>
                   {filteredRequests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>{req.createdAt}</TableCell>
+                      <TableCell>
+                        {new Date(req.date_created).toLocaleString('ru-RU', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </TableCell>
                       <TableCell>{req.fullName}</TableCell>
                       <TableCell>
-                        {req.hasCar && <DirectionsCarIcon color="primary" />}
+                        {req.hasCar === 'Yes' && <DirectionsCarIcon color="primary" />}
                       </TableCell>
                       <TableCell>
                         {req.hasMaterials && <InventoryIcon color="secondary" />}
