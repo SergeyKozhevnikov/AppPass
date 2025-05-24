@@ -31,13 +31,11 @@ const UsersList = (props: IProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log(result);
     if (result === '' || result === 'success') {
       fetchUsers()
         .then((data) => {
           setRequests(data);
           setLoading(false);
-          console.log(data);
         })
         .catch((err) => {
           console.error(err);
@@ -86,9 +84,9 @@ const UsersList = (props: IProps) => {
                   {requests.map((req) => (
                     <TableRow key={req.id}>
                       <TableCell>{req.tabNum}</TableCell>
-                      <TableCell>{req.patronymic}</TableCell>
                       <TableCell>{req.surname}</TableCell>
                       <TableCell>{req.name}</TableCell>
+                      <TableCell>{req.patronymic}</TableCell>
                       <TableCell>{req.pos}</TableCell>
                       <TableCell>{req.email}</TableCell>
                       <TableCell>{req.role}</TableCell>

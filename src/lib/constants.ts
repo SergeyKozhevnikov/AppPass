@@ -1,5 +1,4 @@
 // Константы, для удобного изменения их в одном файле
-
 // MUI точки перестроения экрана - https://mui.com/material-ui/customization/breakpoints/
 
 // Константа для авторизации пользователя
@@ -31,3 +30,10 @@ export const PROFILE_FIELDS = {
   password: { label: 'password', labelRu: 'Пароль', type: 'password' },
   phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'string' },
 } as const;
+
+// Адреса обращения к backend
+const backendAddresses = {
+  local: 'http://localhost:3001/api',
+  server: 'http://195.133.147.112:3001/api',
+};
+export const BACKEND_ADDRESS = backendAddresses.server; // подставляется в запросы, при необходимости можно поменять его в одном месте - здесь
