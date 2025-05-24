@@ -1,4 +1,5 @@
 import { IRegisteredUser, TRole } from '@/interfaces/user.interface';
+import { BACKEND_ADDRESS } from './constants';
 
 // Класс взаимодействия с данными пользователя
 class UserApi {
@@ -112,8 +113,7 @@ export default UserApi;
 
 // Класс UserApi, отвечающий за запросы к серверу
 export const userApi = new UserApi({
-  url: 'http://195.133.147.112:3001/api',
-  // url: 'http://localhost:3001/api',
+  url: `${BACKEND_ADDRESS}`,
   headers: {
     'Content-Type': 'application/json',
   },

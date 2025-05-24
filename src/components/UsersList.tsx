@@ -31,11 +31,9 @@ const UsersList = (props: IProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log(result);
     if (result === '' || result === 'success') {
       fetchUsers()
         .then((data) => {
-          console.log('UserList_fetchUsers', data);
           setRequests(data);
           setLoading(false);
         })

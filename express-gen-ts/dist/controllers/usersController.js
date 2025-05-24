@@ -299,7 +299,7 @@ const updateUser = async (req, res) => {
             await user.update({
                 role: userData.role,
                 surname: userData.surname,
-                name: userData.email,
+                name: userData.name,
                 patronymic: userData.patronymic,
                 pos: userData.pos,
                 department: userData.department,

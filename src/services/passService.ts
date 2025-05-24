@@ -1,8 +1,10 @@
+import { BACKEND_ADDRESS } from '@/lib/constants';
+
 export type Pass = {
   id: number;
   date: string;
   createdAt: string;
-  fullName: string,
+  fullName: string;
   lastName: string;
   firstName: string;
   middleName: string;
@@ -12,7 +14,7 @@ export type Pass = {
 };
 
 export const fetchPasses = async (): Promise<Pass[]> => {
-  const response = await fetch('http://localhost:3001/api/passes');
+  const response = await fetch(`${BACKEND_ADDRESS}/passes`);
   if (!response.ok) {
     throw new Error('Ошибка при получении заявок');
   }

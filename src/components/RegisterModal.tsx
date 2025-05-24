@@ -54,16 +54,17 @@ export default function RegisterModal(props: IProps) {
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const formData = getValues();
-    console.log('RegisterModal_onSubmit', formData);
     userApi
       .createUser(formData)
       .then((res) => {
-        console.log('RegisterModal_createUser', res);
+        console.log(res);
         setResult('success');
       })
       .catch(() => {
         setResult('error');
-        throw new Error('что то пошло не так');
+        throw new Error(
+          'Что-то пошло не так. Возможно пользователь с таким логином или почтой уже существует'
+        );
       });
 
     setIsOpen(false);
