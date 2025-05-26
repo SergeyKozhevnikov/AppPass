@@ -12,6 +12,10 @@ import {
   TableBody,
   Paper,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  Button
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,8 +23,8 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import InventoryIcon from '@mui/icons-material/Inventory';
 
 import RequestFilter from './RequestFilter';
-import { fetchPasses, Pass } from '@/services/passService';
-import Loader from './Loader'; // 👈 добавили импорт
+import Loader from './Loader';
+import { fetchPasses, deletePass, Pass } from '@/services/passService';
 
 type RequestListProps = {
   status?: 'drafts' | 'inReview' | 'approved' | 'rejected';
@@ -30,6 +34,8 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const [filters, setFilters] = useState<{ date: string; search: string }>({ date: '', search: '' });
   const [requests, setRequests] = useState<Pass[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [passToDelete, setPassToDelete] = useState<Pass | null>(null);
 
   useEffect(() => {
     fetchPasses()
@@ -59,8 +65,32 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     });
   }, [filters, status, requests]);
 
+  const handleDeleteClick = (pass: Pass) => {
+    setPassToDelete(pass);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!passToDelete) return;
+
+    try {
+      await deletePass(passToDelete.id);
+      setRequests(prev => prev.filter(p => p.id !== passToDelete.id));
+    } catch (error) {
+      console.error('Ошибка при удалении пропуска:', error);
+    } finally {
+      setDeleteDialogOpen(false);
+      setPassToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setPassToDelete(null);
+  };
+
   if (loading) {
-    return <Loader />; // 👈 заменили текст на компонент
+    return <Loader />;
   }
 
   return (
@@ -106,7 +136,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                         </IconButton>
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton color="error" aria-label="удалить">
+                        <IconButton color="error" aria-label="удалить" onClick={() => handleDeleteClick(req)}>
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
@@ -123,6 +153,17 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Диалог подтверждения удаления */}
+      <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
+        <DialogTitle>
+          Удалить пропуск {passToDelete?.fullName}?
+        </DialogTitle>
+        <DialogActions>
+          <Button onClick={cancelDelete}>Отмена</Button>
+          <Button onClick={confirmDelete} color="error">Удалить</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

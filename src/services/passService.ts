@@ -10,14 +10,26 @@ export type Pass = {
   middleName: string;
   hasCar: string;
   hasMaterials: boolean;
-  status: 'drafts' | 'inReview' | 'approved' | 'rejected'; // Добавлено свойство status
+  status: 'drafts' | 'inReview' | 'approved' | 'rejected';
 };
 
+// Получение всех пропусков
 export const fetchPasses = async (): Promise<Pass[]> => {
   const response = await fetch(`${BACKEND_ADDRESS}/passes`);
   if (!response.ok) {
     throw new Error('Ошибка при получении заявок');
   }
   const data = await response.json();
-  return data.data; // Возвращаем только массив из поля data
+  return data.data;
+};
+
+// Удаление пропуска по ID
+export const deletePass = async (id: number): Promise<void> => {
+  const response = await fetch(`${BACKEND_ADDRESS}/passes/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Ошибка при удалении пропуска');
+  }
 };
