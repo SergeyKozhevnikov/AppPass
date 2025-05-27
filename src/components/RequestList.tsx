@@ -13,12 +13,14 @@ import {
   Paper,
   IconButton,
   Dialog,
-  DialogTitle,
   DialogActions,
-  Button
+  DialogContent,
+  Button,
+  Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import InventoryIcon from '@mui/icons-material/Inventory';
 
@@ -155,13 +157,42 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
       </Card>
 
       {/* Диалог подтверждения удаления */}
-      <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
-        <DialogTitle>
-          Удалить пропуск {passToDelete?.fullName}?
-        </DialogTitle>
-        <DialogActions>
-          <Button onClick={cancelDelete}>Отмена</Button>
-          <Button onClick={confirmDelete} color="error">Удалить</Button>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={cancelDelete}
+        PaperProps={{
+          sx: {
+            width: 500,
+            height: 300,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            padding: 2,
+          },
+        }}
+      >
+        <DialogContent
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h6">
+            Удалить пропуск <strong>{passToDelete?.fullName}</strong>?
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button onClick={cancelDelete} variant="outlined">
+            Отмена
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Удалить
+          </Button>
         </DialogActions>
       </Dialog>
     </div>
