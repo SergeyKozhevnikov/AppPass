@@ -407,7 +407,7 @@ export const updateUser = async (
         {
           role: userData.role,
           surname: userData.surname,
-          name: userData.email,
+          name: userData.name,
           patronymic: userData.patronymic,
           pos: userData.pos,
           department: userData.department,

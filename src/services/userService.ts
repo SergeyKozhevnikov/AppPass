@@ -1,3 +1,5 @@
+import { BACKEND_ADDRESS } from "@/lib/constants";
+
 export type User = {
   id: number;
   //date: string;
@@ -25,7 +27,7 @@ export type User = {
 };
 
 export const fetchUsers = async (): Promise<User[]> => {
-  const response = await fetch('http://localhost:3001/api/users');
+  const response = await fetch(`${BACKEND_ADDRESS}/users`);
   if (!response.ok) {
     throw new Error('Ошибка при получении пользователей');
   }

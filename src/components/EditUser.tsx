@@ -19,10 +19,6 @@ import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-// - Логин подставляется автоматически пользователя (если время много не займет)
-// - Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
-// При создании пользователя сначала запрос в БД нет ли такого же логина (а соответсвенно и почты), если есть, информировать в поле, исправить вручную
-// а также смотрим последний табельный и прибавляем к нему +1
 interface IProps {
   isOpen: boolean;
   setResult: Dispatch<SetStateAction<string>>;
@@ -57,7 +53,6 @@ export default function EditUser(props: IProps) {
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const { ...formData } = getValues();
-    console.log(formData);
 
     // Здесь можно добавить логику отправки данных на сервер
     if (formData) {

@@ -1,20 +1,20 @@
-// import Cookies from 'js-cookie'; // библиотека для работы с cookie
+import { IRegisteredUser, TRole } from '@/interfaces/user.interface';
+import { BACKEND_ADDRESS } from './constants';
 
 // Класс взаимодействия с данными пользователя
 class UserApi {
   #url;
   #headers;
 
-  constructor(data) {
+  constructor(data: { url: string; headers: object }) {
     this.#url = data.url; // ссылка на сервер
     this.#headers = {
       ...data.headers,
-      // authorization: `Bearer ${Cookies.get('auth_token')}`,
     };
   }
 
   // Проверка статуса запроса
-  #handleResponse(res) {
+  #handleResponse(res: Response) {
     if (res.ok) {
       return res.json();
     } else {
@@ -23,21 +23,19 @@ class UserApi {
   }
 
   // Загрузка информации о пользователе по логину
-  getUserByLogin(data) {
+  getUserByLogin(data: { login: string; password: string }) {
     return fetch(`${this.#url}/users/login/${data.login}`, {
       method: 'POST',
       headers: this.#headers,
-      // credentials: 'include',
-      body: JSON.stringify(data), // {login, password}
+      body: JSON.stringify(data),
     }).then(this.#handleResponse);
   }
 
   // Загрузка информации о пользователе
-  getUser(id) {
+  getUser(id: number) {
     // по умолчанию метод get
     return fetch(`${this.#url}/users/${id}`, {
       headers: this.#headers,
-      // credentials: 'include', // теперь куки посылаются вместе с запросом
     }).then(this.#handleResponse);
   }
 
@@ -45,13 +43,12 @@ class UserApi {
   getUsers() {
     return fetch(`${this.#url}/users`, {
       headers: this.#headers,
-      // credentials: 'include',
     }).then(this.#handleResponse);
   }
 
   // Редактирование профиля
   updateUser(
-    id,
+    id: number,
     {
       role,
       surname,
@@ -63,12 +60,22 @@ class UserApi {
       email,
       password,
       phoneNum,
+    }: {
+      role: TRole;
+      surname: string;
+      name: string;
+      patronymic: string;
+      pos?: string;
+      department?: string;
+      login: string;
+      email: string;
+      password?: string;
+      phoneNum?: string;
     }
   ) {
     return fetch(`${this.#url}/users/${id}`, {
       method: 'PATCH',
       headers: this.#headers,
-      // credentials: 'include',
       body: JSON.stringify({
         role: role,
         surname: surname,
@@ -85,20 +92,18 @@ class UserApi {
   }
 
   // Создание пользователя
-  createUser(data) {
+  createUser(data: IRegisteredUser) {
     return fetch(`${this.#url}/users`, {
       method: 'POST',
       headers: this.#headers,
-      // credentials: 'include',
-      body: JSON.stringify(data), //  surname, name, patronymic, login, email, password
+      body: JSON.stringify(data), // surname, name, patronymic, login, email, password
     }).then(this.#handleResponse);
   }
 
   // Удаление пользователя
-  deleteUser(id) {
+  deleteUser(id: number) {
     return fetch(`${this.#url}/users/${id}`, {
       method: 'DELETE',
-      // credentials: 'include',
       headers: this.#headers,
     }).then(this.#handleResponse);
   }
@@ -108,7 +113,7 @@ export default UserApi;
 
 // Класс UserApi, отвечающий за запросы к серверу
 export const userApi = new UserApi({
-  url: 'http://localhost:3001/api',
+  url: `${BACKEND_ADDRESS}`,
   headers: {
     'Content-Type': 'application/json',
   },

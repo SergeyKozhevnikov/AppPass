@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useMemo } from 'react'; // !!!!!!!!!!!!!!!
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Card,
@@ -12,14 +12,21 @@ import {
   TableBody,
   Paper,
   IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Button,
+  Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import InventoryIcon from '@mui/icons-material/Inventory';
-// import { mockRequests } from '@/mock/requests'; // !!!!!!!!!!!!!!!
+
 import RequestFilter from './RequestFilter';
-import { fetchPasses, Pass } from '@/services/passService'; // !!!!!!!!!!!!!!!
+import Loader from './Loader';
+import { fetchPasses, deletePass, Pass } from '@/services/passService';
 
 type RequestListProps = {
   status?: 'drafts' | 'inReview' | 'approved' | 'rejected';
@@ -27,27 +34,29 @@ type RequestListProps = {
 
 const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const [filters, setFilters] = useState<{ date: string; search: string }>({ date: '', search: '' });
-  const [requests, setRequests] = useState<Pass[]>([]); // !!!!!!!!!!!!!!!
-  const [loading, setLoading] = useState(true); // !!!!!!!!!!!!!!!
+  const [requests, setRequests] = useState<Pass[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [passToDelete, setPassToDelete] = useState<Pass | null>(null);
 
   useEffect(() => {
-    fetchPasses() // !!!!!!!!!!!!!!!
+    fetchPasses()
       .then(data => {
-        setRequests(data); // !!!!!!!!!!!!!!!
-        setLoading(false); // !!!!!!!!!!!!!!!
+        setRequests(data);
+        setLoading(false);
       })
       .catch(err => {
-        console.error(err); // !!!!!!!!!!!!!!!
-        setLoading(false); // !!!!!!!!!!!!!!!
+        console.error(err);
+        setLoading(false);
       });
-  }, []); // !!!!!!!!!!!!!!!
+  }, []);
 
   const handleFilterChange = (newFilters: { date: string; search: string }) => {
     setFilters(newFilters);
   };
 
   const filteredRequests = useMemo(() => {
-    return requests.filter((req) => { // !!!!!!!!!!!!!!!
+    return requests.filter((req) => {
       const matchesStatus = status ? req.status === status : true;
       const matchesDate = filters.date ? req.date === filters.date : true;
       const matchesSearch = filters.search
@@ -56,16 +65,39 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
 
       return matchesStatus && matchesDate && matchesSearch;
     });
-  }, [filters, status, requests]); // !!!!!!!!!!!!!!!
+  }, [filters, status, requests]);
+
+  const handleDeleteClick = (pass: Pass) => {
+    setPassToDelete(pass);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!passToDelete) return;
+
+    try {
+      await deletePass(passToDelete.id);
+      setRequests(prev => prev.filter(p => p.id !== passToDelete.id));
+    } catch (error) {
+      console.error('Ошибка при удалении пропуска:', error);
+    } finally {
+      setDeleteDialogOpen(false);
+      setPassToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setPassToDelete(null);
+  };
 
   if (loading) {
-    return <div>Загрузка заявок...</div>; // !!!!!!!!!!!!!!!
+    return <Loader />;
   }
 
   return (
     <div>
       <RequestFilter onFilterChange={handleFilterChange} />
-
       <Card sx={{ boxShadow: 'none', border: 'none' }}>
         <CardContent sx={{ boxShadow: 'none', border: 'none', p: 0 }}>
           <Box mt={2} className="overflow-x-auto">
@@ -84,10 +116,18 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                 <TableBody>
                   {filteredRequests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>{req.createdAt}</TableCell>
+                      <TableCell>
+                        {new Date(req.date_created).toLocaleString('ru-RU', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </TableCell>
                       <TableCell>{req.fullName}</TableCell>
                       <TableCell>
-                        {req.hasCar && <DirectionsCarIcon color="primary" />}
+                        {req.hasCar === 'Yes' && <DirectionsCarIcon color="primary" />}
                       </TableCell>
                       <TableCell>
                         {req.hasMaterials && <InventoryIcon color="secondary" />}
@@ -98,7 +138,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                         </IconButton>
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton color="error" aria-label="удалить">
+                        <IconButton color="error" aria-label="удалить" onClick={() => handleDeleteClick(req)}>
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
@@ -115,6 +155,46 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Диалог подтверждения удаления */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={cancelDelete}
+        PaperProps={{
+          sx: {
+            width: 500,
+            height: 300,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            padding: 2,
+          },
+        }}
+      >
+        <DialogContent
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h6">
+            Удалить пропуск <strong>{passToDelete?.fullName}</strong>?
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button onClick={cancelDelete} variant="outlined">
+            Отмена
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

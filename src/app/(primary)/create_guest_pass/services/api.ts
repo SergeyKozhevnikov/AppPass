@@ -2,8 +2,10 @@
  * Сервис для работы с API бэкенда
  */
 
+import { BACKEND_ADDRESS } from "@/lib/constants"
+
 // Базовый URL API - используется в бэкенде
-const API_BASE_URL = "http://localhost:3001/api"
+const API_BASE_URL = BACKEND_ADDRESS
 
 // Интерфейс для данных пропуска
 export interface PassData {
