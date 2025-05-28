@@ -61,7 +61,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
 
       // Фильтрация по дате
       const matchesDate = filters.date
-        ? new Date(req.date_created).toISOString().split('T')[0] === filters.date
+        ? new Date(req.date_created) <= new Date(filters.date + 'T23:59:59')
         : true;
 
       // Фильтрация по полному имени
@@ -189,7 +189,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
           }}
         >
           <Typography variant="h6">
-            Удалить пропуск <strong>{passToDelete?.fullName}</strong>?
+            Удалить заявку на пропуск для <br/> <strong>{passToDelete?.fullName}</strong>?
           </Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>

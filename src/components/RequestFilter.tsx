@@ -78,7 +78,7 @@ const Transition = React.forwardRef(function Transition(
 
 const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [search, setSearch] = useState('');
 
   const handleClickOpen = () => setOpen(true);
@@ -133,12 +133,17 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
         {/* Кнопка сброса */}
         <Button
           variant="outlined"
-          color="secondary"
           onClick={handleReset}
           sx={{
             borderRadius: 2,
             whiteSpace: 'nowrap',
             height: 36,
+            color: '#005e91',
+            borderColor: '#005e91',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 94, 145, 0.1)', // легкий фон при ховере
+              borderColor: '#005e91',
+            },
           }}
         >
           Сбросить
