@@ -3,8 +3,19 @@ import Link from 'next/link';
 import { useSession } from "next-auth/react";
 
 export function Header() {
-  const { data: session } = useSession();
-  const userLogin = session?.user?.email || "Гость";
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <header style={{ backgroundColor: '#005F90' }} className="text-white shadow-md px-4 py-3">Загрузка...</header>;
+  }
+
+  // Для отладки — выведем всю сессию в консоль
+  console.log("Session:", session);
+
+  // Формируем отображаемое имя: имя + отчество > email > логин > "Гость"
+  const user = session?.user;
+  const userFullName = user?.name && user?.patronymic ? `${user.name} ${user.patronymic}` : null;
+  const displayName = userFullName || user?.email || user?.login || "Гость";
 
   return (
     <header style={{ backgroundColor: '#005F90' }} className="text-white shadow-md">
@@ -19,7 +30,7 @@ export function Header() {
           {/* Логин пользователя */}
           <div className="text-right items-center flex">
             <Link href="/profile/" className="pr-1 flex items-center">
-              <span className="pr-1">{userLogin}</span>
+              <span className="pr-1">{displayName}</span>
               <span>
                 <Image
                   src="/assets/images/avatar.svg"

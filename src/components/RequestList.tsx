@@ -21,7 +21,6 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import InventoryIcon from '@mui/icons-material/Inventory';
 
 import RequestFilter from './RequestFilter';
 import Loader from './Loader';
@@ -114,7 +113,6 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                     <TableCell>Дата</TableCell>
                     <TableCell>ФИО</TableCell>
                     <TableCell>Авто</TableCell>
-                    <TableCell>Материалы</TableCell>
                     <TableCell align="center" className="w-[15px]"></TableCell>
                     <TableCell align="center" className="w-[15px]"></TableCell>
                   </TableRow>
@@ -134,9 +132,6 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                       <TableCell>{req.fullName}</TableCell>
                       <TableCell>
                         {req.hasCar === 'Yes' && <DirectionsCarIcon color="primary" />}
-                      </TableCell>
-                      <TableCell>
-                        {req.hasMaterials && <InventoryIcon color="secondary" />}
                       </TableCell>
                       <TableCell align="center">
                         <IconButton color="primary" aria-label="редактировать">
