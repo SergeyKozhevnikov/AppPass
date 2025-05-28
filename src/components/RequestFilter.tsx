@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -57,7 +57,6 @@ const BlurredBackdrop = styled('div')(() => ({
   },
 }));
 
-// Анимация перехода для диалога
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
@@ -85,8 +84,16 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleApplyFilter = () => {
+  // !!!!! ОБНОВЛЕНИЕ фильтров при изменении полей (автоматически)
+  useEffect(() => {
     onFilterChange({ date, search });
+  }, [date, search, onFilterChange]);
+
+  // Обработчик сброса фильтров
+  const handleReset = () => {
+    setDate('');
+    setSearch('');
+    // onFilterChange вызовется автоматически из useEffect после сброса состояний
   };
 
   return (
@@ -123,20 +130,20 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
             },
           }}
         />
+        {/* Кнопка сброса */}
         <Button
-          variant="contained"
-          color="primary"
-          onClick={handleApplyFilter}
+          variant="outlined"
+          color="secondary"
+          onClick={handleReset}
           sx={{
             borderRadius: 2,
-            transition: 'transform 0.2s',
-            '&:hover': {
-              transform: 'translateY(-1px)',
-            },
+            whiteSpace: 'nowrap',
+            height: 36,
           }}
         >
-          Найти
+          Сбросить
         </Button>
+
         <Box flexGrow={1} />
         <Button
           variant="contained"
@@ -161,7 +168,7 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
-        slots={{ backdrop: BlurredBackdrop }} // Используем кастомный бэкдроп с анимацией
+        slots={{ backdrop: BlurredBackdrop }}
         sx={{
           '& .MuiDialog-container': {
             alignItems: 'flex-start',
