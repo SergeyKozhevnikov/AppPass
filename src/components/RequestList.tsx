@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react'; // добавлен useCallback
 import {
   Box,
   Card,
@@ -20,7 +20,6 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import InventoryIcon from '@mui/icons-material/Inventory';
 
@@ -51,16 +50,23 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
       });
   }, []);
 
-  const handleFilterChange = (newFilters: { date: string; search: string }) => {
+  // !!!!! Изменено: useCallback для стабилизации функции и предотвращения бесконечного рендера
+  const handleFilterChange = useCallback((newFilters: { date: string; search: string }) => {
     setFilters(newFilters);
-  };
+  }, []);
 
   const filteredRequests = useMemo(() => {
     return requests.filter((req) => {
       const matchesStatus = status ? req.status === status : true;
-      const matchesDate = filters.date ? req.date === filters.date : true;
+
+      // Фильтрация по дате
+      const matchesDate = filters.date
+        ? new Date(req.date_created).toISOString().split('T')[0] === filters.date
+        : true;
+
+      // Фильтрация по полному имени
       const matchesSearch = filters.search
-        ? `${req.firstName} ${req.lastName} ${req.middleName}`.toLowerCase().includes(filters.search.toLowerCase())
+        ? req.fullName.toLowerCase().includes(filters.search.toLowerCase())
         : true;
 
       return matchesStatus && matchesDate && matchesSearch;
