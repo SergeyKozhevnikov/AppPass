@@ -78,7 +78,7 @@ const Transition = React.forwardRef(function Transition(
 
 const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [search, setSearch] = useState('');
 
   const handleClickOpen = () => setOpen(true);
