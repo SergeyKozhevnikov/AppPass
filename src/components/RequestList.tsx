@@ -189,7 +189,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
           }}
         >
           <Typography variant="h6">
-            Удалить пропуск <strong>{passToDelete?.fullName}</strong>?
+            Удалить заявку на пропуск для <br/> <strong>{passToDelete?.fullName}</strong>?
           </Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>

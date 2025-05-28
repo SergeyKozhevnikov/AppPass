@@ -133,12 +133,17 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
         {/* Кнопка сброса */}
         <Button
           variant="outlined"
-          color="secondary"
           onClick={handleReset}
           sx={{
             borderRadius: 2,
             whiteSpace: 'nowrap',
             height: 36,
+            color: '#005e91',
+            borderColor: '#005e91',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 94, 145, 0.1)', // легкий фон при ховере
+              borderColor: '#005e91',
+            },
           }}
         >
           Сбросить
