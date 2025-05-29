@@ -7,6 +7,9 @@ export type Pass = {
   fullName: string;
   lastName: string;
   firstName: string;
+  email: string;
+  status_id: number;
+  phone: string;
   middleName: string;
   hasCar: string;
   hasMaterials: boolean;
