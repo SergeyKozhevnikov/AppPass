@@ -34,3 +34,14 @@ export const fetchUsers = async (): Promise<User[]> => {
   const data = await response.json();
   return data.data; // Возвращаем только массив из поля data
 };
+
+// Удаление пользователя по ID
+export const deleteUser = async (id: number): Promise<void> => {
+  const response = await fetch(`${BACKEND_ADDRESS}/users/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Ошибка при удалении пользователя');
+  }
+};
