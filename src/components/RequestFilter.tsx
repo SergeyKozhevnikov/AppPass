@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -57,7 +57,6 @@ const BlurredBackdrop = styled('div')(() => ({
   },
 }));
 
-// Анимация перехода для диалога
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
@@ -79,14 +78,22 @@ const Transition = React.forwardRef(function Transition(
 
 const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [search, setSearch] = useState('');
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleApplyFilter = () => {
+  // !!!!! ОБНОВЛЕНИЕ фильтров при изменении полей (автоматически)
+  useEffect(() => {
     onFilterChange({ date, search });
+  }, [date, search, onFilterChange]);
+
+  // Обработчик сброса фильтров
+  const handleReset = () => {
+    setDate('');
+    setSearch('');
+    // onFilterChange вызовется автоматически из useEffect после сброса состояний
   };
 
   return (
@@ -123,20 +130,25 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
             },
           }}
         />
+        {/* Кнопка сброса */}
         <Button
-          variant="contained"
-          color="primary"
-          onClick={handleApplyFilter}
+          variant="outlined"
+          onClick={handleReset}
           sx={{
             borderRadius: 2,
-            transition: 'transform 0.2s',
+            whiteSpace: 'nowrap',
+            height: 36,
+            color: '#005e91',
+            borderColor: '#005e91',
             '&:hover': {
-              transform: 'translateY(-1px)',
+              backgroundColor: 'rgba(0, 94, 145, 0.1)', // легкий фон при ховере
+              borderColor: '#005e91',
             },
           }}
         >
-          Найти
+          Сбросить
         </Button>
+
         <Box flexGrow={1} />
         <Button
           variant="contained"
@@ -161,7 +173,7 @@ const RequestFilter: React.FC<RequestFilterProps> = ({ onFilterChange }) => {
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
-        slots={{ backdrop: BlurredBackdrop }} // Используем кастомный бэкдроп с анимацией
+        slots={{ backdrop: BlurredBackdrop }}
         sx={{
           '& .MuiDialog-container': {
             alignItems: 'flex-start',

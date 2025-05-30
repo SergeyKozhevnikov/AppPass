@@ -22,15 +22,29 @@ interface ICustomUser {
   updatedAt?: string;
 }
 
-// Создаем модуль для расширения типов NextAuth
+// Расширяем типы next-auth
 declare module 'next-auth' {
   interface User extends ICustomUser {
-    id: number; // по умолчанию string
-    name: string; // по умолчанию string | null | undefined
+    id: number;
+    name: string;
   }
-  interface Session extends ICustomUser {
-    session: ICustomUser;
-    user: ICustomUser; // AdapterUser
+  interface Session {
+    user: ICustomUser; // тут только user, не session: ICustomUser
+  }
+  interface JWT {
+    id?: number;
+    tabNum?: number;
+    role?: TRole;
+    surname?: string;
+    name?: string;
+    patronymic?: string;
+    login?: string;
+    email?: string;
+    pos?: string;
+    department?: string;
+    phoneNum?: string;
+    createdAt?: string;
+    updatedAt?: string;
   }
 }
 
@@ -51,43 +65,68 @@ export const authConfig: AuthOptions = {
       },
 
       async authorize(credentials) {
-        // если данных нет
         if (!credentials?.login || !credentials.password) return null;
 
-        // запрашиваем пользователя из БД
-        const currentUser = await userApi
-          .getUserByLogin({
+        try {
+          const currentUser = await userApi.getUserByLogin({
             login: credentials.login,
             password: credentials.password,
-          })
-          .then((res) => res.user)
-          .catch(() => {
-            throw new Error('Неверный пароль или Пользователь не найден');
           });
 
-        if (currentUser) {
-          return currentUser as ICustomUser;
+          if (currentUser?.user) {
+            return currentUser.user as ICustomUser;
+          }
+          return null;
+        } catch (error) {
+          console.error(error);
+          throw new Error('Неверный пароль или Пользователь не найден');
         }
-
-        return null; // если не авторизован
       },
     }),
   ],
-  // NextAuth автоматически возвращает только поля name и email
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        // Добавляем все поля из профиля пользователя
-        token.user = user as ICustomUser;
+        // Копируем все нужные поля из user в токен
+        token.id = user.id;
+        token.tabNum = user.tabNum;
+        token.role = user.role;
+        token.surname = user.surname;
+        token.name = user.name;
+        token.patronymic = user.patronymic;
+        token.login = user.login;
+        token.email = user.email;
+        token.pos = user.pos;
+        token.department = user.department;
+        token.phoneNum = user.phoneNum;
+        token.createdAt = user.createdAt;
+        token.updatedAt = user.updatedAt;
       }
       return token;
     },
+
     async session({ session, token }) {
-      // Добавляем все поля из JWT в сессию
-      session.user = token.user as ICustomUser;
+      // Прокидываем поля из токена в сессию
+      session.user.id = token.id as number;
+      session.user.tabNum = token.tabNum as number;
+      session.user.role = token.role as TRole;
+      session.user.surname = token.surname as string;
+      session.user.name = token.name as string;
+      session.user.patronymic = token.patronymic as string;
+      session.user.login = token.login as string;
+      session.user.email = token.email as string;
+      session.user.pos = token.pos as string;
+      session.user.department = token.department as string;
+      session.user.phoneNum = token.phoneNum as string;
+      session.user.createdAt = token.createdAt as string;
+      session.user.updatedAt = token.updatedAt as string;
 
       return session;
     },
   },
-  pages: { signIn: '/login' },
+
+  pages: {
+    signIn: '/login',
+  },
 };
