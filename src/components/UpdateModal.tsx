@@ -1,0 +1,181 @@
+// Страница создания нового пользователя (Сергей П)
+'use client';
+
+import {
+  Grid,
+  Button,
+  Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+} from '@mui/material';
+import { Close } from '@mui/icons-material';
+import { UPDATE_FIELDS } from '@/lib/constants';
+import { Dispatch, FormEventHandler, SetStateAction } from 'react';
+import { useForm } from 'react-hook-form';
+import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { scrollbarStyles } from '@/styles/shared-styles';
+import { userApi } from '@/lib/userApi';
+import { User } from '@/services/userService';
+import UpdateField from './UpdateField';
+
+interface IProps {
+  isOpen: boolean;
+  currentUser: User | null;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setResult: Dispatch<SetStateAction<string>>;
+}
+
+export default function UpdateModal(props: IProps) {
+  const { isOpen, currentUser, setIsOpen, setResult } = props;
+
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<profileUserFields>({
+    resolver: zodResolver(profileUserSchema),
+    defaultValues: {
+      id: currentUser?.id,
+      role: currentUser?.role,
+      surname: currentUser?.surname,
+      name: currentUser?.name,
+      patronymic: currentUser?.patronymic,
+      pos: currentUser?.pos,
+      department: currentUser?.department,
+      login: currentUser?.login,
+      email: currentUser?.email,
+      password: currentUser?.password,
+      phoneNum: currentUser?.phoneNum,
+    },
+    mode: 'onChange', // Валидация при изменении полей
+  });
+
+  // Обработчик отправки формы
+  const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
+    const formData = getValues();
+    console.log(formData);
+    if (formData.id) {
+      userApi
+        .updateUser(formData.id, {
+          role: formData.role,
+          surname: formData.surname,
+          name: formData.name,
+          patronymic: formData.patronymic,
+          pos: formData.pos ?? '',
+          department: formData.department ?? '',
+          login: formData.login,
+          email: formData.email,
+          password: formData.password,
+          phoneNum: formData.phoneNum ?? '',
+        })
+        .then((res) => {
+          console.log(res);
+          setResult('success');
+        })
+        .catch(() => {
+          setResult('error');
+          throw new Error('Что-то пошло не так');
+        });
+
+      setIsOpen(false);
+    }
+  });
+
+  return (
+    <Container component="section">
+      <Dialog
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        sx={{ p: 2, maxHeight: '80%', margin: 'auto' }}
+        maxWidth="md"
+        fullWidth
+      >
+        <Grid
+          container
+          sx={{ p: 2, alignItems: 'start', justifyContent: 'space-between' }}
+        >
+          <DialogTitle sx={{ p: 0 }}>Создание пользователя</DialogTitle>
+          <DialogActions sx={{ p: 0 }}>
+            <IconButton
+              aria-label="delete"
+              sx={{ p: 0.25, border: '1px solid', borderRadius: '8px' }}
+            >
+              <Close
+                onClick={() => setIsOpen(false)}
+                sx={{ height: 22, width: 22 }}
+              />
+            </IconButton>
+          </DialogActions>
+        </Grid>
+        <Container
+          component="section"
+          disableGutters
+          sx={{
+            height: '100%',
+            maxWidth: '1200px',
+            minHeight: '100%',
+            pt: 1,
+            flexGrow: 1,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            ...scrollbarStyles,
+            // [theme.breakpoints.up('sm')]: {}, - применить стили выше размера экрана sm (600px)
+          }}
+        >
+          <DialogContent>
+            <Grid
+              component="form"
+              onSubmit={onSubmit}
+              noValidate
+              container
+              spacing={3}
+              columns={{ xs: 1, md: 2 }}
+              sx={{ justifyContent: { xs: 'center', sm: 'end' } }}
+            >
+              {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
+              {Object.values(UPDATE_FIELDS).map((f) => (
+                <UpdateField
+                  field={f}
+                  errors={errors[f.label]}
+                  register={register}
+                  key={f.label}
+                ></UpdateField>
+              ))}
+
+              <DialogActions sx={{ p: 0, width: { xs: '100%', sm: 'auto' } }}>
+                <Grid
+                  size={{ xs: 1, md: 2 }}
+                  container
+                  spacing={2}
+                  justifyContent={{ xs: 'center', md: 'space-between' }}
+                >
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Отмена
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  >
+                    Изменить
+                  </Button>
+                </Grid>
+              </DialogActions>
+            </Grid>
+          </DialogContent>
+        </Container>
+      </Dialog>
+    </Container>
+  );
+}
