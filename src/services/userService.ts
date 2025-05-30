@@ -45,3 +45,14 @@ export const deleteUser = async (id: number): Promise<void> => {
     throw new Error('Ошибка при удалении пользователя');
   }
 };
+
+// Редактирование пользователя по ID
+export const editUser = async (id: number): Promise<void> => {
+  const response = await fetch(`${BACKEND_ADDRESS}/users/${id}`, {
+    method: 'EDIT',
+  });
+
+  if (!response.ok) {
+    throw new Error('Ошибка при редактировании данных пользователя');
+  }
+};
