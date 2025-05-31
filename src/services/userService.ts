@@ -12,7 +12,7 @@ export type User = {
   //hasMaterials: boolean;
 
 
-  role: string;
+  role: 'Пользователь' | 'Администратор';
   tabNum: number;
   surname: string;
   name: string;

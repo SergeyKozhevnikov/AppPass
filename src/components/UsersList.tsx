@@ -25,6 +25,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { fetchUsers, deleteUser, User } from '@/services/userService';
 // import { Pass, deletePass } from '@/services/passService';
 import Loader from './Loader';
+import UpdateModal from './UpdateModal';
 
 interface IProps {
   result: string;
@@ -36,9 +37,14 @@ const UsersList = (props: IProps) => {
   // Начало блока для бэка
   const [requests, setRequests] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-    const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
-    const [userToDelete, setUserToDelete] = useState<User | null>(null);
-    //const [userToName] = useState<User | null>(null);
+  const [requestResult, setRequestResult] = useState('');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
+  const [updateUserDialogOpen, setUpdateUserDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  // const [userToUpdate, setUserToUpdate] = useState<User | null>(null);
+  //const [userToName] = useState<User | null>(null);
+  console.log(requestResult)
 
   useEffect(() => {
     if (result === '' || result === 'success') {
@@ -64,36 +70,33 @@ const UsersList = (props: IProps) => {
     return <div>Загрузка пользователей...</div>;
   }
 
+  const handleDeleteUserClick = (user: User) => {
+    setUserToDelete(user);
+    setDeleteUserDialogOpen(true);
+    console.log(user);
+  };
 
-    const handleDeleteUserClick = (user: User) => {
-      setUserToDelete(user);
-      setDeleteUserDialogOpen(true);
-      console.log(user);
-    };
-  
-    const confirmDelete = async () => {
-      if (!userToDelete) return;
-      try {
-        await deleteUser(userToDelete.id);
-        setRequests(prev => prev.filter(p => p.id !== userToDelete.id));
-      } catch (error) {
-        console.error('Ошибка при удалении пропуска:', error);
-      } finally {
-        setDeleteUserDialogOpen(false);
-        setUserToDelete(null);
-      }
-    };
-  
-    const cancelDelete = () => {
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+    try {
+      await deleteUser(userToDelete.id);
+      setRequests((prev) => prev.filter((p) => p.id !== userToDelete.id));
+    } catch (error) {
+      console.error('Ошибка при удалении пропуска:', error);
+    } finally {
       setDeleteUserDialogOpen(false);
       setUserToDelete(null);
-    };
-  
-
-  
-    if (loading) {
-      return <Loader />;
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteUserDialogOpen(false);
+    setUserToDelete(null);
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
   // Обработчик
   // const handleEdit = () => {}
 
@@ -135,13 +138,20 @@ const UsersList = (props: IProps) => {
                         <IconButton
                           color="primary"
                           aria-label="редактировать"
-                          //onClick={() => setIsOpen(true)}
+                          onClick={() => {
+                            setCurrentUser(req);
+                            setUpdateUserDialogOpen(true);
+                          }}
                         >
                           <EditIcon />
                         </IconButton>
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton color="error" aria-label="удалить" onClick={() => handleDeleteUserClick(req)}>
+                        <IconButton
+                          color="error"
+                          aria-label="удалить"
+                          onClick={() => handleDeleteUserClick(req)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
@@ -153,7 +163,7 @@ const UsersList = (props: IProps) => {
           </Box>
         </CardContent>
       </Card>
-<Dialog
+      <Dialog
         open={deleteUserDialogOpen}
         onClose={cancelDelete}
         PaperProps={{
@@ -179,7 +189,11 @@ const UsersList = (props: IProps) => {
           }}
         >
           <Typography variant="h6">
-            Вы уверены что хотите удалить пользователя <br /> <strong>{userToDelete?.surname} {userToDelete?.name}</strong>?
+            Вы уверены что хотите удалить пользователя <br />{' '}
+            <strong>
+              {userToDelete?.surname} {userToDelete?.name}
+            </strong>
+            ?
           </Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
@@ -191,6 +205,16 @@ const UsersList = (props: IProps) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Если updateUserDialogOpen-true, открыть диалоговое окно и передать ему параметры */}
+      {updateUserDialogOpen && (
+        <UpdateModal
+          currentUser={currentUser}
+          isOpen={updateUserDialogOpen}
+          setIsOpen={setUpdateUserDialogOpen}
+          setResult={setRequestResult}
+        />
+      )}
     </div>
   );
 };

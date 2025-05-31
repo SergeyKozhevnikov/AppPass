@@ -28,7 +28,21 @@ export const PROFILE_FIELDS = {
   login: { label: 'login', labelRu: 'Логин', type: 'text' },
   email: { label: 'email', labelRu: 'Почта', type: 'email' },
   password: { label: 'password', labelRu: 'Пароль', type: 'password' },
-  phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'string' },
+  phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'text' },
+} as const;
+
+// Константа для полей обновления пользователя
+export const UPDATE_FIELDS = {
+  role: { label: 'role', labelRu: 'Роль', type: 'text' },
+  surname: { label: 'surname', labelRu: 'Фамилия', type: 'text' },
+  name: { label: 'name', labelRu: 'Имя', type: 'text' },
+  patronymic: { label: 'patronymic', labelRu: 'Отчество', type: 'text' },
+  pos: { label: 'pos', labelRu: 'Должность', type: 'text' },
+  department: { label: 'department', labelRu: 'Подразделение', type: 'text' },
+  login: { label: 'login', labelRu: 'Логин', type: 'text' },
+  email: { label: 'email', labelRu: 'Почта', type: 'email' },
+  password: { label: 'password', labelRu: 'Пароль', type: 'password' },
+  phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'text' },
 } as const;
 
 // Адреса обращения к backend
