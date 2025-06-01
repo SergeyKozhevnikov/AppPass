@@ -5,7 +5,7 @@ import { userApi } from '@/lib/userApi';
 import { TRole } from '@/interfaces/user.interface';
 
 // Интерфейс для пользователя
-interface ICustomUser {
+export interface ICustomUser {
   id: number;
   tabNum: number;
   role: TRole;
@@ -86,7 +86,7 @@ export const authConfig: AuthOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         // Копируем все нужные поля из user в токен
         token.id = user.id;
@@ -103,6 +103,11 @@ export const authConfig: AuthOptions = {
         token.createdAt = user.createdAt;
         token.updatedAt = user.updatedAt;
       }
+
+      if (trigger === 'update') {
+        return { ...token, ...session.user };
+      }
+
       return token;
     },
 

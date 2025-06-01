@@ -22,12 +22,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { userApi } from '@/lib/userApi';
+import { ICustomUser } from '@/configs/auth';
 
 export default function Profile() {
   const pathname = usePathname(); // текущий url
   const [result, setResult] = useState('');
   const [isOpenErrorAlert, setIsOpenErrorAlert] = useState(false);
   const [isOpenSuccessAlert, setIsOpenSuccessAlert] = useState(false);
+  const { data: session, update } = useSession();
   const user = useSession().data?.user;
 
   // Уведомления о результате действий
@@ -90,10 +92,29 @@ export default function Profile() {
     }
   }, [user, setValue]);
 
+  async function updateSession(data: ICustomUser): Promise<void> {
+    await update({
+      ...session,
+      user: {
+        id: data.id,
+        role: data.role,
+        tabNum: data.tabNum,
+        surname: data.surname,
+        name: data.name,
+        patronymic: data.patronymic,
+        login: data.login,
+        email: data.email,
+        pos: data.pos,
+        department: data.department,
+        phoneNum: data.phoneNum,
+        updatedAt: data.updatedAt,
+      },
+    });
+  }
+
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const { ...formData } = getValues();
-    console.log(formData);
 
     if (formData.id) {
       userApi
@@ -111,6 +132,7 @@ export default function Profile() {
         })
         .then((res) => {
           console.log(res);
+          updateSession(res.data.userData);
           setResult('success');
         })
         .catch(() => {
