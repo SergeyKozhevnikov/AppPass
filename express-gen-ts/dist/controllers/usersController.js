@@ -298,13 +298,14 @@ const updateUser = async (req, res) => {
         try {
             await user.update({
                 role: userData.role,
+                tabNum: userData.tabNum,
                 surname: userData.surname,
                 name: userData.name,
                 patronymic: userData.patronymic,
-                pos: userData.pos,
-                department: userData.department,
                 login: userData.login,
                 email: userData.email,
+                pos: userData.pos,
+                department: userData.department,
                 password: userData.password,
                 phoneNum: userData.phoneNum,
                 updatedAt: now,
@@ -315,6 +316,7 @@ const updateUser = async (req, res) => {
                 message: 'Пользователь успешно обновлен',
                 data: {
                     id: user.id,
+                    userData: user,
                     updatedAt: user.updatedAt,
                 },
             });
