@@ -21,6 +21,7 @@ import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { userApi } from '@/lib/userApi';
 
 export default function Profile() {
   const pathname = usePathname(); // текущий url
@@ -54,16 +55,17 @@ export default function Profile() {
   } = useForm<profileUserFields>({
     resolver: zodResolver(profileUserSchema),
     defaultValues: {
-      tabNum: 0,
-      surname: '',
-      name: '',
-      patronymic: '',
-      pos: '',
-      department: '',
-      login: '',
-      email: ``,
-      phoneNum: '',
-      role: 'Пользователь',
+      id: user?.id ?? 0,
+      tabNum: user?.tabNum ?? 0,
+      surname: user?.surname ?? '',
+      name: user?.name ?? '',
+      patronymic: user?.patronymic ?? '',
+      pos: user?.pos ?? '',
+      department: user?.department ?? '',
+      login: user?.login ?? '',
+      email: user?.email ?? '',
+      phoneNum: user?.phoneNum ?? '',
+      role: user?.role ?? 'Пользователь',
     },
     mode: 'onChange', // Валидация при изменении полей
   });
@@ -91,12 +93,30 @@ export default function Profile() {
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const { ...formData } = getValues();
+    console.log(formData);
 
-    // Здесь можно добавить логику отправки данных на сервер
-    if (formData) {
-      setResult('success');
-    } else {
-      setResult('error');
+    if (formData.id) {
+      userApi
+        .updateUser(formData.id, {
+          role: formData.role,
+          surname: formData.surname,
+          name: formData.name,
+          patronymic: formData.patronymic,
+          pos: formData.pos ?? '',
+          department: formData.department ?? '',
+          login: formData.login,
+          email: formData.email,
+          password: formData.password,
+          phoneNum: formData.phoneNum ?? '',
+        })
+        .then((res) => {
+          console.log(res);
+          setResult('success');
+        })
+        .catch(() => {
+          setResult('error');
+          throw new Error('Что-то пошло не так');
+        });
     }
   });
 
@@ -145,7 +165,7 @@ export default function Profile() {
         <>
           <Box display={'flex'} sx={{ mb: 3 }}>
             <Avatar
-              src={'...'}
+              src={'#'}
               sx={{ height: '55px', width: '55px', mr: 2 }}
             ></Avatar>
             <Box>
