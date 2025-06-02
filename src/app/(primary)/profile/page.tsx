@@ -23,12 +23,14 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { userApi } from '@/lib/userApi';
 import { ICustomUser } from '@/configs/auth';
+import UpdatePasswordModal from '@/components/UpdatePasswordModal';
 
 export default function Profile() {
   const pathname = usePathname(); // текущий url
   const [result, setResult] = useState('');
   const [isOpenErrorAlert, setIsOpenErrorAlert] = useState(false);
   const [isOpenSuccessAlert, setIsOpenSuccessAlert] = useState(false);
+  const [updatePasswordDialogOpen, setUpdateUserDialogOpen] = useState(false);
   const { data: session, update } = useSession();
   const user = useSession().data?.user;
 
@@ -93,6 +95,8 @@ export default function Profile() {
   }, [user, setValue]);
 
   async function updateSession(data: ICustomUser): Promise<void> {
+    console.log(data);
+    
     await update({
       ...session,
       user: {
@@ -226,14 +230,17 @@ export default function Profile() {
                 justifyContent: { xs: 'center', md: 'end' },
               }}
             >
-              <Link
-                underline="hover"
-                href="#"
-                color="inherit"
-                alignContent={'center'}
-              >
-                Изменить пароль
-              </Link>
+              <Button 
+                  onClick={() => setUpdateUserDialogOpen(true)}>
+                <Link
+                  underline="hover"
+                  href="#"
+                  color="inherit"
+                  alignContent={'center'}
+                >
+                  Изменить пароль
+                </Link>
+              </Button>
               <Button
                 type="submit"
                 variant="contained"
@@ -259,6 +266,16 @@ export default function Profile() {
             <CircularProgress size="3rem" />
           </Grid>
         </Grid>
+      )}
+
+      {/* Если updatePasswordDialogOpen-true, открыть диалоговое окно и передать ему параметры */}
+      {updatePasswordDialogOpen && (
+        <UpdatePasswordModal
+          currentUserId={user?.id}
+          isOpen={updatePasswordDialogOpen}
+          setIsOpen={setUpdateUserDialogOpen}
+          setResult={setResult}
+        />
       )}
     </Container>
   );
