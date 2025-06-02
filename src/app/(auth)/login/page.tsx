@@ -12,6 +12,11 @@ import {
   ImageListItem,
   Grid,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  IconButton,
+  Container,
 } from '@mui/material';
 import './login.css';
 import Image from 'next/image';
@@ -22,10 +27,13 @@ import { AUTH_FIELDS } from '@/lib/constants';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authFields, authSchema } from '../../../interfaces/zod-types';
+import { Close } from '@mui/icons-material';
+import SupportRequestPage from '@/app/(primary)/create_support_request/page';
+import { scrollbarStyles } from '@/styles/shared-styles';
 
 export default function LoginPage() {
-  // Alert исчезает, когда если вводишь новые данные (onChangeCapture)
-  const [isOpenAlert, setIsOpenAlert] = useState(false);
+  const [isReqToSupModalOpen, setIsReqToSupModalOpen] = useState(false);
+  const [isOpenAlert, setIsOpenAlert] = useState(false); // Alert исчезает, когда если вводишь новые данные (onChangeCapture)
   const router = useRouter();
 
   // деструкторизация
@@ -182,9 +190,11 @@ export default function LoginPage() {
                     control={<Checkbox value="remember" color="primary" />}
                     label="Запомнить меня"
                   />
-                  <Link underline="hover" href="#" color="inherit">
-                    Забыли пароль?
-                  </Link>
+                  <Button onClick={() => setIsReqToSupModalOpen(true)}>
+                    <Link underline="hover" href="#" color="inherit">
+                      Забыли пароль?
+                    </Link>
+                  </Button>
                 </Box>
 
                 {/* Кнопка войти */}
@@ -229,6 +239,53 @@ export default function LoginPage() {
             </Box>
           </Grid>
         </Grid>
+
+        {/* Диалоговое окно для запроса в тех. поддержку */}
+        <Dialog
+          open={isReqToSupModalOpen}
+          onClose={() => setIsReqToSupModalOpen(false)}
+          sx={{ p: 2 }}
+          maxWidth="md"
+          fullWidth
+        >
+          <Container
+            component="section"
+            disableGutters
+            sx={{
+              height: '100%',
+              maxWidth: '1200px',
+              minHeight: '100%',
+              flexGrow: 1,
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              ...scrollbarStyles,
+            }}
+          >
+            <Grid
+              container
+              sx={{
+                p: 2,
+                pb: 0,
+                alignItems: 'start',
+                justifyContent: 'space-between',
+              }}
+            >
+              <DialogTitle sx={{ p: 0 }}></DialogTitle>
+              <DialogActions sx={{ p: 0 }}>
+                <IconButton
+                  aria-label="delete"
+                  sx={{ p: 0.25, border: '1px solid', borderRadius: '8px' }}
+                >
+                  <Close
+                    onClick={() => setIsReqToSupModalOpen(false)}
+                    sx={{ height: 22, width: 22 }}
+                  />
+                </IconButton>
+              </DialogActions>
+            </Grid>
+            <SupportRequestPage />
+          </Container>
+        </Dialog>
       </Box>
     </main>
   );

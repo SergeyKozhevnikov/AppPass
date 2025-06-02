@@ -96,7 +96,7 @@ export default function UpdatPasswordModal(props: IProps) {
           disableGutters
           sx={{
             height: '100%',
-            maxWidth: '800px',
+            maxWidth: '1200px',
             minHeight: '100%',
             pt: 1,
             flexGrow: 1,
