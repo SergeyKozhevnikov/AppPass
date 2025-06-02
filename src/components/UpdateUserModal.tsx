@@ -29,7 +29,7 @@ interface IProps {
   setResult: Dispatch<SetStateAction<string>>;
 }
 
-export default function UpdateModal(props: IProps) {
+export default function UpdateUserModal(props: IProps) {
   const { isOpen, currentUser, setIsOpen, setResult } = props;
 
   const {
