@@ -88,3 +88,17 @@ export const profileUserSchema = z.object({
   }),
 });
 export type profileUserFields = z.infer<typeof profileUserSchema>;
+
+// схема для обновления пароля
+export const passwordUserSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, { message: 'Пароль не может быть менее 6 символов' }),
+    passwordRepeat: z.string().nonempty('Пожалуйста повторите пароль'),
+  })
+  .refine((data) => data.password === data.passwordRepeat, {
+    message: 'Пароли не совпадают',
+    path: ['passwordRepeat'],
+  });
+export type passwordUserFields = z.infer<typeof passwordUserSchema>;
