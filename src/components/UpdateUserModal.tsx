@@ -20,7 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { scrollbarStyles } from '@/styles/shared-styles';
 import { userApi } from '@/lib/userApi';
 import { User } from '@/services/userService';
-import UpdateField from './UpdateField';
+import UpdateUserField from './UpdateUserField';
 
 interface IProps {
   isOpen: boolean;
@@ -139,12 +139,12 @@ export default function UpdateUserModal(props: IProps) {
             >
               {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
               {Object.values(UPDATE_FIELDS).map((f) => (
-                <UpdateField
+                <UpdateUserField
                   field={f}
                   errors={errors[f.label]}
                   register={register}
                   key={f.label}
-                ></UpdateField>
+                ></UpdateUserField>
               ))}
 
               <DialogActions sx={{ p: 0, width: { xs: '100%', sm: 'auto' } }}>

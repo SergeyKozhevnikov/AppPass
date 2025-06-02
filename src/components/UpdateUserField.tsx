@@ -23,7 +23,7 @@ const getFieldStyles = {
   },
 };
 
-export default function UpdateField({
+export default function UpdateUserField({
   field,
   currentUrl,
   errors,
