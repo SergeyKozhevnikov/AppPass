@@ -61,16 +61,16 @@ class UserApi {
       password,
       phoneNum,
     }: {
-      role: TRole;
-      surname: string;
-      name: string;
-      patronymic: string;
-      pos: string;
-      department: string;
-      login: string;
-      email: string;
-      password: string;
-      phoneNum: string;
+      role?: TRole;
+      surname?: string;
+      name?: string;
+      patronymic?: string;
+      pos?: string;
+      department?: string;
+      login?: string;
+      email?: string;
+      password?: string;
+      phoneNum?: string;
     }
   ) {
     return fetch(`${this.#url}/users/${id}`, {

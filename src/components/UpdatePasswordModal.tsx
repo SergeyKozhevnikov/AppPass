@@ -10,47 +10,36 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  TextField,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { UPDATE_FIELDS } from '@/lib/constants';
 import { Dispatch, FormEventHandler, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
-import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
+import { passwordUserFields, passwordUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { scrollbarStyles } from '@/styles/shared-styles';
 import { userApi } from '@/lib/userApi';
-import { User } from '@/services/userService';
-import UpdateField from './UpdateField';
 
 interface IProps {
   isOpen: boolean;
-  currentUser: User | null;
+  currentUserId: number | undefined;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   setResult: Dispatch<SetStateAction<string>>;
 }
 
-export default function UpdateModal(props: IProps) {
-  const { isOpen, currentUser, setIsOpen, setResult } = props;
+export default function UpdatPasswordModal(props: IProps) {
+  const { isOpen, currentUserId, setIsOpen, setResult } = props;
 
   const {
     register,
     getValues,
     handleSubmit,
     formState: { errors },
-  } = useForm<profileUserFields>({
-    resolver: zodResolver(profileUserSchema),
+  } = useForm<passwordUserFields>({
+    resolver: zodResolver(passwordUserSchema),
     defaultValues: {
-      id: currentUser?.id,
-      role: currentUser?.role,
-      surname: currentUser?.surname,
-      name: currentUser?.name,
-      patronymic: currentUser?.patronymic,
-      pos: currentUser?.pos,
-      department: currentUser?.department,
-      login: currentUser?.login,
-      email: currentUser?.email,
-      password: currentUser?.password,
-      phoneNum: currentUser?.phoneNum,
+      password: '',
+      passwordRepeat: '',
     },
     mode: 'onChange', // Валидация при изменении полей
   });
@@ -58,20 +47,10 @@ export default function UpdateModal(props: IProps) {
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const formData = getValues();
-    console.log(formData);
-    if (formData.id) {
+    if (currentUserId) {
       userApi
-        .updateUser(formData.id, {
-          role: formData.role,
-          surname: formData.surname,
-          name: formData.name,
-          patronymic: formData.patronymic,
-          pos: formData.pos ?? '',
-          department: formData.department ?? '',
-          login: formData.login,
-          email: formData.email,
+        .updateUser(currentUserId, {
           password: formData.password,
-          phoneNum: formData.phoneNum ?? '',
         })
         .then((res) => {
           console.log(res);
@@ -92,14 +71,14 @@ export default function UpdateModal(props: IProps) {
         open={isOpen}
         onClose={() => setIsOpen(false)}
         sx={{ p: 2, maxHeight: '80%', margin: 'auto' }}
-        maxWidth="md"
+        maxWidth="xs"
         fullWidth
       >
         <Grid
           container
           sx={{ p: 2, alignItems: 'start', justifyContent: 'space-between' }}
         >
-          <DialogTitle sx={{ p: 0 }}>Создание пользователя</DialogTitle>
+          <DialogTitle sx={{ p: 0 }}>Изменение пароля</DialogTitle>
           <DialogActions sx={{ p: 0 }}>
             <IconButton
               aria-label="delete"
@@ -117,7 +96,7 @@ export default function UpdateModal(props: IProps) {
           disableGutters
           sx={{
             height: '100%',
-            maxWidth: '1200px',
+            maxWidth: '800px',
             minHeight: '100%',
             pt: 1,
             flexGrow: 1,
@@ -134,18 +113,37 @@ export default function UpdateModal(props: IProps) {
               noValidate
               container
               spacing={3}
-              columns={{ xs: 1, md: 2 }}
+              columns={1}
               sx={{ justifyContent: { xs: 'center', sm: 'end' } }}
             >
               {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
-              {Object.values(UPDATE_FIELDS).map((f) => (
-                <UpdateField
-                  field={f}
-                  errors={errors[f.label]}
-                  register={register}
-                  key={f.label}
-                ></UpdateField>
-              ))}
+              <Grid container size={1}>
+                <TextField
+                  label={'Новый пароль'}
+                  placeholder={'Введите новый пароль'}
+                  fullWidth
+                  margin="normal"
+                  type="password"
+                  {...register('password')}
+                  error={!!errors.password}
+                  helperText={errors['password']?.message}
+                  required
+                  autoFocus={true}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  label={'Повторите новый пароль'}
+                  placeholder={'Повторите новый пароль'}
+                  fullWidth
+                  margin="normal"
+                  type="password"
+                  {...register('passwordRepeat')}
+                  error={!!errors.passwordRepeat || !!errors.root}
+                  helperText={errors['passwordRepeat']?.message}
+                  required
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
 
               <DialogActions sx={{ p: 0, width: { xs: '100%', sm: 'auto' } }}>
                 <Grid

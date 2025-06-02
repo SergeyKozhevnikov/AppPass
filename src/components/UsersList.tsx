@@ -25,7 +25,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { fetchUsers, deleteUser, User } from '@/services/userService';
 // import { Pass, deletePass } from '@/services/passService';
 import Loader from './Loader';
-import UpdateModal from './UpdateModal';
+import UpdateUserModal from './UpdateUserModal';
 
 interface IProps {
   result: string;
@@ -208,7 +208,7 @@ const UsersList = (props: IProps) => {
 
       {/* Если updateUserDialogOpen-true, открыть диалоговое окно и передать ему параметры */}
       {updateUserDialogOpen && (
-        <UpdateModal
+        <UpdateUserModal
           currentUser={currentUser}
           isOpen={updateUserDialogOpen}
           setIsOpen={setUpdateUserDialogOpen}
