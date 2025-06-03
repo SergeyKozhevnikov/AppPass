@@ -56,7 +56,7 @@ export const AdminMenu = () => {
             <ListItemIcon>
               <TextSnippetIcon />
             </ListItemIcon>
-            <ListItemText primary="Черновики" />
+            <ListItemText primary="Ожидает согласования" />
           </ListItemButton>
           <ListItemButton
             sx={{ pl: 4 }}
