@@ -17,9 +17,10 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = 3001;
 app.use((0, cors_1.default)());
-app.use(body_parser_1.default.json());
-app.use(express_1.default.json({ limit: '10mb' }));
-app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
+app.use(body_parser_1.default.json({ limit: '50mb' }));
+app.use(body_parser_1.default.urlencoded({ limit: '50mb', extended: true }));
+app.use(express_1.default.json({ limit: '50mb' }));
+app.use(express_1.default.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
 app.use(Paths_1.default.Base.Api + Paths_1.default.Api.Passes, passRoutes_1.default);
 app.use(Paths_1.default.Base.Api + Paths_1.default.Api.Users, userRoutes_1.default);
@@ -33,6 +34,7 @@ database_1.sequelize
     console.log('Модели синхронизированы с базой данных PostgreSQL.');
     app.listen(PORT, () => {
         console.log(`Сервер запущен на порту ${PORT}`);
+        console.log('Лимит размера запроса: 50MB');
     });
 })
     .catch((err) => {
@@ -42,15 +44,20 @@ database_1.sequelize
 app.use((err, req, res, next) => {
     console.error('Ошибка:', err);
     let message = 'Неизвестная ошибка';
+    let statusCode = 500;
     if (err instanceof Error) {
         message = err.message;
+        if (err.message.includes('request entity too large') || err.message.includes('PayloadTooLargeError')) {
+            message = 'Размер отправляемых данных слишком большой. Пожалуйста, уменьшите размер изображения.';
+            statusCode = 413;
+        }
     }
     else if (typeof err === 'string') {
         message = err;
     }
-    res.status(500).json({
+    res.status(statusCode).json({
         success: false,
-        message: 'Внутренняя ошибка сервера',
+        message: statusCode === 413 ? message : 'Внутренняя ошибка сервера',
         error: process.env.NODE_ENV === 'development' ? message : undefined,
     });
 });

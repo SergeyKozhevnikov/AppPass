@@ -68,7 +68,10 @@ export const createPass = async (passData: PassData): Promise<ApiResponse> => {
       }
 
       // Добавляем информацию о статусе ответа
-      if (response.status === 400) {
+      if (response.status === 413) {
+        errorMessage =
+          "Размер отправляемых данных слишком большой. Пожалуйста, уменьшите размер изображения или попробуйте другое фото."
+      } else if (response.status === 400) {
         errorMessage = `Ошибка валидации данных: ${errorMessage}`
       } else if (response.status === 401 || response.status === 403) {
         errorMessage = `Ошибка авторизации: ${errorMessage}`
@@ -96,6 +99,8 @@ export const createPass = async (passData: PassData): Promise<ApiResponse> => {
       // Проверяем тип ошибки
       if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
         errorMessage = "Ошибка сети. Пожалуйста, проверьте подключение к интернету и доступность сервера."
+      } else if (error.message.includes("PayloadTooLargeError") || error.message.includes("request entity too large")) {
+        errorMessage = "Размер отправляемых данных слишком большой. Пожалуйста, уменьшите размер изображения."
       }
     }
 

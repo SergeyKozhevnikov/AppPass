@@ -62,6 +62,8 @@ const createPass = async (req, res) => {
     let transaction;
     try {
         console.log('Получены данные:', req.body);
+        const userId = req.user?.id ?? 1;
+        console.log(`Используем ID пользователя из сессии: ${userId}`);
         if (!req.body || Object.keys(req.body).length === 0) {
             res.status(400).json({
                 success: false,
@@ -129,7 +131,7 @@ const createPass = async (req, res) => {
                 photo: photoPath,
                 status_id: waitingStatusId,
                 pass_type: guestPassTypeId,
-                author_id: 1,
+                author_id: userId,
             }, { transaction });
             console.log('Создан пропуск с ID:', pass.id);
             if (passData.approvers && passData.approvers.length > 0) {
@@ -199,9 +201,15 @@ const createPass = async (req, res) => {
     }
 };
 exports.createPass = createPass;
-const getAllPasses = async (_req, res) => {
+const getAllPasses = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        let whereClause = {};
+        if (userId && req.user?.role !== 'admin') {
+            whereClause = { author_id: userId };
+        }
         const passes = await Pass_1.default.findAll({
+            where: whereClause,
             include: [
                 {
                     model: Approver_1.default,
@@ -238,6 +246,7 @@ exports.getAllPasses = getAllPasses;
 const getPassById = async (req, res) => {
     try {
         const { id } = req.params;
+        const userId = req.user?.id;
         const pass = await Pass_1.default.findByPk(id, {
             include: [
                 {
@@ -257,6 +266,14 @@ const getPassById = async (req, res) => {
                 success: false,
                 message: 'Пропуск не найден',
                 error: `Пропуск с ID ${id} не существует`,
+            });
+            return;
+        }
+        if (userId && req.user?.role !== 'admin' && pass.author_id !== userId) {
+            res.status(403).json({
+                success: false,
+                message: 'Доступ запрещен',
+                error: 'У вас нет прав для просмотра этого пропуска',
             });
             return;
         }
@@ -284,12 +301,21 @@ const updatePass = async (req, res) => {
     try {
         const { id } = req.params;
         const passData = req.body;
+        const userId = req.user?.id;
         const pass = await Pass_1.default.findByPk(id);
         if (!pass) {
             res.status(404).json({
                 success: false,
                 message: 'Пропуск не найден',
                 error: `Пропуск с ID ${id} не существует`,
+            });
+            return;
+        }
+        if (userId && req.user?.role !== 'admin' && pass.author_id !== userId) {
+            res.status(403).json({
+                success: false,
+                message: 'Доступ запрещен',
+                error: 'У вас нет прав для обновления этого пропуска',
             });
             return;
         }
@@ -416,12 +442,21 @@ const deletePass = async (req, res) => {
     let transaction;
     try {
         const { id } = req.params;
+        const userId = req.user?.id;
         const pass = await Pass_1.default.findByPk(id);
         if (!pass) {
             res.status(404).json({
                 success: false,
                 message: 'Пропуск не найден',
                 error: `Пропуск с ID ${id} не существует`,
+            });
+            return;
+        }
+        if (userId && req.user?.role !== 'admin' && pass.author_id !== userId) {
+            res.status(403).json({
+                success: false,
+                message: 'Доступ запрещен',
+                error: 'У вас нет прав для удаления этого пропуска',
             });
             return;
         }

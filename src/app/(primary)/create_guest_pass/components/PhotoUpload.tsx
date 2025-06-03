@@ -18,11 +18,52 @@ export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction ,
   const [isPhotoLoading, setIsPhotoLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Обработчик загрузки фотографии
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Функция для сжатия изображения
+  const compressImage = (file: File, maxWidth = 800, maxHeight = 600, quality = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement("canvas")
+      const ctx = canvas.getContext("2d")
+      const img = new Image()
 
-    // Максимальный размер файла в байтах (2MB)
-    const MAX_FILE_SIZE = 2 * 1024 * 1024
+      img.onload = () => {
+        // Вычисляем новые размеры с сохранением пропорций
+        let { width, height } = img
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width
+            width = maxWidth
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height
+            height = maxHeight
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+
+        // Рисуем изображение на canvas с новыми размерами
+        ctx?.drawImage(img, 0, 0, width, height)
+
+        // Конвертируем в base64 с заданным качеством
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", quality)
+        resolve(compressedDataUrl)
+      }
+
+      img.onerror = () => {
+        reject(new Error("Ошибка при загрузке изображения"))
+      }
+
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  // Обработчик загрузки фотографии со сжатием
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Максимальный размер файла в байтах (10MB для исходного файла)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024
     // Допустимые типы файлов
     const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/jpg"]
 
@@ -31,7 +72,7 @@ export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction ,
 
       // Проверка размера файла
       if (file.size > MAX_FILE_SIZE) {
-        onError("Размер файла превышает 2MB. Пожалуйста, выберите файл меньшего размера.", "error")
+        onError("Размер файла превышает 10MB. Пожалуйста, выберите файл меньшего размера.", "error")
         // Сбрасываем значение input file
         if (fileInputRef.current) {
           fileInputRef.current.value = ""
@@ -51,18 +92,32 @@ export default function PhotoUpload({ profilePhoto, onProfilePhotoChangeAction ,
 
       setIsPhotoLoading(true)
 
-      const reader = new FileReader()
+      try {
+        // Сжимаем изображение перед сохранением
+        const compressedImage = await compressImage(file, 800, 600, 0.8)
 
-      reader.onloadend = () => {
+        // Проверяем размер сжатого изображения
+        const compressedSize = Math.round((compressedImage.length * 3) / 4) // Приблизительный размер в байтах
+        console.log(
+          `Исходный размер: ${Math.round(file.size / 1024)}KB, Сжатый размер: ${Math.round(compressedSize / 1024)}KB`,
+        )
+
         // Имитация задержки загрузки для демонстрации LoadingButton
         setTimeout(() => {
-          onProfilePhotoChangeAction(reader.result as string)
+          onProfilePhotoChangeAction(compressedImage)
           setIsPhotoLoading(false)
-          onError("Фотография успешно загружена", "success")
+          onError(`Фотография успешно загружена и сжата (${Math.round(compressedSize / 1024)}KB)`, "success")
         }, 1000)
-      }
+      } catch (error) {
+        console.error("Ошибка при сжатии изображения:", error)
+        setIsPhotoLoading(false)
+        onError("Ошибка при обработке изображения. Попробуйте другой файл.", "error")
 
-      reader.readAsDataURL(file) // Читаем файл как Base64
+        // Сбрасываем значение input file
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ""
+        }
+      }
     }
   }
 

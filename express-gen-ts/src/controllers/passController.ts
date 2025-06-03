@@ -1,4 +1,5 @@
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
+import type { ExtendedRequest } from '../types';
 import Pass from '../models/Pass';
 import Approver from '../models/Approver';
 import User from '../models/user';
@@ -98,7 +99,7 @@ async function getOnApprovalStatusId(): Promise<number> {
  * Создает новый пропуск
  */
 export const createPass = async (
-  req: Request,
+  req: ExtendedRequest,
   res: Response,
 ): Promise<void> => {
   // Создаем транзакцию перед любыми операциями с базой данных
@@ -106,6 +107,9 @@ export const createPass = async (
 
   try {
     console.log('Получены данные:', req.body);
+    // Получаем ID пользователя из сессии next-auth
+    const userId = req.user?.id ?? 1; // Если пользователь не аутентифицирован, используем ID = 1
+    console.log(`Используем ID пользователя из сессии: ${userId}`);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     if (!req.body || Object.keys(req.body).length === 0) {
@@ -199,7 +203,7 @@ export const createPass = async (
           photo: photoPath,
           status_id: waitingStatusId,
           pass_type: guestPassTypeId,
-          author_id: 1, // ID текущего пользователя (в реальном приложении получаем из сессии)
+          author_id: userId, // ID текущего пользователя (в реальном приложении получаем из сессии)
         },
         { transaction },
       );
@@ -294,9 +298,20 @@ export const createPass = async (
 /**
  * Получает список всех пропусков
  */
-export const getAllPasses = async (_req: Request, res: Response) => {
+export const getAllPasses = async (req: ExtendedRequest, res: Response) => {
   try {
+    // Фильтрацию по автору, если нужно
+    const userId = req.user?.id;
+
+    let whereClause = {};
+
+    // Если пользователь не админ, показываем только его заявки
+    if (userId && req.user?.role !== 'admin') {
+      whereClause = { author_id: userId };
+    }
+
     const passes = await Pass.findAll({
+      where: whereClause,
       include: [
         {
           model: Approver,
@@ -337,11 +352,12 @@ export const getAllPasses = async (_req: Request, res: Response) => {
  * Получает пропуск по ID
  */
 export const getPassById = async (
-  req: Request,
+  req: ExtendedRequest,
   res: Response,
 ): Promise<void> => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
 
     const pass = await Pass.findByPk(id, {
       include: [
@@ -363,6 +379,16 @@ export const getPassById = async (
         success: false,
         message: 'Пропуск не найден',
         error: `Пропуск с ID ${id} не существует`,
+      });
+      return;
+    }
+
+    // Проверяем права доступа: только автор или админ может просматривать пропуск
+    if (userId && req.user?.role !== 'admin' && pass.author_id !== userId) {
+      res.status(403).json({
+        success: false,
+        message: 'Доступ запрещен',
+        error: 'У вас нет прав для просмотра этого пропуска',
       });
       return;
     }
@@ -392,7 +418,7 @@ export const getPassById = async (
  * Обновляет пропуск
  */
 export const updatePass = async (
-  req: Request,
+  req: ExtendedRequest,
   res: Response,
 ): Promise<void> => {
   // Объявляем переменную для транзакции
@@ -401,6 +427,7 @@ export const updatePass = async (
   try {
     const { id } = req.params;
     const passData = req.body as PassData;
+    const userId = req.user?.id;
 
     // Проверяем существование пропуска
     const pass = await Pass.findByPk(id);
@@ -414,6 +441,16 @@ export const updatePass = async (
       return;
     }
 
+    // Проверяем права доступа: только автор или админ может обновлять пропуск
+    if (userId && req.user?.role !== 'admin' && pass.author_id !== userId) {
+      res.status(403).json({
+        success: false,
+        message: 'Доступ запрещен',
+        error: 'У вас нет прав для обновления этого пропуска',
+      });
+      return;
+    }
+    
     // Проверка на уникальность телефона и email при обновлении
     // Исключаем текущий пропуск из проверки
     const existingPass = await Pass.findOne({
@@ -577,7 +614,7 @@ export const updatePass = async (
  * Удаляет пропуск
  */
 export const deletePass = async (
-  req: Request,
+  req: ExtendedRequest,
   res: Response,
 ): Promise<void> => {
   // Объявляем переменную для транзакции
@@ -585,6 +622,7 @@ export const deletePass = async (
 
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
 
     // Проверяем существование пропуска
     const pass = await Pass.findByPk(id);
@@ -598,6 +636,16 @@ export const deletePass = async (
       return;
     }
 
+    // Проверяем права доступа: только автор или админ может удалять пропуск
+    if (userId && req.user?.role !== 'admin' && pass.author_id !== userId) {
+      res.status(403).json({
+        success: false,
+        message: 'Доступ запрещен',
+        error: 'У вас нет прав для удаления этого пропуска',
+      });
+      return;
+    }
+    
     // Создаем транзакцию только после успешной проверки
     transaction = await sequelize.transaction();
 

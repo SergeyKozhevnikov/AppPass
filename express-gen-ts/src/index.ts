@@ -19,9 +19,10 @@ const PORT = 3001;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.json({ limit: '10mb' })); // Увеличиваем лимит для передачи фото в base64
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '50mb' })); // Увеличиваем лимит для передачи фото в base64
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Статические файлы для загруженных изображений
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -44,6 +45,7 @@ sequelize
     // Запуск сервера
     app.listen(PORT, () => {
       console.log(`Сервер запущен на порту ${PORT}`);
+      console.log('Лимит размера запроса: 50MB');
     });
   })
   .catch((err: unknown) => {
@@ -64,16 +66,22 @@ app.use(
     console.error('Ошибка:', err);
 
     let message = 'Неизвестная ошибка';
+    let statusCode = 500;
 
     if (err instanceof Error) {
       message = err.message;
+
+      if (err.message.includes('request entity too large') || err.message.includes('PayloadTooLargeError')) {
+        message = 'Размер отправляемых данных слишком большой. Пожалуйста, уменьшите размер изображения.';
+        statusCode = 413; // Payload Too Large
+      }
     } else if (typeof err === 'string') {
       message = err;
     }
 
-    res.status(500).json({
+    res.status(statusCode).json({
       success: false,
-      message: 'Внутренняя ошибка сервера',
+      message: statusCode === 413 ? message : 'Внутренняя ошибка сервера',
       // eslint-disable-next-line n/no-process-env
       error: process.env.NODE_ENV === 'development' ? message : undefined,
     });
