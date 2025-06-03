@@ -2,8 +2,8 @@ import type { Request, Response } from 'express';
 import Pass from '../models/Pass';
 import Approver from '../models/Approver';
 import User from '../models/user';
-import { saveBase64Image } from '@/services/fileService';
-import { sequelize } from '@/config/database';
+import { saveBase64Image } from '../services/fileService';
+import { sequelize } from '../config/database';
 // eslint-disable-next-line n/no-extraneous-import
 import { Transaction, QueryTypes, Op } from 'sequelize';
 

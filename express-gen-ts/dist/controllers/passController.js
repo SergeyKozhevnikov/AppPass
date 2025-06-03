@@ -6,9 +6,58 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePass = exports.updatePass = exports.getPassById = exports.getAllPasses = exports.createPass = void 0;
 const Pass_1 = __importDefault(require("../models/Pass"));
 const Approver_1 = __importDefault(require("../models/Approver"));
+const user_1 = __importDefault(require("../models/user"));
 const fileService_1 = require("../services/fileService");
 const database_1 = require("../config/database");
 const sequelize_1 = require("sequelize");
+async function getGuestPassTypeId() {
+    try {
+        const result = await database_1.sequelize.query('SELECT id FROM pass_types WHERE name = \'Гостевой\' LIMIT 1', {
+            type: sequelize_1.QueryTypes.SELECT,
+        });
+        if (result && result.length > 0) {
+            return result[0].id;
+        }
+        console.warn('Тип пропуска \'Гостевой\' не найден, используется ID = 1');
+        return 1;
+    }
+    catch (error) {
+        console.error('Ошибка при получении ID типа пропуска:', error);
+        return 1;
+    }
+}
+async function getWaitingStatusId() {
+    try {
+        const result = await database_1.sequelize.query('SELECT id FROM pass_statuses WHERE name = \'Ожидается\' LIMIT 1', {
+            type: sequelize_1.QueryTypes.SELECT,
+        });
+        if (result && result.length > 0) {
+            return result[0].id;
+        }
+        console.warn('Статус \'Ожидается\' не найден, используется ID = 1');
+        return 1;
+    }
+    catch (error) {
+        console.error('Ошибка при получении ID статуса:', error);
+        return 1;
+    }
+}
+async function getOnApprovalStatusId() {
+    try {
+        const result = await database_1.sequelize.query('SELECT id FROM pass_statuses WHERE name = \'На согласовании\' LIMIT 1', {
+            type: sequelize_1.QueryTypes.SELECT,
+        });
+        if (result && result.length > 0) {
+            return result[0].id;
+        }
+        console.warn('Статус \'На согласовании\' не найден, используется ID = 2');
+        return 2;
+    }
+    catch (error) {
+        console.error('Ошибка при получении ID статуса:', error);
+        return 2;
+    }
+}
 const createPass = async (req, res) => {
     let transaction;
     try {
@@ -53,13 +102,20 @@ const createPass = async (req, res) => {
             });
             return;
         }
+        const guestPassTypeId = await getGuestPassTypeId();
+        const waitingStatusId = await getWaitingStatusId();
+        const onApprovalStatusId = await getOnApprovalStatusId();
+        console.log('Используемые ID:', {
+            guestPassTypeId,
+            waitingStatusId,
+            onApprovalStatusId,
+        });
         transaction = await database_1.sequelize.transaction();
         try {
             let photoPath = '';
             if (passData.photo) {
                 photoPath = (0, fileService_1.saveBase64Image)(passData.photo);
             }
-            const now = new Date();
             const pass = await Pass_1.default.create({
                 fullName: passData.fullName,
                 phone: passData.phone,
@@ -71,20 +127,24 @@ const createPass = async (req, res) => {
                 startDate: new Date(passData.startDate),
                 endDate: new Date(passData.endDate),
                 photo: photoPath,
-                status_id: 0,
-                pass_type: 0,
+                status_id: waitingStatusId,
+                pass_type: guestPassTypeId,
                 author_id: 1,
-                date_created: now,
-                date_modified: now,
             }, { transaction });
+            console.log('Создан пропуск с ID:', pass.id);
             if (passData.approvers && passData.approvers.length > 0) {
-                const approverPromises = passData.approvers.map((approver, index) => {
+                const approverPromises = passData.approvers.map(async (approver) => {
+                    const user = await user_1.default.findByPk(approver.user_id, { transaction });
+                    if (!user) {
+                        throw new Error(`Пользователь с ID ${approver.user_id} не найден`);
+                    }
                     return Approver_1.default.create({
                         pass_id: pass.id,
-                        fullname: approver.name,
-                        login: approver.login || `user${index + 1}`,
-                        position: approver.position,
-                        status_id: approver.status_id || 2,
+                        user_id: approver.user_id,
+                        fullname: `${user.surname} ${user.name}${user.patronymic ? ' ' + user.patronymic : ''}`,
+                        login: user.login,
+                        position: user.pos ?? approver.position,
+                        status_id: approver.status_id ?? onApprovalStatusId,
                     }, { transaction });
                 });
                 await Promise.all(approverPromises);
@@ -146,6 +206,12 @@ const getAllPasses = async (_req, res) => {
                 {
                     model: Approver_1.default,
                     as: 'approvers',
+                    include: [
+                        {
+                            model: user_1.default,
+                            attributes: ['id', 'login', 'surname', 'name', 'patronymic', 'pos'],
+                        },
+                    ],
                 },
             ],
             order: [['date_created', 'DESC']],
@@ -177,6 +243,12 @@ const getPassById = async (req, res) => {
                 {
                     model: Approver_1.default,
                     as: 'approvers',
+                    include: [
+                        {
+                            model: user_1.default,
+                            attributes: ['id', 'login', 'surname', 'name', 'patronymic', 'pos'],
+                        },
+                    ],
                 },
             ],
         });
@@ -248,6 +320,7 @@ const updatePass = async (req, res) => {
             });
             return;
         }
+        const waitingStatusId = await getWaitingStatusId();
         transaction = await database_1.sequelize.transaction();
         try {
             let photoPath = pass.photo ?? '';
@@ -259,7 +332,6 @@ const updatePass = async (req, res) => {
                     photoPath = passData.photo;
                 }
             }
-            const now = new Date();
             await pass.update({
                 fullName: passData.fullName,
                 phone: passData.phone,
@@ -271,19 +343,24 @@ const updatePass = async (req, res) => {
                 startDate: new Date(passData.startDate),
                 endDate: new Date(passData.endDate),
                 photo: photoPath,
-                date_modified: now,
             }, { transaction });
             if (passData.approvers && passData.approvers.length > 0) {
                 await Approver_1.default.destroy({
                     where: { pass_id: pass.id },
                     transaction,
                 });
-                const approverPromises = passData.approvers.map((approver, index) => {
+                const approverPromises = passData.approvers.map(async (approver) => {
+                    const user = await user_1.default.findByPk(approver.user_id, { transaction });
+                    if (!user) {
+                        throw new Error(`Пользователь с ID ${approver.user_id} не найден`);
+                    }
                     return Approver_1.default.create({
                         pass_id: pass.id,
-                        fullname: approver.name,
-                        login: `user${index + 1}`,
-                        position: approver.position,
+                        user_id: approver.user_id,
+                        fullname: `${user.surname} ${user.name}${user.patronymic ? ' ' + user.patronymic : ''}`,
+                        login: user.login,
+                        position: user.pos ?? approver.position,
+                        status_id: approver.status_id ?? waitingStatusId,
                     }, { transaction });
                 });
                 await Promise.all(approverPromises);

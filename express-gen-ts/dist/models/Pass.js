@@ -9,7 +9,6 @@ Pass.init({
         type: sequelize_1.DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        autoIncrementIdentity: true,
     },
     pass_type: {
         type: sequelize_1.DataTypes.INTEGER,
@@ -76,6 +75,7 @@ Pass.init({
     sequelize: database_1.sequelize,
     tableName: 'passes',
     modelName: 'Pass',
+    timestamps: false,
     hooks: {
         beforeCreate: (pass) => {
             pass.date_created = new Date();

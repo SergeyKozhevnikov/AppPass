@@ -1,6 +1,6 @@
 // eslint-disable-next-line n/no-extraneous-import
 import { Model, DataTypes, type Optional } from 'sequelize';
-import { sequelize } from '@/config/database';
+import { sequelize } from '../config/database';
 import Pass from './Pass';
 import User from './user';
 
