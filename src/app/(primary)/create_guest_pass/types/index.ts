@@ -14,9 +14,10 @@ export interface TabPanelProps {
 // Интерфейс для согласующего
 export interface Approver {
   id: number
+  user_id: number // ID пользователя из таблицы users
   name: string
   position: string
-  login: string
+  login: string // Логин для отображения (получается из БД)
   status_id?: number
   status?: string
 }

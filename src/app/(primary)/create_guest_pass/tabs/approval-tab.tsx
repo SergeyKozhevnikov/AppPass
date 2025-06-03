@@ -108,6 +108,15 @@ export default function ApprovalTab({ approvers, setApproversAction, onSubmitFor
 
   // Функция добавления согласующего из списка пользователей
   const handleAddApproverFromList = (user: User) => {
+    // Проверяем, не добавлен ли уже этот пользователь
+    const isAlreadyAdded = approvers.some((approver) => approver.user_id === user.id);
+
+    if (isAlreadyAdded) {
+      // Можно показать уведомление о том, что пользователь уже добавлен
+      console.warn('Пользователь уже добавлен в список согласующих');
+      return;
+    }
+
     const newId = approvers.length > 0 ? Math.max(...approvers.map((a) => a.id)) + 1 : 1;
     const fullName = `${user.surname} ${user.name}${user.patronymic ? ' ' + user.patronymic : ''}`;
 
@@ -115,9 +124,10 @@ export default function ApprovalTab({ approvers, setApproversAction, onSubmitFor
       ...approvers,
       {
         id: newId,
+        user_id: user.id, // Сохраняем ID пользователя
         name: fullName,
         position: user.pos,
-        login: user.login,
+        login: user.login, // Логин для отображения
         status_id: 1, // По умолчанию "Ожидается"
         status: 'Ожидается',
       },
@@ -407,49 +417,62 @@ export default function ApprovalTab({ approvers, setApproversAction, onSubmitFor
 
           {/* Список пользователей */}
           {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
               <CircularProgress />
             </Box>
           ) : (
-            <List sx={{ maxHeight: '400px', overflow: 'auto' }}>
+            <List sx={{ maxHeight: "400px", overflow: "auto" }}>
               {filteredUsers.length === 0 ? (
-                <Typography variant="body1" sx={{ p: 2, textAlign: 'center' }}>
+                <Typography variant="body1" sx={{ p: 2, textAlign: "center" }}>
                   Пользователи не найдены
                 </Typography>
               ) : (
-                filteredUsers.map((user, index) => (
-                  <Box key={user.id}>
-                    <ListItem
-                      component="li"
-                      disablePadding
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                        },
-                      }}
-                      onClick={() => handleAddApproverFromList(user)}
-                    >
-                      <ListItemAvatar>
-                        <Avatar>
-                          <PersonIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={
-                          <Typography variant="subtitle1" component="span">
-                            {user.surname} {user.name} {user.patronymic}
-                          </Typography>
-                        }
-                        secondary={
-                          <>
-                            {user.pos}
-                          </>
-                        }
-                      />
-                    </ListItem>
-                    {index < filteredUsers.length - 1 && <Divider variant="inset" component="li" />}
-                  </Box>
-                ))
+                filteredUsers.map((user, index) => {
+                  const isAlreadyAdded = approvers.some((approver) => approver.user_id === user.id)
+
+                  return (
+                    <Box key={user.id}>
+                      <ListItem
+                        component="li"
+                        disablePadding
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: isAlreadyAdded ? "rgba(255, 0, 0, 0.04)" : "rgba(0, 0, 0, 0.04)",
+                          },
+                          opacity: isAlreadyAdded ? 0.5 : 1,
+                          cursor: isAlreadyAdded ? "not-allowed" : "pointer",
+                        }}
+                        onClick={() => !isAlreadyAdded && handleAddApproverFromList(user)}
+                      >
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Typography variant="subtitle1" component="span">
+                              {user.surname} {user.name} {user.patronymic}
+                              {isAlreadyAdded && (
+                                <Typography component="span" color="error" sx={{ ml: 1 }}>
+                                  (уже добавлен)
+                                </Typography>
+                              )}
+                            </Typography>
+                          }
+                          secondary={
+                            <>
+                              {user.pos}
+                              <br />
+                              Логин: {user.login}
+                            </>
+                          }
+                        />
+                      </ListItem>
+                      {index < filteredUsers.length - 1 && <Divider variant="inset" component="li" />}
+                    </Box>
+                  )
+                })
               )}
             </List>
           )}

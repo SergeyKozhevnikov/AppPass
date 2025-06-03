@@ -51,8 +51,6 @@ Pass.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-      // Явно указываем, что это SERIAL для PostgreSQL
-      autoIncrementIdentity: true,
     },
     pass_type: {
       type: DataTypes.INTEGER,
@@ -120,6 +118,7 @@ Pass.init(
     sequelize,
     tableName: 'passes',
     modelName: 'Pass',
+    timestamps: false, // Отключаем автоматические timestamps Sequelize
     // hooks для автоматического обновления timestamp-полей
     hooks: {
       beforeCreate: (pass: Pass) => {

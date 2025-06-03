@@ -21,8 +21,10 @@ export interface PassData {
   photo?: string
   approvers: Array<{
     id?: number
+    user_id: number // Передаем ID пользователя вместо логина
     name: string
     position: string
+    status_id?: number
   }>
 }
 

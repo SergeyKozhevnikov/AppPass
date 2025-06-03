@@ -239,8 +239,10 @@ export default function GuestPassForm({ onClose }: GuestPassFormProps) {
         endDate: formData.endDate instanceof Date ? formData.endDate.toISOString().split('T')[0] : '',
         photo: profilePhoto || undefined,
         approvers: approvers.map((approver) => ({
+          user_id: approver.user_id, // Передаем ID пользователя
           name: approver.name,
           position: approver.position,
+          status_id: approver.status_id,
         })),
       };
 

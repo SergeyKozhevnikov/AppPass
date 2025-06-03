@@ -1,12 +1,14 @@
 // eslint-disable-next-line n/no-extraneous-import
 import { Model, DataTypes, type Optional } from 'sequelize';
-import { sequelize } from '../config/database';
+import { sequelize } from '@/config/database';
 import Pass from './Pass';
+import User from './user';
 
 // Интерфейс для атрибутов Approver
 interface ApproverAttributes {
   id: number;
   pass_id: number;
+  user_id: number;
   fullname: string;
   login: string;
   position: string;
@@ -19,10 +21,10 @@ type ApproverCreationAttributes = Optional<ApproverAttributes, 'id'>;
 // Определение модели Approver
 class Approver
   extends Model<ApproverAttributes, ApproverCreationAttributes>
-  implements ApproverAttributes
-{
+  implements ApproverAttributes {
   public id!: number;
   public pass_id!: number;
+  public user_id!: number;
   public fullname!: string;
   public login!: string;
   public position!: string;
@@ -35,14 +37,20 @@ Approver.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-      // Явно указываем, что это SERIAL для PostgreSQL
-      autoIncrementIdentity: true,
     },
     pass_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: Pass,
+        key: 'id',
+      },
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
         key: 'id',
       },
     },
@@ -71,11 +79,15 @@ Approver.init(
     sequelize,
     tableName: 'approvers',
     modelName: 'Approver',
-  }
+    timestamps: false, // Отключаем автоматические timestamps Sequelize
+  },
 );
 
 // Определение отношений между моделями
 Pass.hasMany(Approver, { foreignKey: 'pass_id', as: 'approvers' });
 Approver.belongsTo(Pass, { foreignKey: 'pass_id' });
+
+User.hasMany(Approver, { foreignKey: 'user_id', as: 'approvals' });
+Approver.belongsTo(User, { foreignKey: 'user_id' });
 
 export default Approver;

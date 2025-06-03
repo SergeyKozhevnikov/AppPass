@@ -1,10 +1,11 @@
 import type { Request, Response } from 'express';
 import Pass from '../models/Pass';
 import Approver from '../models/Approver';
-import { saveBase64Image } from '../services/fileService';
-import { sequelize } from '../config/database';
+import User from '../models/user';
+import { saveBase64Image } from '@/services/fileService';
+import { sequelize } from '@/config/database';
 // eslint-disable-next-line n/no-extraneous-import
-import { Transaction, Op } from 'sequelize';
+import { Transaction, QueryTypes, Op } from 'sequelize';
 
 // Интерфейс для данных пропуска
 interface PassData {
@@ -20,11 +21,77 @@ interface PassData {
   photo?: string;
   approvers: {
     id?: number,
+    user_id: number,
     name: string,
     position: string,
-    login?: string,
     status_id?: number,
   }[];
+}
+
+/**
+ * Получает ID типа пропуска "Гостевой" из базы данных
+ */
+async function getGuestPassTypeId(): Promise<number> {
+  try {
+    const result = await sequelize.query('SELECT id FROM pass_types WHERE name = \'Гостевой\' LIMIT 1', {
+      type: QueryTypes.SELECT,
+    });
+
+    if (result && result.length > 0) {
+      return (result[0] as unknown as { id: number }).id;
+    }
+
+    // Если не найден, возвращаем 1 как fallback
+    console.warn('Тип пропуска \'Гостевой\' не найден, используется ID = 1');
+    return 1;
+  } catch (error) {
+    console.error('Ошибка при получении ID типа пропуска:', error);
+    return 1;
+  }
+}
+
+/**
+ * Получает ID статуса "Ожидается" из базы данных
+ */
+async function getWaitingStatusId(): Promise<number> {
+  try {
+    const result = await sequelize.query('SELECT id FROM pass_statuses WHERE name = \'Ожидается\' LIMIT 1', {
+      type: QueryTypes.SELECT,
+    });
+
+    if (result && result.length > 0) {
+      return (result[0] as unknown as { id: number }).id;
+    }
+
+    // Если не найден, возвращаем 1 как fallback
+    console.warn('Статус \'Ожидается\' не найден, используется ID = 1');
+    return 1;
+  } catch (error) {
+    console.error('Ошибка при получении ID статуса:', error);
+    return 1;
+  }
+}
+
+/**
+ * Получает ID статуса "На согласовании" из базы данных
+ */
+async function getOnApprovalStatusId(): Promise<number> {
+  try {
+    const result = await sequelize.query('SELECT id FROM pass_statuses WHERE name = \'На согласовании\' LIMIT 1', {
+      type: QueryTypes.SELECT,
+    });
+
+    if (result && result.length > 0) {
+      return (result[0] as unknown as { id: number }).id;
+    }
+
+    // Если не найден, возвращаем 2 как fallback
+    console.warn('Статус \'На согласовании\' не найден, используется ID = 2');
+    return 2;
+  } catch (error) {
+    console.error('Ошибка при получении ID статуса:', error);
+    return 2;
+  }
 }
 
 /**
@@ -32,7 +99,7 @@ interface PassData {
  */
 export const createPass = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Создаем транзакцию перед любыми операциями с базой данных
   let transaction: Transaction | undefined;
@@ -88,13 +155,24 @@ export const createPass = async (
         success: false,
         message: 'Дублирование данных',
         error: `В системе уже существует заявка с таким же ${duplicateFields.join(
-          ' и '
+          ' и ',
         )}. ID заявки: ${existingPass.id}`,
         duplicateFields: duplicateFields,
         existingPassId: existingPass.id,
       });
       return;
     }
+
+    // Получаем правильные ID из базы данных
+    const guestPassTypeId = await getGuestPassTypeId();
+    const waitingStatusId = await getWaitingStatusId();
+    const onApprovalStatusId = await getOnApprovalStatusId();
+
+    console.log('Используемые ID:', {
+      guestPassTypeId,
+      waitingStatusId,
+      onApprovalStatusId,
+    });
 
     // Начинаем транзакцию только после валидации данных
     transaction = await sequelize.transaction();
@@ -105,9 +183,6 @@ export const createPass = async (
       if (passData.photo) {
         photoPath = saveBase64Image(passData.photo);
       }
-
-      // Текущая дата и время для timestamp-полей
-      const now = new Date();
 
       // Создаем запись пропуска
       const pass = await Pass.create(
@@ -122,29 +197,35 @@ export const createPass = async (
           startDate: new Date(passData.startDate),
           endDate: new Date(passData.endDate),
           photo: photoPath,
-          status_id: 0,
-          pass_type: 0,
+          status_id: waitingStatusId,
+          pass_type: guestPassTypeId,
           author_id: 1, // ID текущего пользователя (в реальном приложении получаем из сессии)
-          date_created: now, // Явно устанавливаем дату создания
-          date_modified: now, // При создании дата изменения равна дате создания
         },
-        { transaction }
+        { transaction },
       );
+
+      console.log('Создан пропуск с ID:', pass.id);
 
       // Создаем записи согласующих
       if (passData.approvers && passData.approvers.length > 0) {
-        const approverPromises = passData.approvers.map((approver, index) => {
+        const approverPromises = passData.approvers.map(async (approver) => {
+          // Получаем данные пользователя из БД по user_id
+          const user = await User.findByPk(approver.user_id, { transaction });
+
+          if (!user) {
+            throw new Error(`Пользователь с ID ${approver.user_id} не найден`);
+          }
+
           return Approver.create(
             {
               pass_id: pass.id,
-              fullname: approver.name,
-              // eslint-disable-next-line
-              login: approver.login || `user${index + 1}`, // Используем логин из данных или генерируем
-              position: approver.position,
-              // eslint-disable-next-line
-              status_id: approver.status_id || 2, // По умолчанию "На согласовании" при создании заявки
+              user_id: approver.user_id, // ID пользователя
+              fullname: `${user.surname} ${user.name}${user.patronymic ? ' ' + user.patronymic : ''}`, // Полное имя из БД
+              login: user.login, // Логин из БД
+              position: user.pos ?? approver.position, // Должность из БД
+              status_id: approver.status_id ?? onApprovalStatusId, // По умолчанию "На согласовании" при создании заявки
             },
-            { transaction }
+            { transaction },
           );
         });
 
@@ -220,6 +301,12 @@ export const getAllPasses = async (_req: Request, res: Response) => {
         {
           model: Approver,
           as: 'approvers',
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'login', 'surname', 'name', 'patronymic', 'pos'],
+            },
+          ],
         },
       ],
       order: [['date_created', 'DESC']],
@@ -251,7 +338,7 @@ export const getAllPasses = async (_req: Request, res: Response) => {
  */
 export const getPassById = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const { id } = req.params;
@@ -261,6 +348,12 @@ export const getPassById = async (
         {
           model: Approver,
           as: 'approvers',
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'login', 'surname', 'name', 'patronymic', 'pos'],
+            },
+          ],
         },
       ],
     });
@@ -300,7 +393,7 @@ export const getPassById = async (
  */
 export const updatePass = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Объявляем переменную для транзакции
   let transaction: Transaction | undefined;
@@ -350,13 +443,15 @@ export const updatePass = async (
         success: false,
         message: 'Дублирование данных',
         error: `В системе уже существует заявка с таким же ${duplicateFields.join(
-          ' и '
+          ' и ',
         )}. ID заявки: ${existingPass.id}`,
         duplicateFields: duplicateFields,
         existingPassId: existingPass.id,
       });
       return;
     }
+
+    const waitingStatusId = await getWaitingStatusId();
 
     // Создаем транзакцию только после успешной проверки
     transaction = await sequelize.transaction();
@@ -372,9 +467,6 @@ export const updatePass = async (
         }
       }
 
-      // Текущая дата и время для timestamp-полей
-      const now = new Date();
-
       // Обновляем запись пропуска
       await pass.update(
         {
@@ -388,9 +480,8 @@ export const updatePass = async (
           startDate: new Date(passData.startDate),
           endDate: new Date(passData.endDate),
           photo: photoPath,
-          date_modified: now,
         },
-        { transaction }
+        { transaction },
       );
 
       // Обновляем согласующих
@@ -402,15 +493,24 @@ export const updatePass = async (
         });
 
         // Создаем новых согласующих
-        const approverPromises = passData.approvers.map((approver, index) => {
+        const approverPromises = passData.approvers.map(async (approver) => {
+          // Получаем данные пользователя из БД по user_id
+          const user = await User.findByPk(approver.user_id, { transaction });
+
+          if (!user) {
+            throw new Error(`Пользователь с ID ${approver.user_id} не найден`);
+          }
+
           return Approver.create(
             {
               pass_id: pass.id,
-              fullname: approver.name,
-              login: `user${index + 1}`,
-              position: approver.position,
+              user_id: approver.user_id, // ID пользователя
+              fullname: `${user.surname} ${user.name}${user.patronymic ? ' ' + user.patronymic : ''}`, // Полное имя из БД
+              login: user.login, // Логин из БД
+              position: user.pos ?? approver.position, // Должность из БД
+              status_id: approver.status_id ?? waitingStatusId, // По умолчанию "Ожидается" при обновлении
             },
-            { transaction }
+            { transaction },
           );
         });
 
@@ -478,7 +578,7 @@ export const updatePass = async (
  */
 export const deletePass = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   // Объявляем переменную для транзакции
   let transaction;
