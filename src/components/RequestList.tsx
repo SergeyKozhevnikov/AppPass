@@ -28,7 +28,7 @@ import Loader from './Loader';
 import { fetchPasses, deletePass, Pass } from '@/services/passService';
 
 type RequestListProps = {
-  status?: 'drafts' | 'inReview' | 'approved' | 'rejected';
+  status?: '1' | '2' | '3' | '4';
 };
 
 type ApprovalStatus = {
@@ -69,8 +69,11 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   }, []);
 
   const filteredRequests = useMemo(() => {
+    // Приводим status из пропсов к числу для сравнения
+    const statusId = status ? Number(status) : null;
+
     return requests.filter((req) => {
-      const matchesStatus = status ? req.status === status : true;
+      const matchesStatus = statusId ? req.status_id === statusId : true;
       const matchesDate = filters.date
         ? new Date(req.date_created) <= new Date(filters.date + 'T23:59:59')
         : true;
