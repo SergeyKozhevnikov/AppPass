@@ -6,7 +6,7 @@ import RequestList from '@/components/RequestList';
 const DraftsPage: React.FC = () => {
   return (
     <div>
-      <RequestList status="drafts" />
+      <RequestList status="1" />
     </div>
   );
 };
