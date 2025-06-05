@@ -6,7 +6,7 @@ import RequestList from '@/components/RequestList';
 const ApprovedPage: React.FC = () => {
   return (
     <div>
-      <RequestList status="approved" />
+      <RequestList status="2" />
     </div>
   );
 };

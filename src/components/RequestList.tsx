@@ -18,6 +18,7 @@ import {
   Button,
   Typography,
   Chip,
+  Pagination
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -46,7 +47,7 @@ const approvalStatuses: ApprovalStatus[] = [
 ];
 
 const RequestList: React.FC<RequestListProps> = ({ status }) => {
-  const [filters, setFilters] = useState<{ date: string; search: string }>({ date: '', search: '' });
+  const [filters, setFilters] = useState({ date: '', search: '' });
   const [requests, setRequests] = useState<Pass[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -55,37 +56,42 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [passToEdit, setPassToEdit] = useState<Pass | null>(null);
 
-  useEffect(() => {
+  const loadRequests = useCallback(() => {
+    setLoading(true);
     fetchPasses()
-      .then(data => {
-        setRequests(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+      .then(setRequests)
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    loadRequests();
+  }, [loadRequests]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters, status]);
 
   const handleFilterChange = useCallback((newFilters: { date: string; search: string }) => {
     setFilters(newFilters);
   }, []);
 
   const filteredRequests = useMemo(() => {
-    // Приводим status из пропсов к числу для сравнения
     const statusId = status ? Number(status) : null;
-
     return requests.filter((req) => {
       const matchesStatus = statusId ? req.status_id === statusId : true;
-      const matchesDate = filters.date
-        ? new Date(req.date_created) <= new Date(filters.date + 'T23:59:59')
-        : true;
-      const matchesSearch = filters.search
-        ? req.fullName.toLowerCase().includes(filters.search.toLowerCase())
-        : true;
+      const matchesDate = filters.date ? new Date(req.date_created) <= new Date(filters.date + 'T23:59:59') : true;
+      const matchesSearch = filters.search ? req.fullName.toLowerCase().includes(filters.search.toLowerCase()) : true;
       return matchesStatus && matchesDate && matchesSearch;
     });
   }, [filters, status, requests]);
+
+  const paginatedRequests = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    return filteredRequests.slice(start, start + rowsPerPage);
+  }, [filteredRequests, page]);
+
+  const totalPages = Math.ceil(filteredRequests.length / rowsPerPage);
 
   const handleDeleteClick = (pass: Pass) => {
     setPassToDelete(pass);
@@ -96,7 +102,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     if (!passToDelete) return;
     try {
       await deletePass(passToDelete.id);
-      setRequests(prev => prev.filter(p => p.id !== passToDelete.id));
+      loadRequests();
     } catch (error) {
       console.error('Ошибка при удалении пропуска:', error);
     } finally {
@@ -140,7 +146,6 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const renderStatusChip = (statusId: number) => {
     const status = approvalStatuses.find((s) => s.id === statusId);
     if (!status) return null;
-
     return (
       <Chip
         label={status.name}
@@ -151,9 +156,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     );
   };
 
-  if (loading) {
-    return <Loader />;
-  }
+  if (loading) return <Loader />;
 
   return (
     <div>
@@ -171,12 +174,12 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                     <TableCell>Email заявителя</TableCell>
                     <TableCell>Авто</TableCell>
                     <TableCell>Статус заявки</TableCell>
-                    <TableCell align="center" className="w-[15px]"></TableCell>
-                    <TableCell align="center" className="w-[15px]"></TableCell>
+                    <TableCell align="center"></TableCell>
+                    <TableCell align="center"></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredRequests.map((req) => (
+                  {paginatedRequests.map((req) => (
                     <TableRow key={req.id}>
                       <TableCell onClick={() => handleApproveClick(req)}>
                         {new Date(req.date_created).toLocaleString('ru-RU', {
@@ -200,7 +203,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                         </IconButton>
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton color="error" aria-label="удалить" onClick={() => handleDeleteClick(req)}>
+                        <IconButton color="error" onClick={() => handleDeleteClick(req)}>
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
@@ -208,9 +211,22 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                   ))}
                 </TableBody>
               </Table>
+
               {filteredRequests.length === 0 && (
                 <Box textAlign="center" py={4} color="gray">
                   Ничего не найдено по текущим фильтрам
+                </Box>
+              )}
+
+              {/* Пагинация показывается только если заявок больше 5 */}
+              {filteredRequests.length > rowsPerPage && (
+                <Box display="flex" justifyContent="center" p={2}>
+                  <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={(e, value) => setPage(value)}
+                    color="primary"
+                  />
                 </Box>
               )}
             </Paper>
@@ -218,37 +234,14 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
         </CardContent>
       </Card>
 
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={cancelDelete}
-        PaperProps={{
-          sx: {
-            width: 500,
-            height: 300,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            padding: 2,
-          },
-        }}
-      >
-        <DialogContent
-          sx={{
-            flexGrow: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogContent>
           <Typography variant="h6">
             Удалить заявку на пропуск для <br /> <strong>{passToDelete?.fullName}</strong>?
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
-          <Button onClick={cancelDelete} variant="outlined">
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
             Отмена
           </Button>
           <Button onClick={confirmDelete} color="error" variant="contained">

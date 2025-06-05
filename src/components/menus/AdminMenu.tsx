@@ -103,7 +103,7 @@ export const AdminMenu = () => {
       {/* Подменю для "Панель администратора" */}
       <Collapse in={openOpportunities} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <ListItemButton sx={{ pl: 4 }} component={Link} href="/">
+          <ListItemButton sx={{ pl: 4 }} component={Link} href="/requests">
             <ListItemIcon>
               <RecentActorsIcon />
             </ListItemIcon>
