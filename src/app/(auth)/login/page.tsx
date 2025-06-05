@@ -47,6 +47,7 @@ export default function LoginPage() {
     defaultValues: {
       login: '',
       password: '',
+      checked: true,
     },
     mode: 'onChange', // Валидация при изменении полей
   });
@@ -58,6 +59,7 @@ export default function LoginPage() {
     const res = await signIn('credentials', {
       login: formData.login,
       password: formData.password,
+      rememberMe: formData.checked,
       redirect: false, // чтобы в случае ошибки не перебрасывало на встроенную форму nextauth
     });
 
@@ -187,7 +189,13 @@ export default function LoginPage() {
                   }}
                 >
                   <FormControlLabel
-                    control={<Checkbox value="remember" color="primary" />}
+                    control={
+                      <Checkbox
+                        color="primary"
+                        defaultChecked
+                        {...register('checked')}
+                      />
+                    }
                     label="Запомнить меня"
                   />
                   <Button onClick={() => setIsReqToSupModalOpen(true)}>

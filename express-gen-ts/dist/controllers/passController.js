@@ -369,6 +369,7 @@ const updatePass = async (req, res) => {
                 startDate: new Date(passData.startDate),
                 endDate: new Date(passData.endDate),
                 photo: photoPath,
+                status_id: passData.status_id,
             }, { transaction });
             if (passData.approvers && passData.approvers.length > 0) {
                 await Approver_1.default.destroy({
