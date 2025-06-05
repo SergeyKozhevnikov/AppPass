@@ -1,13 +1,14 @@
-// Главная страница - MainPage (Андрей Б)
-import { Layout } from '@/components/layout/Layout';
-import RequestList from '@/components/RequestList';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation'; // ✅ важно: next/navigation, а не next/router
 
 export default function Home() {
-  return (
-    <Layout>
-      <div className="sidebar m-0.5 min-w-[340px]">
-        <RequestList />
-      </div>
-    </Layout>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/dashboard');
+  }, [router]);
+
+  return null; // или Loader
 }
