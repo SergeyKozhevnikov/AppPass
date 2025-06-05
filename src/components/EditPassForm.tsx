@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import { Pass, updatePass } from '@/services/passService';
+import { useSession } from 'next-auth/react';
 
 type EditPassFormProps = {
   open: boolean;
@@ -17,7 +18,6 @@ type EditPassFormProps = {
   onUpdate: (updated: Pass) => void;
 };
 
-// Статусы
 const statusOptions = [
   { id: 1, label: 'Ожидается' },
   { id: 2, label: 'На согласовании' },
@@ -25,7 +25,6 @@ const statusOptions = [
   { id: 4, label: 'Отклонен' },
 ];
 
-// Типы пропусков
 const passTypeOptions = [
   { id: 1, label: 'Гостевой' },
   { id: 2, label: 'Временный' },
@@ -38,6 +37,9 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
                                                      initialData,
                                                      onUpdate,
                                                    }) => {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'Администратор';
+
   const [formData, setFormData] = useState<Pass | null>(initialData);
 
   useEffect(() => {
@@ -48,7 +50,6 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-
     setFormData((prev) =>
       prev
         ? {
@@ -190,21 +191,23 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
           style={fieldStyle}
         />
 
-        <TextField
-          select
-          label="Статус"
-          name="status_id"
-          value={formData.status_id || ''}
-          onChange={handleChange}
-          fullWidth
-          style={fieldStyle}
-        >
-          {statusOptions.map((status) => (
-            <MenuItem key={status.id} value={status.id}>
-              {status.label}
-            </MenuItem>
-          ))}
-        </TextField>
+        {isAdmin && (
+          <TextField
+            select
+            label="Статус"
+            name="status_id"
+            value={formData.status_id || ''}
+            onChange={handleChange}
+            fullWidth
+            style={fieldStyle}
+          >
+            {statusOptions.map((status) => (
+              <MenuItem key={status.id} value={status.id}>
+                {status.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
       </DialogContent>
 
       <DialogActions sx={{ p: 2 }}>

@@ -54,17 +54,17 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const [passToDelete, setPassToDelete] = useState<Pass | null>(null);
   const [editingPass, setEditingPass] = useState<Pass | null>(null);
 
-  useEffect(() => {
+  const loadRequests = useCallback(() => {
+    setLoading(true);
     fetchPasses()
-      .then(data => {
-        setRequests(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+      .then(data => setRequests(data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    loadRequests();
+  }, [loadRequests]);
 
   const handleFilterChange = useCallback((newFilters: { date: string; search: string }) => {
     setFilters(newFilters);
@@ -72,7 +72,6 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
 
   const filteredRequests = useMemo(() => {
     const statusId = status ? Number(status) : null;
-
     return requests.filter((req) => {
       const matchesStatus = statusId ? req.status_id === statusId : true;
       const matchesDate = filters.date
@@ -94,7 +93,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     if (!passToDelete) return;
     try {
       await deletePass(passToDelete.id);
-      setRequests(prev => prev.filter(p => p.id !== passToDelete.id));
+      loadRequests();
     } catch (error) {
       console.error('Ошибка при удалении пропуска:', error);
     } finally {
@@ -103,20 +102,9 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     }
   };
 
-  const cancelDelete = () => {
-    setDeleteDialogOpen(false);
-    setPassToDelete(null);
-  };
-
-  const handleUpdate = (updated: Pass) => {
-    setRequests((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-    setEditingPass(null);
-  };
-
   const renderStatusChip = (statusId: number) => {
     const status = approvalStatuses.find((s) => s.id === statusId);
     if (!status) return null;
-
     return (
       <Chip
         label={status.name}
@@ -184,41 +172,27 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
         </CardContent>
       </Card>
 
-      {/* Диалог удаления */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={cancelDelete}
-        PaperProps={{
-          sx: {
-            width: 500,
-            height: 300,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            padding: 2,
-          },
-        }}
-      >
-        <DialogContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogContent>
           <Typography variant="h6">
             Удалить заявку на пропуск для <br /> <strong>{passToDelete?.fullName}</strong>?
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
-          <Button onClick={cancelDelete} variant="outlined">Отмена</Button>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">Отмена</Button>
           <Button onClick={confirmDelete} color="error" variant="contained">Удалить</Button>
         </DialogActions>
       </Dialog>
 
-      {/* Диалог редактирования */}
       {editingPass && (
         <EditPassForm
           open={!!editingPass}
           onClose={() => setEditingPass(null)}
           initialData={editingPass}
-          onUpdate={handleUpdate}
+          onUpdate={() => {
+            loadRequests();
+            setEditingPass(null);
+          }}
         />
       )}
     </div>
