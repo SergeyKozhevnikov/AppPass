@@ -18,6 +18,8 @@ import {
   Button,
   Typography,
   Chip,
+  Pagination,
+  Stack,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -47,17 +49,20 @@ const approvalStatuses: ApprovalStatus[] = [
 ];
 
 const RequestList: React.FC<RequestListProps> = ({ status }) => {
-  const [filters, setFilters] = useState<{ date: string; search: string }>({ date: '', search: '' });
+  const [filters, setFilters] = useState({ date: '', search: '' });
   const [requests, setRequests] = useState<Pass[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [passToDelete, setPassToDelete] = useState<Pass | null>(null);
   const [editingPass, setEditingPass] = useState<Pass | null>(null);
 
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 5;
+
   const loadRequests = useCallback(() => {
     setLoading(true);
     fetchPasses()
-      .then(data => setRequests(data))
+      .then(setRequests)
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -65,6 +70,10 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   useEffect(() => {
     loadRequests();
   }, [loadRequests]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters, status]);
 
   const handleFilterChange = useCallback((newFilters: { date: string; search: string }) => {
     setFilters(newFilters);
@@ -74,15 +83,18 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     const statusId = status ? Number(status) : null;
     return requests.filter((req) => {
       const matchesStatus = statusId ? req.status_id === statusId : true;
-      const matchesDate = filters.date
-        ? new Date(req.date_created) <= new Date(filters.date + 'T23:59:59')
-        : true;
-      const matchesSearch = filters.search
-        ? req.fullName.toLowerCase().includes(filters.search.toLowerCase())
-        : true;
+      const matchesDate = filters.date ? new Date(req.date_created) <= new Date(filters.date + 'T23:59:59') : true;
+      const matchesSearch = filters.search ? req.fullName.toLowerCase().includes(filters.search.toLowerCase()) : true;
       return matchesStatus && matchesDate && matchesSearch;
     });
   }, [filters, status, requests]);
+
+  const paginatedRequests = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    return filteredRequests.slice(start, start + rowsPerPage);
+  }, [filteredRequests, page]);
+
+  const totalPages = Math.ceil(filteredRequests.length / rowsPerPage);
 
   const handleDeleteClick = (pass: Pass) => {
     setPassToDelete(pass);
@@ -138,11 +150,17 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredRequests.map((req) => (
+                  {paginatedRequests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>{new Date(req.date_created).toLocaleString('ru-RU', {
-                        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
-                      })}</TableCell>
+                      <TableCell>
+                        {new Date(req.date_created).toLocaleString('ru-RU', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </TableCell>
                       <TableCell>{req.fullName}</TableCell>
                       <TableCell>{req.phone}</TableCell>
                       <TableCell>{req.email}</TableCell>
@@ -162,9 +180,22 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                   ))}
                 </TableBody>
               </Table>
+
               {filteredRequests.length === 0 && (
                 <Box textAlign="center" py={4} color="gray">
                   Ничего не найдено по текущим фильтрам
+                </Box>
+              )}
+
+              {/* Пагинация показывается только если заявок больше 5 */}
+              {filteredRequests.length > rowsPerPage && (
+                <Box display="flex" justifyContent="center" p={2}>
+                  <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={(e, value) => setPage(value)}
+                    color="primary"
+                  />
                 </Box>
               )}
             </Paper>
@@ -179,8 +210,12 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">Отмена</Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">Удалить</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+            Отмена
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Удалить
+          </Button>
         </DialogActions>
       </Dialog>
 

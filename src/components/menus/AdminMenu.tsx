@@ -61,7 +61,7 @@ export const AdminMenu = () => {
           <ListItemButton
             sx={{ pl: 4 }}
             component={Link}
-            href="/requests/approved"
+            href="/requests/inreview"
           >
             <ListItemIcon>
               <TextSnippetIcon />
@@ -71,7 +71,7 @@ export const AdminMenu = () => {
           <ListItemButton
             sx={{ pl: 4 }}
             component={Link}
-            href="/requests/inreview"
+            href="/requests/approved"
           >
             <ListItemIcon>
               <TextSnippetIcon />
@@ -103,7 +103,7 @@ export const AdminMenu = () => {
       {/* Подменю для "Панель администратора" */}
       <Collapse in={openOpportunities} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <ListItemButton sx={{ pl: 4 }} component={Link} href="/">
+          <ListItemButton sx={{ pl: 4 }} component={Link} href="/requests">
             <ListItemIcon>
               <RecentActorsIcon />
             </ListItemIcon>
