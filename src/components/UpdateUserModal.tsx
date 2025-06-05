@@ -99,7 +99,7 @@ export default function UpdateUserModal(props: IProps) {
           container
           sx={{ p: 2, alignItems: 'start', justifyContent: 'space-between' }}
         >
-          <DialogTitle sx={{ p: 0 }}>Создание пользователя</DialogTitle>
+          <DialogTitle sx={{ p: 0 }}>Обновление пользователя</DialogTitle>
           <DialogActions sx={{ p: 0 }}>
             <IconButton
               aria-label="delete"
