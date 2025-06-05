@@ -36,3 +36,14 @@ export const deletePass = async (id: number): Promise<void> => {
     throw new Error('Ошибка при удалении пропуска');
   }
 };
+
+// Согласование пропуска по ID
+export const approvePass = async (id: number): Promise<void> => {
+  const response = await fetch(`${BACKEND_ADDRESS}/passes/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Ошибка при согласовании пропуска');
+  }
+};
