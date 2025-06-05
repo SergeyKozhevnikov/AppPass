@@ -47,7 +47,7 @@ export const UPDATE_FIELDS = {
 
 // Адреса обращения к backend
 const backendAddresses = {
-  local: 'http://localhost:3001/api',
+  local: 'http://195.133.147.112:3001/api',
   server: 'http://195.133.147.112:3001/api',
 };
 export const BACKEND_ADDRESS = backendAddresses.local; // подставляется в запросы, при необходимости можно поменять его в одном месте - здесь
