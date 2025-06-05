@@ -5,6 +5,7 @@
 export const AUTH_FIELDS = {
   login: { label: 'login', type: 'text' },
   password: { label: 'password', type: 'password' },
+  rememberMe: { label: 'rememberMe', type: 'boolean' },
 } as const;
 
 // Константа для полей создания пользователя

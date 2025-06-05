@@ -20,6 +20,7 @@ export interface ICustomUser {
   phoneNum?: string;
   createdAt?: string;
   updatedAt?: string;
+  maxAge?: number;
 }
 
 // Расширяем типы next-auth
@@ -30,6 +31,7 @@ declare module 'next-auth' {
   }
   interface Session {
     user: ICustomUser; // тут только user, не session: ICustomUser
+    maxAge?: number; // Добавляем поле для хранения времени жизни сессии
   }
   interface JWT {
     id?: number;
@@ -45,6 +47,7 @@ declare module 'next-auth' {
     phoneNum?: string;
     createdAt?: string;
     updatedAt?: string;
+    maxAge?: number; // Добавляем поле для хранения времени жизни сессии
   }
 }
 
@@ -62,6 +65,11 @@ export const authConfig: AuthOptions = {
           type: AUTH_FIELDS.password.type,
           required: true,
         },
+        rememberMe: {
+          label: AUTH_FIELDS.rememberMe.label,
+          type: AUTH_FIELDS.rememberMe.type,
+          required: true,
+        },
       },
 
       async authorize(credentials) {
@@ -74,7 +82,15 @@ export const authConfig: AuthOptions = {
           });
 
           if (currentUser?.user) {
-            return currentUser.user as ICustomUser;
+            const maxAge =
+              credentials.rememberMe === 'true'
+                ? 21 * 24 * 60 * 60 // сессия завершиться через 21 день если rememberMe = true
+                : 12 * 60 * 60; // через 12 часов если rememberMe = false
+
+            return {
+              ...currentUser.user,
+              maxAge,
+            };
           }
           return null;
         } catch (error) {
@@ -84,6 +100,11 @@ export const authConfig: AuthOptions = {
       },
     }),
   ],
+
+  session: {
+    strategy: 'jwt',
+    // maxAge: 24 * 60 * 60 * 60, // Базовое значение времени жизни сессии (1 день)
+  },
 
   callbacks: {
     async jwt({ token, user, trigger, session }) {
@@ -102,6 +123,10 @@ export const authConfig: AuthOptions = {
         token.phoneNum = user.phoneNum;
         token.createdAt = user.createdAt;
         token.updatedAt = user.updatedAt;
+
+        if (typeof user.maxAge === 'number') {
+          token.maxAge = user.maxAge;
+        }
       }
 
       if (trigger === 'update') {
@@ -126,6 +151,11 @@ export const authConfig: AuthOptions = {
       session.user.phoneNum = token.phoneNum as string;
       session.user.createdAt = token.createdAt as string;
       session.user.updatedAt = token.updatedAt as string;
+
+      // Устанавливаем время жизни сессии
+      if (token.maxAge) {
+        session.maxAge = token.maxAge as number;
+      }
 
       return session;
     },

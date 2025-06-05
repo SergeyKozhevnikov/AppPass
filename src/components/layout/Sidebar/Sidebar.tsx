@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import AboutPage from '@/components/AboutModal';
 import { UserMenu } from '@/components/menus/UserMenu';
@@ -20,6 +20,15 @@ export function Sidebar() {
   const [isModalAboutSystemOpen, setIsModalAboutSystemOpen] = useState(false);
   const headerHeight = process.env.NEXT_PUBLIC_HEADER_HEIGHT;
   const user = useSession().data?.user;
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session && session.maxAge) {
+      setTimeout(() => {
+        signOut();
+      }, session.maxAge * 1000);
+    } // лучше делать по-другому
+  }, [session]);
 
   return (
     <div
@@ -35,7 +44,7 @@ export function Sidebar() {
       className="px-5 py-5 layout__main flex-1 h-full border border-2 m-0.5 rounded"
     >
       {/* Меню, в зависимости от роли пользователя */}
-      {user?.role === 'Пользователь' ? <UserMenu /> : <AdminMenu/>}
+      {user?.role === 'Пользователь' ? <UserMenu /> : <AdminMenu />}
 
       <Divider sx={{ my: 2 }} />
 

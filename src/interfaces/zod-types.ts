@@ -12,6 +12,7 @@ export const authSchema = z.object({
   password: z
     .string()
     .min(6, { message: 'Пароль не может быть менее 6 символов' }),
+  checked: z.boolean(),
 });
 export type authFields = z.infer<typeof authSchema>; // infer - утилита zod, которая извлекает типы из схемы валидации
 
