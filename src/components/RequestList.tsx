@@ -26,6 +26,7 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import RequestFilter from './RequestFilter';
 import Loader from './Loader';
 import { fetchPasses, deletePass, Pass } from '@/services/passService';
+import EditPassForm from './EditPassForm';
 
 type RequestListProps = {
   status?: '1' | '2' | '3' | '4';
@@ -51,6 +52,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [passToDelete, setPassToDelete] = useState<Pass | null>(null);
+  const [editingPass, setEditingPass] = useState<Pass | null>(null);
 
   useEffect(() => {
     fetchPasses()
@@ -69,7 +71,6 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   }, []);
 
   const filteredRequests = useMemo(() => {
-    // Приводим status из пропсов к числу для сравнения
     const statusId = status ? Number(status) : null;
 
     return requests.filter((req) => {
@@ -107,6 +108,11 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     setPassToDelete(null);
   };
 
+  const handleUpdate = (updated: Pass) => {
+    setRequests((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    setEditingPass(null);
+  };
+
   const renderStatusChip = (statusId: number) => {
     const status = approvalStatuses.find((s) => s.id === statusId);
     if (!status) return null;
@@ -121,9 +127,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     );
   };
 
-  if (loading) {
-    return <Loader />;
-  }
+  if (loading) return <Loader />;
 
   return (
     <div>
@@ -141,36 +145,28 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                     <TableCell>Email заявителя</TableCell>
                     <TableCell>Авто</TableCell>
                     <TableCell>Статус заявки</TableCell>
-                    <TableCell align="center" className="w-[15px]"></TableCell>
-                    <TableCell align="center" className="w-[15px]"></TableCell>
+                    <TableCell align="center"></TableCell>
+                    <TableCell align="center"></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredRequests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>
-                        {new Date(req.date_created).toLocaleString('ru-RU', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </TableCell>
+                      <TableCell>{new Date(req.date_created).toLocaleString('ru-RU', {
+                        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                      })}</TableCell>
                       <TableCell>{req.fullName}</TableCell>
                       <TableCell>{req.phone}</TableCell>
                       <TableCell>{req.email}</TableCell>
-                      <TableCell>
-                        {req.hasCar === 'Yes' && <DirectionsCarIcon color="primary" />}
-                      </TableCell>
+                      <TableCell>{req.hasCar === 'Yes' && <DirectionsCarIcon color="primary" />}</TableCell>
                       <TableCell>{renderStatusChip(req.status_id)}</TableCell>
                       <TableCell align="center">
-                        <IconButton color="primary" aria-label="редактировать">
+                        <IconButton color="primary" onClick={() => setEditingPass(req)}>
                           <EditIcon />
                         </IconButton>
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton color="error" aria-label="удалить" onClick={() => handleDeleteClick(req)}>
+                        <IconButton color="error" onClick={() => handleDeleteClick(req)}>
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
@@ -188,6 +184,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
         </CardContent>
       </Card>
 
+      {/* Диалог удаления */}
       <Dialog
         open={deleteDialogOpen}
         onClose={cancelDelete}
@@ -204,28 +201,26 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
           },
         }}
       >
-        <DialogContent
-          sx={{
-            flexGrow: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        <DialogContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <Typography variant="h6">
             Удалить заявку на пропуск для <br /> <strong>{passToDelete?.fullName}</strong>?
           </Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
-          <Button onClick={cancelDelete} variant="outlined">
-            Отмена
-          </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
-            Удалить
-          </Button>
+          <Button onClick={cancelDelete} variant="outlined">Отмена</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">Удалить</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Диалог редактирования */}
+      {editingPass && (
+        <EditPassForm
+          open={!!editingPass}
+          onClose={() => setEditingPass(null)}
+          initialData={editingPass}
+          onUpdate={handleUpdate}
+        />
+      )}
     </div>
   );
 };
