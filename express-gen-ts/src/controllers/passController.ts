@@ -20,6 +20,7 @@ interface PassData {
   startDate: string;
   endDate: string;
   photo?: string;
+  status_id?: number;
   approvers: {
     id?: number,
     user_id: number,
@@ -517,6 +518,7 @@ export const updatePass = async (
           startDate: new Date(passData.startDate),
           endDate: new Date(passData.endDate),
           photo: photoPath,
+          status_id: passData.status_id,
         },
         { transaction },
       );

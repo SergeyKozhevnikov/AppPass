@@ -17,11 +17,19 @@ type EditPassFormProps = {
   onUpdate: (updated: Pass) => void;
 };
 
+// Статусы
 const statusOptions = [
   { id: 1, label: 'Ожидается' },
   { id: 2, label: 'На согласовании' },
   { id: 3, label: 'Согласован' },
   { id: 4, label: 'Отклонен' },
+];
+
+// Типы пропусков
+const passTypeOptions = [
+  { id: 1, label: 'Гостевой' },
+  { id: 2, label: 'Временный' },
+  { id: 3, label: 'Постоянный' },
 ];
 
 const EditPassForm: React.FC<EditPassFormProps> = ({
@@ -36,9 +44,19 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
     setFormData(initialData);
   }, [initialData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => prev && { ...prev, [name]: value });
+
+    setFormData((prev) =>
+      prev
+        ? {
+          ...prev,
+          [name]: name === 'pass_type' || name === 'status_id' ? Number(value) : value,
+        }
+        : prev
+    );
   };
 
   const handleSubmit = async () => {
@@ -54,17 +72,33 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
 
   if (!formData) return null;
 
-  // Стиль для полей с отступом снизу
-  const fieldStyle = { marginBottom: '16px' };
+  const fieldStyle = { marginBottom: 16 };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Редактировать заявку</DialogTitle>
       <DialogContent dividers>
         <TextField
+          select
+          label="Тип пропуска"
+          name="pass_type"
+          value={formData.pass_type || ''}
+          onChange={handleChange}
+          fullWidth
+          required
+          style={fieldStyle}
+        >
+          {passTypeOptions.map((option) => (
+            <MenuItem key={option.id} value={option.id}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <TextField
           label="ФИО"
           name="fullName"
-          value={formData.fullName}
+          value={formData.fullName || ''}
           onChange={handleChange}
           fullWidth
           required
@@ -74,7 +108,16 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
         <TextField
           label="Телефон"
           name="phone"
-          value={formData.phone}
+          value={formData.phone || ''}
+          onChange={handleChange}
+          fullWidth
+          style={fieldStyle}
+        />
+
+        <TextField
+          label="Организация"
+          name="organization"
+          value={formData.organization || ''}
           onChange={handleChange}
           fullWidth
           style={fieldStyle}
@@ -83,18 +126,9 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
         <TextField
           label="Email"
           name="email"
-          value={formData.email}
+          value={formData.email || ''}
           onChange={handleChange}
           type="email"
-          fullWidth
-          style={fieldStyle}
-        />
-
-        <TextField
-          label="Организация"
-          name="organization"
-          value={formData.organization}
-          onChange={handleChange}
           fullWidth
           style={fieldStyle}
         />
@@ -103,7 +137,7 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
           label="Дата рождения"
           name="birthDate"
           type="date"
-          value={formData.birthDate?.toString().slice(0, 10)}
+          value={formData.birthDate ? formData.birthDate.slice(0, 10) : ''}
           onChange={handleChange}
           InputLabelProps={{ shrink: true }}
           fullWidth
@@ -114,7 +148,7 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
           select
           label="Наличие авто"
           name="hasCar"
-          value={formData.hasCar}
+          value={formData.hasCar || ''}
           onChange={handleChange}
           fullWidth
           style={fieldStyle}
@@ -126,7 +160,7 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
         <TextField
           label="Обоснование"
           name="justification"
-          value={formData.justification}
+          value={formData.justification || ''}
           onChange={handleChange}
           multiline
           rows={3}
@@ -135,10 +169,10 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
         />
 
         <TextField
-          label="Начало действия"
+          label="Дата начала действия"
           name="startDate"
           type="date"
-          value={formData.startDate?.toString().slice(0, 10)}
+          value={formData.startDate ? formData.startDate.slice(0, 10) : ''}
           onChange={handleChange}
           InputLabelProps={{ shrink: true }}
           fullWidth
@@ -146,10 +180,10 @@ const EditPassForm: React.FC<EditPassFormProps> = ({
         />
 
         <TextField
-          label="Окончание действия"
+          label="Дата окончания действия"
           name="endDate"
           type="date"
-          value={formData.endDate?.toString().slice(0, 10)}
+          value={formData.endDate ? formData.endDate.slice(0, 10) : ''}
           onChange={handleChange}
           InputLabelProps={{ shrink: true }}
           fullWidth
