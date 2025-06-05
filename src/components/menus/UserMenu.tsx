@@ -48,7 +48,7 @@ export const UserMenu = () => {
             <ListItemIcon>
               <TextSnippetIcon />
             </ListItemIcon>
-            <ListItemText primary="Черновики" />
+            <ListItemText primary="Ожидает согласования" />
           </ListItemButton>
           <ListItemButton
             sx={{ pl: 4 }}
@@ -58,7 +58,7 @@ export const UserMenu = () => {
             <ListItemIcon>
               <TextSnippetIcon />
             </ListItemIcon>
-            <ListItemText primary="На согласовании" />
+            <ListItemText primary="Согласованные" />
           </ListItemButton>
           <ListItemButton
             sx={{ pl: 4 }}
@@ -68,7 +68,7 @@ export const UserMenu = () => {
             <ListItemIcon>
               <TextSnippetIcon />
             </ListItemIcon>
-            <ListItemText primary="Согласованные" />
+            <ListItemText primary="На согласовании" />
           </ListItemButton>
           <ListItemButton
             sx={{ pl: 4 }}
