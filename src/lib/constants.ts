@@ -25,7 +25,6 @@ export const REGISTER_FIELDS = {
 
 // Константа для полей профиля (без roles, т.к. это не поле)
 export const PROFILE_FIELDS = {
-  role: { label: 'role', labelRu: 'Роль', type: 'string' },
   tabNum: { label: 'tabNum', labelRu: 'Табельный номер', type: 'number' },
   surname: { label: 'surname', labelRu: 'Фамилия', type: 'text' },
   name: { label: 'name', labelRu: 'Имя', type: 'text' },
@@ -39,7 +38,6 @@ export const PROFILE_FIELDS = {
 
 // Константа для полей обновления пользователя
 export const UPDATE_FIELDS = {
-  role: { label: 'role', labelRu: 'Роль', type: 'text' },
   surname: { label: 'surname', labelRu: 'Фамилия', type: 'text' },
   name: { label: 'name', labelRu: 'Имя', type: 'text' },
   patronymic: { label: 'patronymic', labelRu: 'Отчество', type: 'text' },
