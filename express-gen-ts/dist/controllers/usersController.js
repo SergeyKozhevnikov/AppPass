@@ -160,7 +160,8 @@ const createUser = async (req, res) => {
             !userData.patronymic ||
             !userData.login ||
             !userData.password ||
-            !userData.email) {
+            !userData.email ||
+            !userData.role) {
             res.status(400).json({
                 success: false,
                 message: 'Не заполнены обязательные поля',
@@ -176,6 +177,10 @@ const createUser = async (req, res) => {
                 login: userData.login,
                 password: userData.password,
                 email: userData.email,
+                role: userData.role,
+                pos: userData.pos ?? '',
+                department: userData.department ?? '',
+                phoneNum: userData.phoneNum ?? '',
                 createdAt: now,
                 updatedAt: now,
             }, { transaction });

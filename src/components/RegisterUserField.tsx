@@ -32,10 +32,10 @@ export function RegisterUserField({
   register,
 }: FieldProps) {
   // необязательные и закрытые для изменения поля
-  // const optionalFields =
-  //   field === REGISTER_FIELDS.pos ||
-  //   field === REGISTER_FIELDS.phoneNum ||
-  //   field === REGISTER_FIELDS.department;
+  const optionalFields =
+    field === REGISTER_FIELDS.pos ||
+    field === REGISTER_FIELDS.phoneNum ||
+    field === REGISTER_FIELDS.department;
 
   // изменение падежа для фамилии и почты
   const getPlaceholder = (field: RegisterFieldsValue): string => {
@@ -60,7 +60,7 @@ export function RegisterUserField({
         {...register(field.label)}
         error={!!errors}
         helperText={errors?.message}
-        // required={!optionalFields}
+        required={!optionalFields}
         autoFocus={currentUrl !== '/profile'}
         sx={getFieldStyles}
         InputLabelProps={{ shrink: true }}

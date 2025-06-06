@@ -16,6 +16,11 @@ export const REGISTER_FIELDS = {
   login: { label: 'login', labelRu: 'Логин', type: 'text' },
   email: { label: 'email', labelRu: 'Почта', type: 'email' },
   password: { label: 'password', labelRu: 'Пароль', type: 'password' },
+  // необязательные
+  pos: { label: 'pos', labelRu: 'Должность', type: 'text' },
+  department: { label: 'department', labelRu: 'Подразделение', type: 'text' },
+  role: { label: 'role', labelRu: 'Роль', type: 'string' },
+  phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'text' },
 } as const;
 
 // Константа для полей профиля (без roles, т.к. это не поле)

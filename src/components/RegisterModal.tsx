@@ -42,8 +42,13 @@ export default function RegisterModal(props: IProps) {
       name: '',
       patronymic: '',
       login: '',
-      email: '', // @atom.ru
+      email: '',
       password: '',
+      // необязательные
+      role: 'Пользователь',
+      pos: '',
+      department: '',
+      phoneNum: '',
     },
     mode: 'onChange', // Валидация при изменении полей
   });
@@ -51,6 +56,7 @@ export default function RegisterModal(props: IProps) {
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const formData = getValues();
+    console.log(formData)
     userApi
       .createUser(formData)
       .then((res) => {
@@ -105,7 +111,6 @@ export default function RegisterModal(props: IProps) {
             overflowY: 'auto',
             overflowX: 'hidden',
             ...scrollbarStyles,
-            // [theme.breakpoints.up('sm')]: {}, - применить стили выше размера экрана sm (600px)
           }}
         >
           <DialogContent>

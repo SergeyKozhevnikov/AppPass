@@ -46,6 +46,13 @@ export const newUserSchema = z.object({
   password: z
     .string()
     .min(6, { message: 'Пароль не может быть менее 6 символов' }),
+  role: z.enum(['Пользователь', 'Администратор'], {
+    message: 'Роль может быть "Пользователь" или "Администратор"',
+  }),
+  // необязательеые поля
+  pos: z.string().nullable(),
+  department: z.string().nullable(),
+  phoneNum: z.string().nullable(),
 });
 export type newUserFields = z.infer<typeof newUserSchema>;
 
