@@ -96,7 +96,7 @@ export default function Profile() {
 
   async function updateSession(data: ICustomUser): Promise<void> {
     console.log(data);
-    
+
     await update({
       ...session,
       user: {
@@ -118,6 +118,8 @@ export default function Profile() {
 
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
+    console.log(getValues())
+
     const { ...formData } = getValues();
 
     if (formData.id) {
@@ -131,7 +133,6 @@ export default function Profile() {
           department: formData.department ?? '',
           login: formData.login,
           email: formData.email,
-          password: formData.password,
           phoneNum: formData.phoneNum ?? '',
         })
         .then((res) => {
@@ -211,6 +212,7 @@ export default function Profile() {
             columns={{ xs: 1, md: 2 }}
             sx={{ justifyContent: { xs: 'center', md: 'end' } }}
           >
+
             {/* Проходим по полям профиля, и возвращаем для каждого компонент */}
             {Object.values(PROFILE_FIELDS).map((f) => (
               <Field
@@ -230,8 +232,7 @@ export default function Profile() {
                 justifyContent: { xs: 'center', md: 'end' },
               }}
             >
-              <Button 
-                  onClick={() => setUpdateUserDialogOpen(true)}>
+              <Button onClick={() => setUpdateUserDialogOpen(true)}>
                 <Link
                   underline="hover"
                   href="#"

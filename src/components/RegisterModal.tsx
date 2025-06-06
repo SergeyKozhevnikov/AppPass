@@ -13,17 +13,14 @@ import {
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { REGISTER_FIELDS } from '@/lib/constants';
-import Field from '@/components/Field';
 import { Dispatch, FormEventHandler, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 import { newUserFields, newUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { scrollbarStyles } from '@/styles/shared-styles';
 import { userApi } from '@/lib/userApi';
+import { RegisterUserField } from './RegisterUserField';
 
-// Пароль по умолчанию = его логин. и почта = логин@greenatom.ru
-// При создании пользователя сначала запрос в БД нет ли такого же логина (а соответсвенно и почты), если есть, информировать в поле, исправить вручную
-// а также смотрим последний табельный и прибавляем к нему +1
 interface IProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -45,8 +42,13 @@ export default function RegisterModal(props: IProps) {
       name: '',
       patronymic: '',
       login: '',
-      email: '', // @atom.ru
+      email: '',
       password: '',
+      // необязательные
+      role: 'Пользователь',
+      pos: '',
+      department: '',
+      phoneNum: '',
     },
     mode: 'onChange', // Валидация при изменении полей
   });
@@ -54,6 +56,7 @@ export default function RegisterModal(props: IProps) {
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
     const formData = getValues();
+    console.log(formData)
     userApi
       .createUser(formData)
       .then((res) => {
@@ -108,7 +111,6 @@ export default function RegisterModal(props: IProps) {
             overflowY: 'auto',
             overflowX: 'hidden',
             ...scrollbarStyles,
-            // [theme.breakpoints.up('sm')]: {}, - применить стили выше размера экрана sm (600px)
           }}
         >
           <DialogContent>
@@ -121,14 +123,14 @@ export default function RegisterModal(props: IProps) {
               columns={{ xs: 1, md: 2 }}
               sx={{ justifyContent: { xs: 'center', sm: 'end' } }}
             >
-              {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
+              {/* Проходим по константе, в которой определены поля, и возвращаем для каждого поля компонент */}
               {Object.values(REGISTER_FIELDS).map((f) => (
-                <Field
+                <RegisterUserField
                   field={f}
                   errors={errors[f.label]}
                   register={register}
                   key={f.label}
-                ></Field>
+                ></RegisterUserField>
               ))}
 
               <DialogActions sx={{ p: 0, width: { xs: '100%', sm: 'auto' } }}>

@@ -4,9 +4,9 @@ import { Grid, TextField } from '@mui/material';
 // import { useState } from 'react';
 
 // объединенный тип из значений объекта + интерфейс для пропсов
-type ProfileFieldValue = (typeof UPDATE_FIELDS)[keyof typeof UPDATE_FIELDS];
+type FieldsValue = (typeof UPDATE_FIELDS)[keyof typeof UPDATE_FIELDS];
 interface FieldProps {
-  field: ProfileFieldValue;
+  field: FieldsValue;
   currentUrl?: string;
   errors: any; // eslint-disable-line
   register: any; // eslint-disable-line
@@ -29,7 +29,6 @@ export default function UpdateUserField({
   errors,
   register,
 }: FieldProps) {
-  // const [showPassword, setShowPassword] = useState(false);
   // необязательные и закрытые для изменения поля
   const optionalFields =
     field === UPDATE_FIELDS.pos ||
@@ -37,7 +36,7 @@ export default function UpdateUserField({
     field === UPDATE_FIELDS.department;
 
   // изменение падежа для фамилии и почты
-  const getPlaceholder = (field: ProfileFieldValue): string => {
+  const getPlaceholder = (field: FieldsValue): string => {
     switch (field.labelRu) {
       case 'Фамилия':
         return 'фамилию';
@@ -47,8 +46,6 @@ export default function UpdateUserField({
         return field.labelRu.toLowerCase();
     }
   };
-
-  // const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   return (
     <Grid container size={1}>
