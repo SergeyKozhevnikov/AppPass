@@ -31,6 +31,7 @@ export default function UpdatPasswordModal(props: IProps) {
   const { isOpen, currentUserId, setIsOpen, setResult } = props;
 
   const {
+    reset,
     register,
     getValues,
     handleSubmit,
@@ -59,7 +60,8 @@ export default function UpdatPasswordModal(props: IProps) {
         .catch(() => {
           setResult('error');
           throw new Error('Что-то пошло не так');
-        });
+        })
+        .finally(() => reset()); // сбросить поля до defaultValues
 
       setIsOpen(false);
     }

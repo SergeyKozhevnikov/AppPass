@@ -23,18 +23,15 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { fetchUsers, deleteUser, User } from '@/services/userService';
-// import { Pass, deletePass } from '@/services/passService';
 import Loader from './Loader';
 import UpdateUserModal from './UpdateUserModal';
 
 interface IProps {
   result: string;
-  // setResult: Dispatch<React.SetStateAction<string>>;
 }
 
 const UsersList = (props: IProps) => {
   const { result } = props;
-  // Начало блока для бэка
   const [requests, setRequests] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestResult, setRequestResult] = useState('');
@@ -42,9 +39,6 @@ const UsersList = (props: IProps) => {
   const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
   const [updateUserDialogOpen, setUpdateUserDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
-  // const [userToUpdate, setUserToUpdate] = useState<User | null>(null);
-  //const [userToName] = useState<User | null>(null);
-  console.log(requestResult)
 
   useEffect(() => {
     if (result === '' || result === 'success') {
@@ -52,6 +46,7 @@ const UsersList = (props: IProps) => {
         .then((data) => {
           setRequests(data);
           setLoading(false);
+          console.log(requestResult);
         })
         .catch((err) => {
           console.error(err);
@@ -59,12 +54,6 @@ const UsersList = (props: IProps) => {
         });
     }
   }, [result]);
-
-  // const userRequests = useMemo(() => {
-  //   return requests.filter((req) => {
-  //     const matchesStatus = status ? req.status === status : true;
-  //   });
-  // }, [requests]);
 
   if (loading) {
     return <div>Загрузка пользователей...</div>;
@@ -97,8 +86,6 @@ const UsersList = (props: IProps) => {
   if (loading) {
     return <Loader />;
   }
-  // Обработчик
-  // const handleEdit = () => {}
 
   return (
     <div>

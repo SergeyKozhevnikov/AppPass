@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { UPDATE_FIELDS } from '@/lib/constants';
-import { Dispatch, FormEventHandler, SetStateAction } from 'react';
+import { Dispatch, FormEventHandler, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,6 +20,7 @@ import { scrollbarStyles } from '@/styles/shared-styles';
 import { userApi } from '@/lib/userApi';
 import { User } from '@/services/userService';
 import UpdateUserField from './UpdateUserField';
+import UpdatePasswordModal from './UpdatePasswordModal';
 
 interface IProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ interface IProps {
 
 export default function UpdateUserModal(props: IProps) {
   const { isOpen, currentUser, setIsOpen, setResult } = props;
+  const [isOpenPassChange, setIsOpenPassChange] = useState(false);
 
   const {
     register,
@@ -121,7 +123,6 @@ export default function UpdateUserModal(props: IProps) {
             overflowY: 'auto',
             overflowX: 'hidden',
             ...scrollbarStyles,
-            // [theme.breakpoints.up('sm')]: {}, - применить стили выше размера экрана sm (600px)
           }}
         >
           <DialogContent>
@@ -132,7 +133,7 @@ export default function UpdateUserModal(props: IProps) {
               container
               spacing={3}
               columns={{ xs: 1, md: 2 }}
-              sx={{ justifyContent: { xs: 'center', sm: 'end' } }}
+              sx={{ justifyContent: { xs: 'center', sm: 'space-between' } }}
             >
               {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
               {Object.values(UPDATE_FIELDS).map((f) => (
@@ -144,13 +145,20 @@ export default function UpdateUserModal(props: IProps) {
                 ></UpdateUserField>
               ))}
 
-              <DialogActions sx={{ p: 0, width: { xs: '100%', sm: 'auto' } }}>
+              <DialogActions sx={{ p: 0, width: { xs: '100%', md: 'auto' } }}>
                 <Grid
                   size={{ xs: 1, md: 2 }}
                   container
                   spacing={2}
-                  justifyContent={{ xs: 'center', md: 'space-between' }}
+                  justifyContent={{ xs: 'center', sm: 'end' }}
                 >
+                  <Button
+                    color="primary"
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                    onClick={() => setIsOpenPassChange(true)}
+                  >
+                    Изменить пароль
+                  </Button>
                   <Button
                     variant="contained"
                     color="primary"
@@ -173,6 +181,13 @@ export default function UpdateUserModal(props: IProps) {
           </DialogContent>
         </Container>
       </Dialog>
+
+      <UpdatePasswordModal
+        isOpen={isOpenPassChange}
+        currentUserId={currentUser?.id}
+        setIsOpen={setIsOpenPassChange}
+        setResult={setResult}
+      ></UpdatePasswordModal>
     </Container>
   );
 }
