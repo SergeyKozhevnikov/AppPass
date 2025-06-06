@@ -42,7 +42,6 @@ export const UPDATE_FIELDS = {
   department: { label: 'department', labelRu: 'Подразделение', type: 'text' },
   login: { label: 'login', labelRu: 'Логин', type: 'text' },
   email: { label: 'email', labelRu: 'Почта', type: 'email' },
-  password: { label: 'password', labelRu: 'Пароль', type: 'password' },
   phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'text' },
 } as const;
 

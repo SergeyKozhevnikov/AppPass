@@ -1,14 +1,14 @@
 'use client';
 
 // Шаблон поля
-import { PROFILE_FIELDS } from '@/lib/constants';
+import { REGISTER_FIELDS } from '@/lib/constants';
 import { Grid, TextField } from '@mui/material';
-import { useSession } from 'next-auth/react';
 
 // объединенный тип из значений объекта + интерфейс для пропсов
-type ProfileFieldsValue = (typeof PROFILE_FIELDS)[keyof typeof PROFILE_FIELDS];
+type RegisterFieldsValue =
+  (typeof REGISTER_FIELDS)[keyof typeof REGISTER_FIELDS];
 interface FieldProps {
-  field: ProfileFieldsValue;
+  field: RegisterFieldsValue;
   currentUrl?: string;
   errors: any; // eslint-disable-line
   register: any; // eslint-disable-line
@@ -25,28 +25,20 @@ const getFieldStyles = {
   },
 };
 
-export default function Field({
+export function RegisterUserField({
   field,
   currentUrl,
   errors,
   register,
 }: FieldProps) {
-  const user = useSession().data?.user;
   // необязательные и закрытые для изменения поля
-  const optionalFields =
-    field === PROFILE_FIELDS.pos ||
-    field === PROFILE_FIELDS.phoneNum ||
-    field === PROFILE_FIELDS.department;
-  const profileDisableFields =
-    currentUrl === '/profile' &&
-    (field === PROFILE_FIELDS.tabNum ||
-      ((field === PROFILE_FIELDS.login ||
-        field === PROFILE_FIELDS.email ||
-        field === PROFILE_FIELDS.role) &&
-        user?.role !== 'Администратор'));
+  // const optionalFields =
+  //   field === REGISTER_FIELDS.pos ||
+  //   field === REGISTER_FIELDS.phoneNum ||
+  //   field === REGISTER_FIELDS.department;
 
   // изменение падежа для фамилии и почты
-  const getPlaceholder = (field: ProfileFieldsValue): string => {
+  const getPlaceholder = (field: RegisterFieldsValue): string => {
     switch (field.labelRu) {
       case 'Фамилия':
         return 'фамилию';
@@ -68,8 +60,7 @@ export default function Field({
         {...register(field.label)}
         error={!!errors}
         helperText={errors?.message}
-        required={!optionalFields}
-        disabled={profileDisableFields}
+        // required={!optionalFields}
         autoFocus={currentUrl !== '/profile'}
         sx={getFieldStyles}
         InputLabelProps={{ shrink: true }}

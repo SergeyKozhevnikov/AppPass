@@ -1,4 +1,3 @@
-// Страница создания нового пользователя (Сергей П)
 'use client';
 
 import {
@@ -49,7 +48,6 @@ export default function UpdateUserModal(props: IProps) {
       department: currentUser?.department,
       login: currentUser?.login,
       email: currentUser?.email,
-      password: currentUser?.password,
       phoneNum: currentUser?.phoneNum,
     },
     mode: 'onChange', // Валидация при изменении полей
@@ -70,7 +68,6 @@ export default function UpdateUserModal(props: IProps) {
           department: formData.department ?? '',
           login: formData.login,
           email: formData.email,
-          password: formData.password,
           phoneNum: formData.phoneNum ?? '',
         })
         .then((res) => {
