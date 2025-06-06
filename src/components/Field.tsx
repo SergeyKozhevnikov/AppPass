@@ -40,9 +40,7 @@ export default function Field({
   const profileDisableFields =
     currentUrl === '/profile' &&
     (field === PROFILE_FIELDS.tabNum ||
-      ((field === PROFILE_FIELDS.login ||
-        field === PROFILE_FIELDS.email ||
-        field === PROFILE_FIELDS.role) &&
+      ((field === PROFILE_FIELDS.login || field === PROFILE_FIELDS.email) &&
         user?.role !== 'Администратор'));
 
   // изменение падежа для фамилии и почты

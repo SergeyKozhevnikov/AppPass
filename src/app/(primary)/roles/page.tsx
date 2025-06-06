@@ -53,7 +53,7 @@ const UsersPage: React.FC = () => {
         {/* Сообщения об успехе и ошибке */}
         {isOpenSuccessAlert && (
           <Alert severity="success" sx={alertStyle}>
-            Пользователь успешно создан
+            Операция выполнена успешно
           </Alert>
         )}
         {isOpenErrorAlert && isOpen === true && (
@@ -70,7 +70,7 @@ const UsersPage: React.FC = () => {
           />
         )}
       </section>
-      <UsersList result={requestResult} /> {/* setResult={setRequestResult} */}
+      <UsersList result={requestResult} setResult={setRequestResult}/>
     </div>
   );
 };

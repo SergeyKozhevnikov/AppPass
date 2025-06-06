@@ -15,6 +15,9 @@ import {
   Grid,
   Alert,
   CircularProgress,
+  InputLabel,
+  NativeSelect,
+  FormControl,
 } from '@mui/material';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { profileUserFields, profileUserSchema } from '@/interfaces/zod-types';
@@ -118,8 +121,6 @@ export default function Profile() {
 
   // Обработчик отправки формы
   const onSubmit: FormEventHandler<HTMLFormElement> = handleSubmit(() => {
-    console.log(getValues())
-
     const { ...formData } = getValues();
 
     if (formData.id) {
@@ -212,6 +213,30 @@ export default function Profile() {
             columns={{ xs: 1, md: 2 }}
             sx={{ justifyContent: { xs: 'center', md: 'end' } }}
           >
+            {/* Поле выбора роли */}
+            <Grid size={1} alignContent="center">
+              <FormControl fullWidth disabled={user?.role === 'Пользователь'}>
+                <InputLabel variant="standard" htmlFor="uncontrolled-native">
+                  Роль
+                </InputLabel>
+                <NativeSelect
+                  defaultValue={user?.role}
+                  {...register('role')}
+                  sx={{
+                    height: '45px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                  inputProps={{
+                    name: 'role',
+                    id: 'role',
+                  }}
+                >
+                  <option value={'Пользователь'}>Пользователь</option>
+                  <option value={'Администратор'}>Администратор</option>
+                </NativeSelect>
+              </FormControl>
+            </Grid>
 
             {/* Проходим по полям профиля, и возвращаем для каждого компонент */}
             {Object.values(PROFILE_FIELDS).map((f) => (

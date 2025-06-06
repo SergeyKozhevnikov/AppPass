@@ -1,6 +1,6 @@
 'use client'; // определяет компонент как клиентский
 
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 import React from 'react';
 import {
@@ -28,13 +28,13 @@ import UpdateUserModal from './UpdateUserModal';
 
 interface IProps {
   result: string;
+  setResult: Dispatch<SetStateAction<string>>;
 }
 
 const UsersList = (props: IProps) => {
-  const { result } = props;
+  const { result, setResult } = props;
   const [requests, setRequests] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [requestResult, setRequestResult] = useState('');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
   const [updateUserDialogOpen, setUpdateUserDialogOpen] = useState(false);
@@ -46,7 +46,6 @@ const UsersList = (props: IProps) => {
         .then((data) => {
           setRequests(data);
           setLoading(false);
-          console.log(requestResult);
         })
         .catch((err) => {
           console.error(err);
@@ -199,7 +198,7 @@ const UsersList = (props: IProps) => {
           currentUser={currentUser}
           isOpen={updateUserDialogOpen}
           setIsOpen={setUpdateUserDialogOpen}
-          setResult={setRequestResult}
+          setResult={setResult}
         />
       )}
     </div>

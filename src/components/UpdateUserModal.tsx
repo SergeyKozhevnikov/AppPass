@@ -9,6 +9,9 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  FormControl,
+  InputLabel,
+  NativeSelect,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { UPDATE_FIELDS } from '@/lib/constants';
@@ -135,6 +138,31 @@ export default function UpdateUserModal(props: IProps) {
               columns={{ xs: 1, md: 2 }}
               sx={{ justifyContent: { xs: 'center', sm: 'space-between' } }}
             >
+              {/* Поле выбора роли */}
+              <Grid size={1} alignContent="center">
+                <FormControl fullWidth>
+                  <InputLabel variant="standard" htmlFor="uncontrolled-native">
+                    Роль
+                  </InputLabel>
+                  <NativeSelect
+                    defaultValue={currentUser?.role ?? 'Пользователь'}
+                    {...register('role')}
+                    sx={{
+                      height: '45px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                    }}
+                    inputProps={{
+                      name: 'role',
+                      id: 'role',
+                    }}
+                  >
+                    <option value={'Пользователь'}>Пользователь</option>
+                    <option value={'Администратор'}>Администратор</option>
+                  </NativeSelect>
+                </FormControl>
+              </Grid>
+
               {/* Проходим по константе, в которой определены поля профиля, и возвращаем для каждого поля компонент */}
               {Object.values(UPDATE_FIELDS).map((f) => (
                 <UpdateUserField
