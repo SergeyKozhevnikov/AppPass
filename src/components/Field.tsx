@@ -1,7 +1,9 @@
+'use client';
+
 // Шаблон поля
 import { PROFILE_FIELDS } from '@/lib/constants';
 import { Grid, TextField } from '@mui/material';
-// import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 // объединенный тип из значений объекта + интерфейс для пропсов
 type ProfileFieldValue = (typeof PROFILE_FIELDS)[keyof typeof PROFILE_FIELDS];
@@ -29,7 +31,7 @@ export default function Field({
   errors,
   register,
 }: FieldProps) {
-  // const [showPassword, setShowPassword] = useState(false);
+  const user = useSession().data?.user;
   // необязательные и закрытые для изменения поля
   const optionalFields =
     field === PROFILE_FIELDS.pos ||
@@ -38,8 +40,10 @@ export default function Field({
   const profileDisableFields =
     currentUrl === '/profile' &&
     (field === PROFILE_FIELDS.tabNum ||
-      field === PROFILE_FIELDS.login ||
-      field === PROFILE_FIELDS.email);
+      ((field === PROFILE_FIELDS.login ||
+        field === PROFILE_FIELDS.email ||
+        field === PROFILE_FIELDS.role) &&
+        user?.role !== 'Администратор'));
 
   // изменение падежа для фамилии и почты
   const getPlaceholder = (field: ProfileFieldValue): string => {
@@ -52,8 +56,6 @@ export default function Field({
         return field.labelRu.toLowerCase();
     }
   };
-
-  // const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   return (
     <Grid container size={1}>

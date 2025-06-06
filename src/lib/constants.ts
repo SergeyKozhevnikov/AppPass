@@ -20,16 +20,16 @@ export const REGISTER_FIELDS = {
 
 // Константа для полей профиля (без roles, т.к. это не поле)
 export const PROFILE_FIELDS = {
+  role: { label: 'role', labelRu: 'Роль', type: 'string' },
   tabNum: { label: 'tabNum', labelRu: 'Табельный номер', type: 'number' },
   surname: { label: 'surname', labelRu: 'Фамилия', type: 'text' },
   name: { label: 'name', labelRu: 'Имя', type: 'text' },
   patronymic: { label: 'patronymic', labelRu: 'Отчество', type: 'text' },
   pos: { label: 'pos', labelRu: 'Должность', type: 'text' },
   department: { label: 'department', labelRu: 'Подразделение', type: 'text' },
+  phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'text' },
   login: { label: 'login', labelRu: 'Логин', type: 'text' },
   email: { label: 'email', labelRu: 'Почта', type: 'email' },
-  password: { label: 'password', labelRu: 'Пароль', type: 'password' },
-  phoneNum: { label: 'phoneNum', labelRu: 'Телефон', type: 'text' },
 } as const;
 
 // Константа для полей обновления пользователя

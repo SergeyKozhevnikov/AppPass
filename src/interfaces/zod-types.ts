@@ -80,9 +80,6 @@ export const profileUserSchema = z.object({
       message: 'Логин может содержать только латинские буквы',
     }),
   email: z.string().email({ message: 'Некорректный email адрес' }),
-  password: z
-    .string()
-    .min(6, { message: 'Пароль не может быть менее 6 символов' }),
   phoneNum: z.string().nullable(),
   role: z.enum(['Пользователь', 'Администратор'], {
     message: 'Роль может быть "Пользователь" или "Администратор"',
