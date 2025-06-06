@@ -26,7 +26,7 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 import RequestFilter from './RequestFilter';
 import Loader from './Loader';
-import { fetchPasses, deletePass, Pass } from '@/services/passService';
+import { fetchPasses, deletePass, approvePass, Pass } from '@/services/passService';
 import EditPassForm from './EditPassForm';
 
 type RequestListProps = {
@@ -54,6 +54,9 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [passToDelete, setPassToDelete] = useState<Pass | null>(null);
   const [editingPass, setEditingPass] = useState<Pass | null>(null);
+
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [passToApprove, setPassToApprove] = useState<Pass | null>(null);
 
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
@@ -126,6 +129,33 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
     );
   };
 
+    // approved passes
+
+    const handleApproveClick = (pass: Pass) => {
+      setPassToApprove(pass);
+      setApproveDialogOpen(true);
+    };
+  
+    const confirmApprove = async () => {
+      if (!passToApprove) return;
+      try {
+        await approvePass(passToApprove.id);
+        setRequests(prev => prev.filter(p => p.id !== passToApprove.id));
+      } catch (error) {
+        console.error('Ошибка при согласовании пропуска:', error);
+      } finally {
+        setApproveDialogOpen(false);
+        setPassToApprove(null);
+      }
+    };
+  
+    const cancelApprove = () => {
+      setApproveDialogOpen(false);
+      setPassToApprove(null);
+    };
+  
+    //end approve passes
+
   if (loading) return <Loader />;
 
   return (
@@ -151,7 +181,7 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                 <TableBody>
                   {paginatedRequests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell>
+                      <TableCell onClick={() => handleApproveClick(req)}>
                         {new Date(req.date_created).toLocaleString('ru-RU', {
                           day: '2-digit',
                           month: '2-digit',
@@ -160,11 +190,11 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
                           minute: '2-digit',
                         })}
                       </TableCell>
-                      <TableCell>{req.fullName}</TableCell>
-                      <TableCell>{req.phone}</TableCell>
-                      <TableCell>{req.email}</TableCell>
-                      <TableCell>{req.hasCar === 'Yes' && <DirectionsCarIcon color="primary" />}</TableCell>
-                      <TableCell>{renderStatusChip(req.status_id)}</TableCell>
+                      <TableCell onClick={() => handleApproveClick(req)}>{req.fullName}</TableCell>
+                      <TableCell onClick={() => handleApproveClick(req)}>{req.phone}</TableCell>
+                      <TableCell onClick={() => handleApproveClick(req)}>{req.email}</TableCell>
+                      <TableCell onClick={() => handleApproveClick(req)}>{req.hasCar === 'Yes' && <DirectionsCarIcon color="primary" />}</TableCell>
+                      <TableCell onClick={() => handleApproveClick(req)}>{renderStatusChip(req.status_id)}</TableCell>
                       <TableCell align="center">
                         <IconButton color="primary" onClick={() => setEditingPass(req)}>
                           <EditIcon />
@@ -229,6 +259,46 @@ const RequestList: React.FC<RequestListProps> = ({ status }) => {
           }}
         />
       )}
+
+<Dialog
+        open={approveDialogOpen}
+        onClose={cancelApprove}
+        PaperProps={{
+          sx: {
+            width: 400,
+            height: 300,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            padding: 2,
+          },
+        }}
+      >
+        <DialogContent
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h6">
+            Заявка на пропуск: <br /> <strong>{passToApprove?.fullName}</strong> желаете согласовать? 
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button onClick={cancelApprove} variant="outlined">
+            Отклонить
+          </Button>
+          <Button onClick={confirmApprove} color="success" variant="contained">
+            Согласовать
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </div>
   );
 };
